@@ -16,6 +16,8 @@ This project provides a simple web application to convert CSV files to JSON form
 - **Pandas** - A powerful data manipulation library to handle CSV to JSON conversion.
 - **HTML/CSS/JavaScript** - Frontend for the user interface and handling file uploads asynchronously.
 
+![alt text](image.png)
+
 ## 🚀 Getting Started
 
 ### Prerequisites

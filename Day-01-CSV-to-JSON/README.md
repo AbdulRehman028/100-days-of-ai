@@ -128,7 +128,7 @@ Charlie,22,UK
 Feel free to fork the repository, make improvements, and submit pull requests. If you encounter bugs or issues, open an issue on the repository.
 
 ## 👨‍💻 Developer
-Developed by **M.Abdulrehman Baig** ❤️
+Developed by **M.Abdul Rehman Baig** ❤️
 
 ---
 

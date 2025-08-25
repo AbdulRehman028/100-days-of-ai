@@ -2,6 +2,9 @@
 
 This project provides a simple web application to convert CSV files to JSON format using **Flask**. The user can upload a CSV file, and the system will convert it into a JSON format and provide both a preview of the JSON data and the option to download the JSON file. 
 
+![alt text](image.png)
+
+
 ## Features
 
 - Upload a CSV file.
@@ -16,7 +19,6 @@ This project provides a simple web application to convert CSV files to JSON form
 - **Pandas** - A powerful data manipulation library to handle CSV to JSON conversion.
 - **HTML/CSS/JavaScript** - Frontend for the user interface and handling file uploads asynchronously.
 
-![alt text](image.png)
 
 ## 🚀 Getting Started
 

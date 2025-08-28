@@ -2,7 +2,6 @@
 
 This Streamlit web application provides a user-friendly interface for exploring and cleaning datasets. It allows users to upload a CSV file, view its statistics, apply various data cleaning operations, and then download the cleaned dataset.
 
----
 
 ## ✨ Features
 
@@ -69,7 +68,6 @@ Make sure you have Python installed (version 3.7 or higher recommended).
 5.  **Check Post-Cleaning Stats**: Select the "Show Post-Cleaning Statistics" checkbox to see how the cleaning operations have altered the dataset's characteristics.
 6.  **Download Cleaned CSV**: Once satisfied, click the "Download Cleaned CSV" button to save your processed dataset.
 
----
 
 ## 🛠️ Technologies Used
 
@@ -79,4 +77,9 @@ Make sure you have Python installed (version 3.7 or higher recommended).
 * **NumPy**: For numerical operations.
 * **scikit-learn**: For advanced imputation (KNNImputer) and scaling (StandardScaler, MinMaxScaler).
 
+## 👨‍💻 Developer
+Developed by **M.Abdul Rehman Baig** ❤️
+
 ---
+
+⭐ **If you found this project helpful, please give it a star!** ⭐

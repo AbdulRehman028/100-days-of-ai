@@ -42,7 +42,6 @@ This is a web application designed to preprocess text data, making it ready for 
 1.  **Clone the repository:**
     ```bash
     git clone git clone https://github.com/AbdulRehman028/100-days-of-ai.git
-
     cd Day-03-Text-Preprocessor
     ```
 
@@ -87,7 +86,7 @@ This is a web application designed to preprocess text data, making it ready for 
 ## How to Use
 
 1.  On the web page, you can either type text into the text area or upload a `.txt` file.
-2.  Check or uncheck the options on the sidebar to customize the preprocessing steps (e.g., "Remove stopwords," "Lemmatize words," "Generate embeddings").
+2.  Check or uncheck the options on the sidebar to customize the preprocessing steps (e.g., "Remove       stopwords," "Lemmatize words," "Generate embeddings").
 3.  Click the "Preprocess Text" button to see the results.
 4.  The cleaned text and a word cloud will be displayed.
 5.  If "Generate embeddings" is checked, a preview of the embedding will be shown, and a download button for the JSON file will appear.
@@ -103,7 +102,7 @@ This is a web application designed to preprocess text data, making it ready for 
 └── ...
 
 ## 👨‍💻 Developer
-Developed by **M.Abdul Rehman Baig** ❤️
+Developed by **M.AbdulRehman Baig** ❤️
 
 ---
 

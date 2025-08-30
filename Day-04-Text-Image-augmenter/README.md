@@ -1,9 +1,3 @@
-    # 📸 Image Augmentation Gallery
-
-![Streamlit](https://img.shields.io/badge/Framework-Streamlit-red?logo=streamlit)  
-![Python](https://img.shields.io/badge/Language-Python-blue?logo=python)  
-![Pillow](https://img.shields.io/badge/Library-Pillow-yellowgreen)  
-
 ## 🚀 Overview
 The **Image Augmentation Gallery** is a **Streamlit-based web app** that lets you:
 - Upload multiple images  
@@ -12,6 +6,10 @@ The **Image Augmentation Gallery** is a **Streamlit-based web app** that lets yo
 - Download a **ZIP file** of all augmented images  
 
 Perfect for **dataset generation, preprocessing for ML models, or creative editing.**
+
+![Streamlit](https://img.shields.io/badge/Framework-Streamlit-red?logo=streamlit)  
+![Python](https://img.shields.io/badge/Language-Python-blue?logo=python)  
+![Pillow](https://img.shields.io/badge/Library-Pillow-yellowgreen) 
 
 ![alt text](iamge-resizer.png)
 
@@ -23,7 +21,6 @@ Perfect for **dataset generation, preprocessing for ML models, or creative editi
 - 🌞 Adjust Brightness (0.1 – 2.0)  
 - 🖼️ Preview augmented gallery  
 - 📦 Download as ZIP  
-
 
 
 ## 🛠️ Tech Stack
@@ -46,7 +43,6 @@ Perfect for **dataset generation, preprocessing for ML models, or creative editi
 - 🎨 Creative Image Editing  
 - 📚 Teaching Image Augmentation  
 
----
 
 ## ⚡ Installation & Usage
 

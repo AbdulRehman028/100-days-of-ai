@@ -24,7 +24,7 @@ Perfect for **dataset generation, preprocessing for ML models, or creative editi
 - 🖼️ Preview augmented gallery  
 - 📦 Download as ZIP  
 
----
+
 
 ## 🛠️ Tech Stack
 - **Python** 🐍  
@@ -32,7 +32,6 @@ Perfect for **dataset generation, preprocessing for ML models, or creative editi
 - **Pillow (PIL)** 🖌 – Image processing  
 - **Zipfile & io** 📦 – Bundling results  
 
----
 
 ## 📂 Workflow
 1. **Upload** → Select JPG/PNG images  
@@ -40,7 +39,6 @@ Perfect for **dataset generation, preprocessing for ML models, or creative editi
 3. **Preview** → See augmented results instantly  
 4. **Download** → Export all augmented images as a `.zip`  
 
----
 
 ## 🎯 Use Cases
 - 🧠 AI/ML Dataset Generation  
@@ -54,11 +52,18 @@ Perfect for **dataset generation, preprocessing for ML models, or creative editi
 
 ```bash
 # Clone repo
-git clone https://github.com/yourusername/image-augmentation-gallery.git
-cd image-augmentation-gallery
+    git clone git clone https://github.com/AbdulRehman028/100-days-of-ai.git
+    cd Day-04-Text-Image-augmenter
 
 # Install dependencies
 pip install streamlit pillow
 
 # Run app
 streamlit run app.py
+
+## 👨‍💻 Developer
+Developed by **M.AbdulRehman Baig** ❤️
+
+---
+
+⭐ **If you found this project helpful, please give it a star!** ⭐

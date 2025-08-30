@@ -1,0 +1,64 @@
+    # 📸 Image Augmentation Gallery
+
+![Streamlit](https://img.shields.io/badge/Framework-Streamlit-red?logo=streamlit)  
+![Python](https://img.shields.io/badge/Language-Python-blue?logo=python)  
+![Pillow](https://img.shields.io/badge/Library-Pillow-yellowgreen)  
+
+## 🚀 Overview
+The **Image Augmentation Gallery** is a **Streamlit-based web app** that lets you:
+- Upload multiple images  
+- Apply augmentations (resize, rotate, flip, brightness)  
+- Preview results in an interactive gallery  
+- Download a **ZIP file** of all augmented images  
+
+Perfect for **dataset generation, preprocessing for ML models, or creative editing.**
+
+![alt text](iamge-resizer.png)
+
+## ✨ Features
+- 📂 Upload multiple images (JPG/PNG)  
+- 🔄 Resize (custom width & height)  
+- 🎛️ Rotate (–180° to +180°)  
+- 🔃 Flip (horizontal)  
+- 🌞 Adjust Brightness (0.1 – 2.0)  
+- 🖼️ Preview augmented gallery  
+- 📦 Download as ZIP  
+
+---
+
+## 🛠️ Tech Stack
+- **Python** 🐍  
+- **Streamlit** 🎨 – Interactive web UI  
+- **Pillow (PIL)** 🖌 – Image processing  
+- **Zipfile & io** 📦 – Bundling results  
+
+---
+
+## 📂 Workflow
+1. **Upload** → Select JPG/PNG images  
+2. **Choose** → Pick augmentations (resize, rotate, etc.)  
+3. **Preview** → See augmented results instantly  
+4. **Download** → Export all augmented images as a `.zip`  
+
+---
+
+## 🎯 Use Cases
+- 🧠 AI/ML Dataset Generation  
+- ⚡ Quick Image Preprocessing  
+- 🎨 Creative Image Editing  
+- 📚 Teaching Image Augmentation  
+
+---
+
+## ⚡ Installation & Usage
+
+```bash
+# Clone repo
+git clone https://github.com/yourusername/image-augmentation-gallery.git
+cd image-augmentation-gallery
+
+# Install dependencies
+pip install streamlit pillow
+
+# Run app
+streamlit run app.py

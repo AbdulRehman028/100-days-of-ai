@@ -56,6 +56,7 @@ pip install streamlit pillow
 
 # Run app
 streamlit run app.py
+```
 
 ## 👨‍💻 Developer
 Developed by **M.AbdulRehman Baig** ❤️

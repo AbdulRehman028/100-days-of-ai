@@ -11,7 +11,7 @@ Perfect for **dataset generation, preprocessing for ML models, or creative editi
 ![Python](https://img.shields.io/badge/Language-Python-blue?logo=python)  
 ![Pillow](https://img.shields.io/badge/Library-Pillow-yellowgreen) 
 
-![alt text](iamge-resizer.png)
+![alt text](<data set splitter.png>)
 
 ## ✨ Features
 - 📂 Upload multiple images (JPG/PNG)  

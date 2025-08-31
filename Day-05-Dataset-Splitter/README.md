@@ -15,7 +15,7 @@ Perfect for **ML dataset preparation**, **class distribution validation**, or **
 ![Scikit-learn](https://img.shields.io/badge/Library-Scikit--learn-orange)  
 ![Matplotlib](https://img.shields.io/badge/Library-Matplotlib-lightgrey)
 
-![App Screenshot](your-app-screenshot.png) <!-- Replace with actual image -->
+![alt text](<data set splitter.png>)
 
 
 ## ✨ Features  

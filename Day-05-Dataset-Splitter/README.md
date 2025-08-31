@@ -17,7 +17,6 @@ Perfect for **ML dataset preparation**, **class distribution validation**, or **
 
 ![App Screenshot](your-app-screenshot.png) <!-- Replace with actual image -->
 
----
 
 ## ✨ Features  
 - 📁 Upload CSV datasets  
@@ -28,7 +27,6 @@ Perfect for **ML dataset preparation**, **class distribution validation**, or **
 - 🧾 Preview train and test DataFrames  
 - 📥 Download split CSV files  
 
----
 
 ## 🛠️ Tech Stack  
 - **Python** 🐍  
@@ -38,7 +36,6 @@ Perfect for **ML dataset preparation**, **class distribution validation**, or **
 - **Matplotlib** 📈 – Visualization  
 - **BytesIO** 💾 – File download handler  
 
----
 
 ## 📂 Workflow  
 1. **Upload** → Load your CSV file  
@@ -47,7 +44,6 @@ Perfect for **ML dataset preparation**, **class distribution validation**, or **
 4. **Visualize** → Check target distribution in both sets  
 5. **Download** → Save train/test data as `.csv` files  
 
----
 
 ## 🎯 Use Cases  
 - 🧠 Train/Test splitting for machine learning  
@@ -55,14 +51,13 @@ Perfect for **ML dataset preparation**, **class distribution validation**, or **
 - 🛠️ Data preprocessing pipelines  
 - 👩‍🏫 Teaching/train-test split concepts  
 
----
 
 ## ⚡ Installation & Usage
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/dataset-splitter-visualizer.git
-cd dataset-splitter-visualizer
+git clone git clone https://github.com/AbdulRehman028/100-days-of-ai.git
+cd Day-05-Dataset-Splitter
 
 # Install dependencies
 pip install -r requirements.txt

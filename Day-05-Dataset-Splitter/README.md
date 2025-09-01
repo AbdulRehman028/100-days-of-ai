@@ -9,7 +9,11 @@ The **Dataset Splitter and Visualizer** is a **Streamlit-based web app** that le
 
 Perfect for **ML dataset preparation**, **class distribution validation**, or **data exploration** before modeling.
 
-
+![Streamlit](https://img.shields.io/badge/Framework-Streamlit-red?logo=streamlit)  
+![Python](https://img.shields.io/badge/Language-Python-blue?logo=python)  
+![Pandas](https://img.shields.io/badge/Library-Pandas-yellowgreen)  
+![Scikit-learn](https://img.shields.io/badge/Library-Scikit--learn-orange)  
+![Matplotlib](https://img.shields.io/badge/Library-Matplotlib-lightgrey)
 
 ![alt text](<data set splitter.png>)
 

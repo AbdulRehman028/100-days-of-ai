@@ -27,7 +27,13 @@ Perfect for **ML dataset preparation**, **class distribution validation**, or **
 - 📥 Download split CSV files  
 
 
- 
+## 🛠️ Tech Stack  
+- **Python** 🐍  
+- **Streamlit** 🎨 – Interactive web interface  
+- **Pandas** 📊 – Data manipulation  
+- **Scikit-learn** 🔀 – Dataset splitting  
+- **Matplotlib** 📈 – Visualization  
+- **BytesIO** 💾 – File download handler  
 
 
 ## 📂 Workflow  

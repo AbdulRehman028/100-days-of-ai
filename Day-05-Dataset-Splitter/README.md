@@ -22,7 +22,6 @@ Perfect for **ML dataset preparation**, **class distribution validation**, or **
 - 📁 Upload CSV datasets  
 - 🎯 Select target column for ML  
 - 🎚️ Adjustable train/test split  
-- ⚖️ Optional **stratified sampling**  
 - 📊 Side-by-side histograms for label distribution  
 - 🧾 Preview train and test DataFrames  
 - 📥 Download split CSV files  

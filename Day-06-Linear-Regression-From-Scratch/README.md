@@ -26,3 +26,19 @@ pip install -r requirements.txt
 python main.py --data sample_data.csv --target y --solver gd --lr 0.05 --iters 2000 --verbose
 # Or:
 python main.py --data sample_data.csv --target y --solver normal
+
+Args
+
+--data: path to CSV
+
+--target: target column name
+
+--solver: gd (gradient descent) or normal (normal equation)
+
+--lr: learning rate (GD)
+
+--iters: iterations (GD)
+
+--test_size: test split ratio (default 0.2)
+
+--verbose: print training progress

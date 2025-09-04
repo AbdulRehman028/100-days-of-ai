@@ -20,7 +20,12 @@ Evaluate with MSE, MAE, and R². Plot if the dataset is 1D.
 
 ---
 
-
+## ▶️ Usage
+```bash
+pip install -r requirements.txt
+python main.py --data sample_data.csv --target y --solver gd --lr 0.05 --iters 2000 --verbose
+# Or:
+python main.py --data sample_data.csv --target y --solver normal
 
 Args
 

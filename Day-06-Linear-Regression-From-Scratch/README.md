@@ -6,19 +6,16 @@ Build a linear regression model **without scikit-learn**, using:
 - (Optional) **Normal Equation** for closed-form solution  
 Evaluate with MSE, MAE, and R². Plot if the dataset is 1D.
 
----
 
 ## 🧰 Tech Stack
 - Python, NumPy, Pandas, Matplotlib
 
----
 
 ## 📁 Files
 - `main.py` – CLI tool to train & evaluate linear regression
 - `sample_data.csv` – tiny demo dataset
 - `requirements.txt` – dependencies
 
----
 
 ## ▶️ Usage
 ```bash

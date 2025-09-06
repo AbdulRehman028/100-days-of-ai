@@ -7,7 +7,8 @@ Build a linear regression model **without scikit-learn**, using:
 Evaluate with MSE, MAE, and R². Plot if the dataset is 1D.
 
 
-
+## 🧰 Tech Stack
+- Python, NumPy, Pandas, Matplotlib
 
 
 ## 📁 Files

@@ -1,6 +1,10 @@
 # Day 06 – Linear Regression (From Scratch with NumPy)
 
-
+## 📌 Objective
+Build a linear regression model **without scikit-learn**, using:
+- **Gradient Descent** for optimization
+- (Optional) **Normal Equation** for closed-form solution  
+Evaluate with MSE, MAE, and R². Plot if the dataset is 1D.
 
 
 ## 🧰 Tech Stack

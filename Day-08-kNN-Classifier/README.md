@@ -18,3 +18,4 @@ It uses **Euclidean distance** and majority voting for predictions.
 
     python knn_classifier_scratch.py
 
+4. add your dataset

@@ -8,6 +8,7 @@ It predicts labels based on **Euclidean distance** to the nearest neighbors.
 
 ## 🚀 How to Run
 1. Activate your environment:
+
    ```bash
    venv\Scripts\activate
 

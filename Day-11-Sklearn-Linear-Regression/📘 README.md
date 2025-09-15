@@ -36,9 +36,3 @@ We fit a model to predict a **target variable** from a single feature and evalua
 # 🧠 Learning Goals
 
 Use scikit-learn’s LinearRegression class.
-
-Train/test split for evaluation.
-
-Measure performance with MSE and R² score.
-
-Visualize regression results with matplotlib.

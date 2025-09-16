@@ -18,7 +18,7 @@ We fit a model to predict a **target variable** from a single feature and evalua
 
 4. Install dependencies:
 
-    pip install -r requirements.txt
+pip install -r requirements.txt
 
 
 5. Run the script:

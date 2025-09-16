@@ -23,7 +23,7 @@ pip install -r requirements.txt
 
 5. Run the script:
 
-    python linear_regression_sklearn.py
+python linear_regression_sklearn.py
 
 # ✨ Example Output
 

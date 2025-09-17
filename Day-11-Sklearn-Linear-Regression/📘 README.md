@@ -34,11 +34,3 @@ python linear_regression_sklearn.py
 
 
 # 🧠 Learning Goals
-
-Use scikit-learn’s LinearRegression class.
-
-Train/test split for evaluation.
-
-Measure performance with MSE and R² score.
-
-Visualize regression results with matplotlib.

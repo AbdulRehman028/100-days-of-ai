@@ -11,9 +11,9 @@ We fit a model to predict a **target variable** from a single feature and evalua
    ```bash
    venv\Scripts\activate
 
-2. go to the project folder:
+- go to the project folder:
 
-3. cd Day-11-Sklearn-Linear-Regression
+- cd Day-11-Sklearn-Linear-Regression
 
 
 4. Install dependencies:

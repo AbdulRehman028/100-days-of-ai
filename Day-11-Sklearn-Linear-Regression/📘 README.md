@@ -37,5 +37,4 @@ python linear_regression_sklearn.py
 
 Use scikit-learn’s LinearRegression class.
 
-Train/test split for evaluation.
 

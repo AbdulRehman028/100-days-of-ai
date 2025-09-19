@@ -17,9 +17,6 @@ except FileNotFoundError:
     X = 2 * np.random.rand(100, 1)
     y = 4 + 3 * X.flatten() + np.random.randn(100)
 
-# ------------------------
-# Step 2: Train/Test Split
-# ------------------------
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 # ------------------------

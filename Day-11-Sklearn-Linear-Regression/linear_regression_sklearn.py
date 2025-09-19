@@ -32,9 +32,6 @@ print(f"✅ Model Intercept: {model.intercept_:.2f}")
 print(f"📉 Mean Squared Error: {mse:.2f}")
 print(f"📊 R² Score: {r2:.2f}")
 
-# ------------------------
-# Step 5: Visualization
-# ------------------------
 plt.scatter(X_test, y_test, color="blue", label="Actual")
 plt.plot(X_test, y_pred, color="red", linewidth=2, label="Predicted")
 plt.xlabel("Feature")

@@ -24,24 +24,21 @@ scaler = StandardScaler()
 X_train = scaler.fit_transform(X_train)
 X_test = scaler.transform(X_test)
 
-# ------------------------
 # Step 4: Train SVM Classifier
-# ------------------------
+
 model = SVC(kernel="linear", C=1.0, random_state=42)  # linear kernel for simplicity
 model.fit(X_train, y_train)
 
-# ------------------------
 # Step 5: Predictions & Evaluation
-# ------------------------
+
 y_pred = model.predict(X_test)
 
 print("✅ Accuracy:", accuracy_score(y_test, y_pred))
 print("\n📊 Classification Report:\n", classification_report(y_test, y_pred))
 print("\n📉 Confusion Matrix:\n", confusion_matrix(y_test, y_pred))
 
-# ------------------------
 # Step 6: Visualization (Decision Boundaries)
-# ------------------------
+
 import numpy as np
 
 def plot_decision_boundary(X, y, model):

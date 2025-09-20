@@ -4,27 +4,25 @@
 This project implements a **Support Vector Machine (SVM)** classifier using the famous **Iris dataset**.  
 It demonstrates classification, evaluation, and visualization of decision boundaries.
 
----
-
 ## 🚀 How to Run
 1. Activate your environment:
    ```bash
    venv\Scripts\activate
-Go to the project folder:
 
-cd Day-12-Sklearn-SVM-Classifier
+2. Go to the project folder:
 
+    cd Day-12-Sklearn-SVM-Classifier
 
-Install dependencies:
+3. Install dependencies:
 
-pip install -r requirements.txt
+    pip install -r requirements.txt
 
+4. Run the script:
 
-Run the script:
+    python svm_classifier.py
 
-python svm_classifier.py
+# ✨ Example Output
 
-✨ Example Output
 ✅ Accuracy: 0.95
 
 📊 Classification Report:
@@ -41,12 +39,12 @@ python svm_classifier.py
 
 It also plots the decision boundary for the first two features of the Iris dataset.
 
-🧠 Learning Goals
+# 🧠 Learning Goals
 
-Understand Support Vector Machines (SVMs).
+- Understand Support Vector Machines (SVMs).
 
-Use linear kernel for binary/multi-class classification.
+- Use linear kernel for binary/multi-class classification.
 
-Evaluate with accuracy, confusion matrix, and classification report.
+- Evaluate with accuracy, confusion matrix, and classification report.
 
-Visualize decision boundaries in 2D.
+- Visualize decision boundaries in 2D.

@@ -12,7 +12,6 @@ try:
     print("📂 Loaded dataset from sample_data.csv")
 except FileNotFoundError:
     print("⚠️ sample_data.csv not found, generating synthetic dataset...")
-    # Generate synthetic linear data
     np.random.seed(42)
     X = 2 * np.random.rand(100, 1)
     y = 4 + 3 * X.flatten() + np.random.randn(100)

@@ -7,21 +7,19 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 
-# ------------------------
 # Step 1: Load Dataset (Iris)
-# ------------------------
+
 iris = datasets.load_iris()
 X = iris.data[:, :2]  # Use first two features for visualization (Sepal length & width)
 y = iris.target
 
-# ------------------------
+
 # Step 2: Train/Test Split
-# ------------------------
+
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42, stratify=y)
 
-# ------------------------
 # Step 3: Standardize Data
-# ------------------------
+
 scaler = StandardScaler()
 X_train = scaler.fit_transform(X_train)
 X_test = scaler.transform(X_test)

@@ -7,8 +7,6 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 
-# Step 1: Load Dataset (Iris)
-
 iris = datasets.load_iris()
 X = iris.data[:, :2]  # Use first two features for visualization (Sepal length & width)
 y = iris.target

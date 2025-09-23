@@ -36,7 +36,6 @@ print("✅ Accuracy:", accuracy_score(y_test, y_pred))
 print("\n📊 Classification Report:\n", classification_report(y_test, y_pred))
 print("\n📉 Confusion Matrix:\n", confusion_matrix(y_test, y_pred))
 
-# Step 6: Visualization (Decision Boundaries)
 
 import numpy as np
 

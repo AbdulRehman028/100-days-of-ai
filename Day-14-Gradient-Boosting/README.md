@@ -46,8 +46,8 @@ It also plots a feature importance bar chart.
 
 - Understand Gradient Boosting as an ensemble technique.
 
-Compare with Random Forest (Day 13) and SVM (Day 12).
+- Compare with Random Forest (Day 13) and SVM (Day 12).
 
-Learn how XGBoost and LightGBM can be used interchangeably.
+- Learn how XGBoost and LightGBM can be used interchangeably.
 
-Interpret feature importances to explain model decisions.
+- Interpret feature importances to explain model decisions.

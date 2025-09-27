@@ -4,6 +4,7 @@
 This project demonstrates a **Gradient Boosting Classifier** using the Iris dataset.  
 It trains an ensemble model with either **XGBoost** or **LightGBM** depending on which is installed.
 
+![alt text](image.png)
 
 ## 🚀 How to Run
 1. Activate your environment:
@@ -18,7 +19,6 @@ It trains an ensemble model with either **XGBoost** or **LightGBM** depending on
 3. Install dependencies:
 
     pip install -r requirements.txt
-
 
 4. Run the script:
 
@@ -39,7 +39,6 @@ virginica        1.00      0.93      0.97        15
 [[15  0  0]
  [ 0 15  0]
  [ 0  1 14]]
-
 
 It also plots a feature importance bar chart.
 

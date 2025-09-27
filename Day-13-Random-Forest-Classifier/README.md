@@ -44,6 +44,7 @@ The script also plots a feature importance bar chart, showing which Iris feature
 ```
 
 # 🧠 Learning Goals
+
 Understand Random Forests as an ensemble of decision trees.
 
 Train and evaluate a model using scikit-learn.

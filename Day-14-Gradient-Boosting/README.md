@@ -29,7 +29,7 @@ It trains an ensemble model with either **XGBoost** or **LightGBM** depending on
     ✅ Using XGBoost Classifier
     ✅ Accuracy: 0.97
 
-📊 Classification Report:
+```📊 Classification Report:
               precision    recall  f1-score   support
 setosa           1.00      1.00      1.00        15
 versicolor       0.93      1.00      0.97        15
@@ -41,6 +41,7 @@ virginica        1.00      0.93      0.97        15
  [ 0  1 14]]
 
 It also plots a feature importance bar chart.
+```
 
 # 🧠 Learning Goals
 

@@ -6,7 +6,14 @@ It trains an ensemble model with either **XGBoost** or **LightGBM** depending on
 
 ![alt text](image.png)
 
+## 🚀 How to Run
+1. Activate your environment:
+   ```bash
+   venv\Scripts\activate
 
+2. Navigate to the project folder:
+
+    cd Day-14-Gradient-Boosting
 
 
 3. Install dependencies:

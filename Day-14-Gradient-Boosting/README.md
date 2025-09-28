@@ -36,6 +36,7 @@ versicolor       0.93      1.00      0.97        15
 virginica        1.00      0.93      0.97        15
 
 📉 Confusion Matrix:
+
 [[15  0  0]
  [ 0 15  0]
  [ 0  1 14]]

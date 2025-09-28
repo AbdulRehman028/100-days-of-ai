@@ -50,4 +50,4 @@ It also plots a feature importance bar chart.
 
 - Learn how XGBoost and LightGBM can be used interchangeably.
 
-- Interpret feature importances to explain model decisions.
+- Interpret feature importance to explain model decisions.

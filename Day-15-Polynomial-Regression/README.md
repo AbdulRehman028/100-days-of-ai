@@ -4,29 +4,29 @@
 This project demonstrates **Polynomial Regression** using Scikit-Learn.  
 It compares a simple **Linear Regression** with a **Polynomial Regression (degree=3)** to fit a non-linear dataset.
 
----
+![alt text](image.png)
 
 ## 🚀 How to Run
+
 1. Activate your environment:
    ```bash
    venv\Scripts\activate
-Navigate to the project folder:
 
-cd Day-15-Polynomial-Regression
+2. Navigate to the project folder:
 
+    ``cd Day-15-Polynomial-Regression
 
-Install dependencies:
+3. Install dependencies:
 
-pip install -r requirements.txt
+    ``pip install -r requirements.txt
 
+4. Run the script:
 
-Run the script:
-
-python polynomial_regression.py
+    ```python polynomial_regression.py
 
 ✨ Example Output
-📊 Linear Regression R²: 0.48
-📊 Polynomial Regression R²: 0.95
+    📊 Linear Regression R²: 0.8181600159807446
+    📊 Polynomial Regression R²: 0.920121611346604
 
 
 A plot will show:

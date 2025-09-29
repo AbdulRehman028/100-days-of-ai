@@ -25,7 +25,8 @@ It compares a simple **Linear Regression** with a **Polynomial Regression (degre
     ```python polynomial_regression.py
 
 ✨ Example Output
-    📊 Linear Regression R²: 0.8181600159807446
+   
+     ```📊 Linear Regression R²: 0.8181600159807446
     📊 Polynomial Regression R²: 0.920121611346604
 
 
@@ -36,13 +37,14 @@ Blue dots → noisy cubic dataset
 Red line → Linear regression (poor fit)
 
 Green curve → Polynomial regression (better fit)
+```
 
-🧠 Learning Goals
+# 🧠 Learning Goals
 
-Learn how to use PolynomialFeatures from scikit-learn.
+- Learn how to use PolynomialFeatures from scikit-learn.
 
-Understand why linear models fail on non-linear data.
+- Understand why linear models fail on non-linear data.
 
-See how higher-degree polynomials can improve fit.
+- See how higher-degree polynomials can improve fit.
 
-Compare R² scores to evaluate performance.
+-  Compare R² scores to evaluate performance.

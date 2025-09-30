@@ -30,7 +30,6 @@ def prepare_features(df: pd.DataFrame, target: str) -> Tuple[pd.DataFrame, pd.Se
     X = df.drop(columns=[target])
     y = df[target]
 
-    # Handle non-numeric features with one-hot encoding.
     X_encoded = pd.get_dummies(X, drop_first=False)
 
     if X_encoded.empty:

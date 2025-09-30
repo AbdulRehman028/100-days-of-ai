@@ -56,7 +56,6 @@ def select_features_rfe(
     support_mask = selector.get_support()
     selected_features = X.columns[support_mask].tolist()
 
-    # Collect importance scores when available.
     coefficients = getattr(selector.estimator_, "coef_", None)
     if coefficients is not None:
         coefficients = np.atleast_2d(coefficients)

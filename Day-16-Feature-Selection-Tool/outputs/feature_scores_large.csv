@@ -1,0 +1,14 @@
+feature,selected,ranking,score
+loyalty_member,True,1,0.5156787892144603
+region_West,True,1,0.44474395939350775
+region_East,True,1,0.4203211582797913
+gender_M,True,1,0.3447833185118736
+region_North,True,1,0.22047566153673456
+gender_F,True,1,0.07804080651379464
+age,False,6,0.0
+income,False,8,0.0
+credit_score,False,7,0.0
+tenure_years,False,2,0.0
+spending_score,False,4,0.0
+web_visits,False,5,0.0
+region_South,False,3,0.0

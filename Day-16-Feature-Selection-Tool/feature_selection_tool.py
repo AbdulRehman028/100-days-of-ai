@@ -46,7 +46,9 @@ def select_features_rfe(
 ) -> Tuple[List[str], pd.DataFrame]:
     """Select features using Recursive Feature Elimination (RFE)."""
     if task_type == "classification":
-        estimator = LogisticRegression(max_iter=1000)
+        unique_classes = pd.unique(y.dropna())
+        solver = "liblinear" if len(unique_classes) <= 2 else "lbfgs"
+        estimator = LogisticRegression(max_iter=5000, solver=solver)
     else:
         estimator = LinearRegression()
 
@@ -54,12 +56,15 @@ def select_features_rfe(
     selector.fit(X, y)
 
     support_mask = selector.get_support()
+    selected_indices = selector.get_support(indices=True)
     selected_features = X.columns[support_mask].tolist()
 
     coefficients = getattr(selector.estimator_, "coef_", None)
     if coefficients is not None:
         coefficients = np.atleast_2d(coefficients)
-        scores = np.mean(np.abs(coefficients), axis=0)
+        averaged = np.mean(np.abs(coefficients), axis=0)
+        scores = np.zeros(len(X.columns))
+        scores[selected_indices] = averaged
     else:
         scores = np.ones(len(X.columns))
 
@@ -97,14 +102,17 @@ def select_features_mutual_info(
 
 
 def save_reduced_dataset(
-    df: pd.DataFrame,
+    X_encoded: pd.DataFrame,
     selected_features: List[str],
-    target: str,
+    target_series: pd.Series,
     output_path: Path,
 ) -> None:
-    """Persist the reduced dataset containing selected features and the target column."""
-    columns_to_save = selected_features + [target]
-    reduced_df = df[columns_to_save]
+    """Persist the reduced dataset containing selected (possibly encoded) features and the target column."""
+    missing = set(selected_features) - set(X_encoded.columns)
+    if missing:
+        raise KeyError(f"Selected features not present in encoded dataset: {sorted(missing)}")
+
+    reduced_df = pd.concat([X_encoded[selected_features], target_series], axis=1)
     reduced_df.to_csv(output_path, index=False)
 
 
@@ -169,7 +177,8 @@ def main() -> None:
         selected_features, scores_df = select_features_mutual_info(X, y, n_features, task_type)
 
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    save_reduced_dataset(df, selected_features, args.target, args.output)
+    target_series = y.rename(args.target)
+    save_reduced_dataset(X, selected_features, target_series, args.output)
 
     if args.save_scores:
         args.save_scores.parent.mkdir(parents=True, exist_ok=True)

@@ -3,8 +3,9 @@
 ## 📌 Overview
 This project delivers a command-line helper that trims your dataset down to the most informative features using **Recursive Feature Elimination (RFE)** or **Mutual Information**. Supply a CSV file, point to the target column, choose a method, and receive a reduced dataset ready for modelling.
 
-## 🧪 Sample Dataset
-A small example dataset is included as `sample_data.csv` so you can experiment immediately.
+## 🧪 Sample Datasets
+- `sample_data.csv` — bite-sized demo for quick smoke tests.
+- `sample_data_large.csv` — 200 synthetic customer records with extra behavioural features for more realistic experiments.
 
 ## ⚙️ Setup
 
@@ -19,6 +20,12 @@ A small example dataset is included as `sample_data.csv` so you can experiment i
 
 ```powershell
 python feature_selection_tool.py --input sample_data.csv --target purchased --method mutual_info --n-features 3 --output outputs/selected_features.csv --save-scores outputs/feature_scores.csv
+```
+
+### Larger dataset example
+
+```powershell
+python feature_selection_tool.py --input sample_data_large.csv --target purchased --method rfe --n-features 6 --output outputs/selected_features_large.csv --save-scores outputs/feature_scores_large.csv
 ```
 
 ### Key Arguments

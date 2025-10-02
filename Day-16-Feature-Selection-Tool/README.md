@@ -43,5 +43,5 @@ python feature_selection_tool.py --input sample_data_large.csv --target purchase
 
 ## 🧠 Learning Goals
 - Practice feature selection workflows with scikit-learn.
-- Compare RFE and mutual information techniques.
+- Compare     RFE and mutual information techniques.
 - Automate the hand-off from raw data to model-ready features.

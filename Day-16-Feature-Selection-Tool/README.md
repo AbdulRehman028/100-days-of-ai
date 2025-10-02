@@ -5,7 +5,7 @@ This project delivers a command-line helper that trims your dataset down to the 
 
 ## 🧪 Sample Datasets
 - `sample_data.csv` — bite-sized demo for quick smoke tests.
-- `sample_data_large.csv` — 200 synthetic customer records with extra behavioural features for more realistic experiments.
+- `sample_data_large.csv` — 200 synthetic customer records with extra behavioral features for more realistic experiments.
 
 ## ⚙️ Setup
 

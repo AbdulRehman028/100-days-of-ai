@@ -3,9 +3,6 @@ import pandas as pd
 import re
 from collections import Counter
 
-# ------------------------
-# Step 1: Sample Documents
-# ------------------------
 documents = [
     "Machine learning is amazing",
     "Deep learning drives AI advancements",
@@ -13,9 +10,6 @@ documents = [
     "Neural networks are part of deep learning"
 ]
 
-# ------------------------
-# Step 2: Preprocessing
-# ------------------------
 def preprocess(text):
     text = text.lower()
     text = re.sub(r"[^a-z\s]", "", text)  # remove punctuation/numbers
@@ -24,15 +18,9 @@ def preprocess(text):
 tokenized_docs = [preprocess(doc) for doc in documents]
 print("Tokenized Docs:", tokenized_docs)
 
-# ------------------------
-# Step 3: Vocabulary
-# ------------------------
 vocab = sorted(set(word for doc in tokenized_docs for word in doc))
 print("\nVocabulary:", vocab)
 
-# ------------------------
-# Step 4: Term Frequency (TF)
-# ------------------------
 def compute_tf(doc):
     word_counts = Counter(doc)
     total_words = len(doc)
@@ -41,9 +29,6 @@ def compute_tf(doc):
 tf_scores = [compute_tf(doc) for doc in tokenized_docs]
 print("\nTF Scores (First Doc):", tf_scores[0])
 
-# ------------------------
-# Step 5: Inverse Document Frequency (IDF)
-# ------------------------
 def compute_idf(tokenized_docs):
     N = len(tokenized_docs)
     idf_scores = {}
@@ -55,9 +40,6 @@ def compute_idf(tokenized_docs):
 idf_scores = compute_idf(tokenized_docs)
 print("\nIDF Scores:", idf_scores)
 
-# ------------------------
-# Step 6: TF-IDF
-# ------------------------
 def compute_tfidf(tf_scores, idf_scores):
     return {word: tf_scores[word] * idf_scores[word] for word in vocab}
 

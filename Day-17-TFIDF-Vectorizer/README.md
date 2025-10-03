@@ -4,6 +4,7 @@
 This project implements **TF-IDF (Term Frequency – Inverse Document Frequency)** from scratch without using Scikit-Learn.  
 TF-IDF helps identify important words in documents for tasks like **text classification, information retrieval, and NLP**.
 
+![alt text](image.png)
 
 ## 🚀 How to Run
 1. Activate environment:

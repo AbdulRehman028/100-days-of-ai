@@ -4,26 +4,23 @@
 This project implements **TF-IDF (Term Frequency – Inverse Document Frequency)** from scratch without using Scikit-Learn.  
 TF-IDF helps identify important words in documents for tasks like **text classification, information retrieval, and NLP**.
 
----
 
 ## 🚀 How to Run
 1. Activate environment:
    ```bash
    venv\Scripts\activate
 
-Navigate:
+2. Navigate:
 
-cd Day-17-TFIDF-From-Scratch
+    cd Day-17-TFIDF-From-Scratch
 
+3. Install requirements:
 
-Install requirements:
+    ```pip install -r requirements.txt
 
-pip install -r requirements.txt
+4. Run:
 
-
-Run:
-
-python tfidf_from_scratch.py
+    python tfidf_from_scratch.py
 
 ✨ Example Output
 Tokenized Docs: [['machine', 'learning', 'is', 'amazing'], ...]

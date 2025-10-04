@@ -1,6 +1,7 @@
 # 📝 Project 18 - Word Frequency Counter
 
 ## 📌 Overview
+
 This project counts the frequency of words in a given text file.  
 It is a **fundamental NLP technique** used in:
 - Keyword extraction
@@ -14,7 +15,6 @@ It is a **fundamental NLP technique** used in:
 2. Navigate to the project folder:
 
    cd Day-18-Word-Frequency-Counter
-
 
 3. Run the script:
 

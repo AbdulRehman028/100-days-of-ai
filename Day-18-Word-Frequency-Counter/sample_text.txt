@@ -1,0 +1,4 @@
+Artificial Intelligence is the new electricity.
+Machine learning is a subset of AI.
+Deep learning is a subset of machine learning.
+AI will change the world.

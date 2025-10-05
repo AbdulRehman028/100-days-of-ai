@@ -10,29 +10,29 @@ You’ll learn to create **line charts, bar charts, and pie charts** to analyze 
 1. Activate your virtual environment:
    ```bash
    venv\Scripts\activate
-Navigate to this project folder:
+2. Navigate to this project folder:
 
-cd Day-19-Data-Visualization
-
-
-Install dependencies:
-
-pip install -r requirements.txt
+    cd Day-19-Data-Visualization
 
 
-Run the project:
+3. Install dependencies:
 
-python data_visualization_basics.py
+    pip install -r requirements.txt
 
-📈 Visualizations Generated
 
-Line Chart – Sales vs Expenses (sales_vs_expenses.png)
+4. Run the project:
 
-Bar Chart – Monthly Profit (monthly_profit.png)
+    python data_visualization_basics.py
 
-Pie Chart – Profit Distribution by Month (profit_pie_chart.png)
+# 📈 Visualizations Generated
 
-✨ Example Output
+- Line Chart – Sales vs Expenses (sales_vs_expenses.png)
+
+- Bar Chart – Monthly Profit (monthly_profit.png)
+
+- Pie Chart – Profit Distribution by Month (profit_pie_chart.png)
+
+# ✨ Example Output
 Data Loaded Successfully:
       Month  Sales  Expenses  Profit
 0   January  10000      7000    3000

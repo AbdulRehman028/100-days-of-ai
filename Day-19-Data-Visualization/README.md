@@ -14,11 +14,9 @@ You’ll learn to create **line charts, bar charts, and pie charts** to analyze 
 
     cd Day-19-Data-Visualization
 
-
 3. Install dependencies:
 
     pip install -r requirements.txt
-
 
 4. Run the project:
 
@@ -40,4 +38,3 @@ Data Loaded Successfully:
 2     March   9000      5000    4000
 3     April  15000     10000    5000
 4       May  13000      9000    4000
-

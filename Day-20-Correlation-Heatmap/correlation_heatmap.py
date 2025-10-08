@@ -2,22 +2,19 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# ------------------------
 # Step 1: Load Dataset
-# ------------------------
+
 data = pd.read_csv("sample_data.csv")
 print("✅ Data Loaded Successfully:\n")
 print(data.head())
 
-# ------------------------
 # Step 2: Compute Correlation
-# ------------------------
+
 corr_matrix = data.corr(numeric_only=True)
 print("\n📊 Correlation Matrix:\n", corr_matrix)
 
-# ------------------------
 # Step 3: Plot Heatmap
-# ------------------------
+
 plt.figure(figsize=(8, 6))
 sns.heatmap(
     corr_matrix,

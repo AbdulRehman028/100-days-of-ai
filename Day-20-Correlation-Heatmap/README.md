@@ -13,7 +13,6 @@ It’s an essential tool for **EDA (Exploratory Data Analysis)** to understand f
    ```
    venv\Scripts\activate
 
-
 2. Navigate to the project folder:
 
     cd Day-20-Correlation-Heatmap
@@ -48,7 +47,7 @@ Marketing_Spend   0.99      0.96    0.86       0.94             1.00
 
 - Understand correlation between numerical variables.
 
-- Learn how to use Seaborn’s heatmap effectively.
+- Learn how to use Seaborn's heatmap effectively.
 
 - Improve your EDA skills before building ML models.
 

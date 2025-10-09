@@ -17,13 +17,11 @@ bias = np.random.rand(1)
 learning_rate = 0.01
 epochs = 100
 
-# ------------------------
 # Step 3: Define Activation (Step Function)
 # ------------------------
 def activation(z):
     return 1 if z >= 0 else 0
 
-# ------------------------
 # Step 4: Training Loop
 # ------------------------
 for epoch in range(epochs):
@@ -41,14 +39,12 @@ for epoch in range(epochs):
     if epoch % 10 == 0:
         print(f"Epoch {epoch}: Total Error = {total_error}")
 
-# ------------------------
 # Step 5: Final Weights
 # ------------------------
 print("\n✅ Training Complete!")
 print(f"Final Weights: {weights}")
 print(f"Final Bias: {bias}")
 
-# ------------------------
 # Step 6: Test Prediction
 # ------------------------
 def predict(study, sleep):

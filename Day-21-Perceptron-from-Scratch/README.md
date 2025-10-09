@@ -37,12 +37,12 @@ Study=8, Sleep=2 → 1
 
 # 🧠 Concepts Learned
 
-How a perceptron learns through weight updates
+- How a perceptron learns through weight updates
 
-Understanding activation functions (step)
+- Understanding activation functions (step)
 
-Relationship between inputs, weights, and bias
+- Relationship between inputs, weights, and bias
 
-How learning rate affects convergence
+- How learning rate affects convergence
 
-Basics of binary classification
+- Basics of binary classification

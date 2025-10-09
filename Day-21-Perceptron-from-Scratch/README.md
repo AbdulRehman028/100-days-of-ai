@@ -10,21 +10,19 @@ You’ll understand how **weights**, **bias**, and **activation functions** work
    ```bash
    venv\Scripts\activate
 
-Navigate to the folder:
+2. Navigate to the folder:
 
-cd Day-21-Perceptron-from-Scratch
+    cd Day-21-Perceptron-from-Scratch
 
+3. Install dependencies:
 
-Install dependencies:
+    pip install -r requirements.txt
 
-pip install -r requirements.txt
+4. Run:
 
+    python perceptron_scratch.py
 
-Run:
-
-python perceptron_scratch.py
-
-📈 Example Output
+# 📈 Example Output
 Epoch 0: Total Error = 6
 Epoch 10: Total Error = 2
 Epoch 20: Total Error = 1
@@ -37,7 +35,7 @@ Final Bias: [0.13]
 Study=4, Sleep=6 → 0
 Study=8, Sleep=2 → 1
 
-🧠 Concepts Learned
+# 🧠 Concepts Learned
 
 How a perceptron learns through weight updates
 

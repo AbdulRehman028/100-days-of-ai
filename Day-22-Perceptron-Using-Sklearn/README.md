@@ -4,51 +4,47 @@
 In this project, you’ll learn how to implement a **Perceptron classifier** using **Scikit-Learn** — a high-level library that automates model training, scaling, and evaluation.  
 This builds directly on Day 21, where you implemented a perceptron manually.
 
----
-
 ## 🚀 Steps to Run
 
 1. Activate your environment:
    ```bash
    venv\Scripts\activate
 
-Navigate to this folder:
+2. Navigate to this folder:
 
-cd Day-22-Perceptron-Using-Sklearn
-
-
-Install dependencies:
-
-pip install -r requirements.txt
+    cd Day-22-Perceptron-Using-Sklearn
 
 
-Run:
+3. Install dependencies:
 
-python perceptron_sklearn.py
+    pip install -r requirements.txt
 
-🧠 Concepts Learned
+4. Run:
 
-How to use sklearn.linear_model.Perceptron
+    python perceptron_sklearn.py
 
-Feature scaling using StandardScaler
+# 🧠 Concepts Learned
 
-Model evaluation using accuracy and classification report
+- How to use sklearn.linear_model.Perceptron
 
-Comparing manual vs. library implementations
+- Feature scaling using StandardScaler
 
-🧩 Challenge Ideas
+- Model evaluation using accuracy and classification report
 
-Try adjusting eta0 (learning rate) and max_iter
+- Comparing manual vs. library implementations
 
-Add more data points and see how it affects accuracy
+# 🧩 Challenge Ideas
 
-Plot the decision boundary using matplotlib
+- Try adjusting eta0 (learning rate) and max_iter
 
-Compare Perceptron with other classifiers like LogisticRegression
+- Add more data points and see how it affects accuracy
 
-📈 Example Output
-✅ Model Trained Successfully!
+- Plot the decision boundary using matplotlib
 
+- Compare Perceptron with other classifiers like LogisticRegression
+
+# 📈 Example Output
+```
 📊 Accuracy: 1.0
 
 🧾 Classification Report:
@@ -64,3 +60,4 @@ weighted avg       1.00      1.00      1.00         3
 🔮 Predictions:
 Study=4, Sleep=6 → 0
 Study=8, Sleep=2 → 1
+```

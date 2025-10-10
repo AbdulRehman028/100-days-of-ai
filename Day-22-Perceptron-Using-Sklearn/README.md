@@ -14,7 +14,6 @@ This builds directly on Day 21, where you implemented a perceptron manually.
 
     cd Day-22-Perceptron-Using-Sklearn
 
-
 3. Install dependencies:
 
     pip install -r requirements.txt

@@ -26,18 +26,19 @@ It builds on previous projects (Perceptron) and introduces **probabilistic decis
 
 # 🧠 Concepts Learned
 
-Understanding Logistic Regression as a classification algorithm
+- Understanding Logistic Regression as a classification algorithm
 
-Using LogisticRegression() from Scikit-learn
+- Using LogisticRegression() from Scikit-learn
 
-Interpreting confusion matrix and probabilities
+- Interpreting confusion matrix and probabilities
 
-Comparing with Perceptron (Deterministic vs. Probabilistic)
+- Comparing with Perceptron (Deterministic vs. Probabilistic)
 
-Visualizing model performance with Seaborn
+- Visualizing model performance with Seaborn
 
-📈 Example Output
-✅ Model Trained Successfully!
+# 📈 Example Output
+
+```
 📊 Accuracy: 1.00
 
 🧾 Classification Report:
@@ -53,3 +54,4 @@ weighted avg       1.00      1.00      1.00         4
 🔮 Predictions:
 Sample 1: Predicted=0, Probability=[0.92 0.08]
 Sample 2: Predicted=1, Probability=[0.04 0.96]
+```

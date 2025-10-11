@@ -11,3 +11,46 @@ It builds on previous projects (Perceptron) and introduces **probabilistic decis
 1. Activate your environment:
    ```bash
    venv\Scripts\activate
+Navigate to the project:
+
+cd Day-23-Logistic-Regression
+
+
+Install dependencies:
+
+pip install -r requirements.txt
+
+
+Run:
+
+python logistic_regression_app.py
+
+🧠 Concepts Learned
+
+Understanding Logistic Regression as a classification algorithm
+
+Using LogisticRegression() from Scikit-learn
+
+Interpreting confusion matrix and probabilities
+
+Comparing with Perceptron (Deterministic vs. Probabilistic)
+
+Visualizing model performance with Seaborn
+
+📈 Example Output
+✅ Model Trained Successfully!
+📊 Accuracy: 1.00
+
+🧾 Classification Report:
+              precision    recall  f1-score   support
+
+           0       1.00      1.00      1.00         2
+           1       1.00      1.00      1.00         2
+
+    accuracy                           1.00         4
+   macro avg       1.00      1.00      1.00         4
+weighted avg       1.00      1.00      1.00         4
+
+🔮 Predictions:
+Sample 1: Predicted=0, Probability=[0.92 0.08]
+Sample 2: Predicted=1, Probability=[0.04 0.96]

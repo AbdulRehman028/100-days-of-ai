@@ -11,21 +11,20 @@ It builds on previous projects (Perceptron) and introduces **probabilistic decis
 1. Activate your environment:
    ```bash
    venv\Scripts\activate
-Navigate to the project:
+2. Navigate to the project:
 
-cd Day-23-Logistic-Regression
-
-
-Install dependencies:
-
-pip install -r requirements.txt
+    cd Day-23-Logistic-Regression
 
 
-Run:
+3. Install dependencies:
 
-python logistic_regression_app.py
+    pip install -r requirements.txt
 
-🧠 Concepts Learned
+4. Run:
+
+    python logistic_regression_app.py
+
+# 🧠 Concepts Learned
 
 Understanding Logistic Regression as a classification algorithm
 

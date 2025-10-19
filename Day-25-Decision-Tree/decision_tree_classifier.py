@@ -21,9 +21,6 @@ y = data["buys_computer"]
   
 # Step 3: Split Dataset
   
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.3, random_state=42
-)
 
 # Step 4: Train Decision Tree
   

@@ -50,3 +50,7 @@ plot_tree(
 plt.title("Decision Tree Visualization")
 plt.show()
 
+# Step 7: Test Prediction
+sample = [[1, 2, 1, 0]]  # Example input
+prediction = clf.predict(sample)
+print(f"\n🧠 Prediction for {sample}: {prediction[0]} (1=Yes, 0=No)")

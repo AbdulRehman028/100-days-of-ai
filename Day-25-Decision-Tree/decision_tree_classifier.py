@@ -10,15 +10,7 @@ import matplotlib.pyplot as plt
 data = pd.read_csv("data.csv")
 print("✅ Data Loaded Successfully:\n", data.head())
   
-# Step 2: Encode Categorical Columns
-  
-le = LabelEncoder()
-for column in data.columns:
-    data[column] = le.fit_transform(data[column])
 
-X = data.drop("buys_computer", axis=1)
-y = data["buys_computer"]
-  
 # Step 3: Split Dataset
   
 X_train, X_test, y_train, y_test = train_test_split(

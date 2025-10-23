@@ -1,7 +1,8 @@
 import numpy as np
 import tensorflow as tf
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import LSTM, Dense, Dropout
+from tensorflow import keras
+from keras.models import Sequential
+from keras.layers import LSTM, Dense, Dropout
 from music21 import converter, instrument, note, chord, stream
 import glob
 import pickle
@@ -71,7 +72,7 @@ def prepare_sequences(notes, n_vocab):
     n_patterns = len(network_input)
     print(f"📊 Created {n_patterns} training patterns")
     network_input = np.reshape(network_input, (n_patterns, sequence_length, 1)) / float(n_vocab)
-    network_output = tf.keras.utils.to_categorical(network_output)
+    network_output = keras.utils.to_categorical(network_output)
 
     return network_input, network_output
 

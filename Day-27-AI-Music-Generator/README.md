@@ -12,8 +12,8 @@ This project generates **music sequences** using a **Recurrent Neural Network (L
 Install dependencies:
 ```bash
 pip install -r requirements.txt
-
-▶️ How to Run
+```
+# ▶️ How to Run
 
 Place your MIDI files inside the midi_songs/ folder.
 
@@ -24,6 +24,6 @@ python music_generator.py
 
 After training, your generated music will be saved as output.mid.
 
-🎧 Output
+# 🎧 Output
 
 You can open the generated MIDI file in any DAW (like FL Studio, GarageBand, or LMMS).

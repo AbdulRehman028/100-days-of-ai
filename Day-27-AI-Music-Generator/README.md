@@ -15,12 +15,10 @@ pip install -r requirements.txt
 ```
 # ▶️ How to Run
 
-Place your MIDI files inside the midi_songs/ folder.
+- Place your MIDI files inside the midi_songs/ folder.
 
-Run the project:
-
-python music_generator.py
-
+- Run the project:
+     python music_generator.py
 
 After training, your generated music will be saved as output.mid.
 

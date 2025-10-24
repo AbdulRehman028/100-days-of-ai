@@ -18,17 +18,15 @@ Install dependencies:
 
 pip install -r requirements.txt
 
-▶️ Usage
+# ▶️ Usage
 
-Run the script:
+- Run the script:
 
-python story_generator.py
+    python story_generator.py
 
+- Enter your story prompt when asked — for example:
 
-Enter your story prompt when asked — for example:
-
-Once upon a time in a distant galaxy,
-
+    Once upon a time in a distant galaxy,
 
 The AI will generate a full story based on your input.
 

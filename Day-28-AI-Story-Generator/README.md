@@ -2,14 +2,10 @@
 
 This project generates **creative stories** from a text prompt using **OpenAI’s GPT-2** model.
 
----
-
 ## 🧠 Features
 - Generates human-like stories
 - Uses Hugging Face Transformers
 - Adjustable story length and randomness
-
----
 
 ## 🛠️ Installation
 1. Clone the repository or navigate to the folder.

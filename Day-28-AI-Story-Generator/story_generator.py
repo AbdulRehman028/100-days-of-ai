@@ -7,7 +7,6 @@ def generate_story(prompt, max_length=200, temperature=0.8, top_k=50, top_p=0.95
     tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
     model = GPT2LMHeadModel.from_pretrained("gpt2")
 
-    # Encode the input prompt
     input_ids = tokenizer.encode(prompt, return_tensors="pt")
 
     # Generate story

@@ -49,3 +49,15 @@ Model saved as mobilenet_finetuned.h5
 
 MobileNetV2 (pretrained on ImageNet)
 Fine-tuned on a custom dataset.
+
+✅ How It Works
+
+Loads MobileNetV2 pretrained on ImageNet.
+
+Adds new dense layers for your dataset.
+
+Trains on your data (freezes base model first, then fine-tunes).
+
+Saves your trained model.
+
+Plots accuracy curves.

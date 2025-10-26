@@ -11,15 +11,15 @@ This project demonstrates how to fine-tune a **pre-trained MobileNet** model for
 
 
 ## 🛠️ Installation
-```bash
-python -m venv venv
-venv\Scripts\activate
-pip install -r requirements.txt
 
-📂 Dataset
+- python -m venv venv
+    venv\Scripts\activate
+- pip install -r requirements.txt
 
-Organize your dataset as:
+## 📂 Dataset
 
+- Organize your dataset as:
+```
 dataset/
 ├── train/
 │   ├── class1/
@@ -27,30 +27,33 @@ dataset/
 └── validation/
     ├── class1/
     └── class2/
+```
 
-    Example:
+## Example:
 
-dataset/train/cats
-dataset/train/dogs
-dataset/validation/cats
-dataset/validation/dogs
-▶️ Run
-python transfer_learning_mobilenet.py
+- dataset/train/cats
+- dataset/train/dogs
+- dataset/validation/cats
+- dataset/validation/dogs
 
-📊 Example Output
+## ▶️ Run
 
-Training Accuracy: 95%
+- python transfer_learning_mobilenet.py
 
-Validation Accuracy: 92%
+## 📊 Example Output
 
-Model saved as mobilenet_finetuned.h5
+- Training Accuracy: 95%
 
-🧰 Model Used
+- Validation Accuracy: 92%
+
+- Model saved as mobilenet_finetuned.h5
+
+## 🧰 Model Used
 
 MobileNetV2 (pretrained on ImageNet)
 Fine-tuned on a custom dataset.
 
-✅ How It Works
+## ✅ How It Works
 
 Loads MobileNetV2 pretrained on ImageNet.
 

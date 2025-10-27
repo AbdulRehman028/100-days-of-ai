@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 
 # ===============================
 # 1. Load Dataset
-# ===============================
 train_dir = "dataset/train"
 val_dir = "dataset/validation"
 

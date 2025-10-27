@@ -4,7 +4,6 @@ from tensorflow.keras.applications import MobileNetV2
 from tensorflow.keras import layers, models
 import matplotlib.pyplot as plt
 
-# ===============================
 # 1. Load Dataset
 train_dir = "dataset/train"
 val_dir = "dataset/validation"

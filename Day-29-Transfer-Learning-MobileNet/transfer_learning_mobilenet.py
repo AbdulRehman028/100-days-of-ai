@@ -38,9 +38,7 @@ model = models.Sequential([
     layers.Dense(train_gen.num_classes, activation='softmax')
 ])
 
-# ===============================
 # 4. Compile Model
-# ===============================
 model.compile(optimizer='adam',
               loss='categorical_crossentropy',
               metrics=['accuracy'])

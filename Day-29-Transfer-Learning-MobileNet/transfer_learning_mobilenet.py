@@ -43,18 +43,14 @@ model.compile(optimizer='adam',
               loss='categorical_crossentropy',
               metrics=['accuracy'])
 
-# ===============================
 # 5. Train Model
-# ===============================
 history = model.fit(
     train_gen,
     validation_data=val_gen,
     epochs=5
 )
 
-# ===============================
 # 6. Fine-tune (optional)
-# ===============================
 base_model.trainable = True
 model.compile(optimizer=tf.keras.optimizers.Adam(1e-5),
               loss='categorical_crossentropy',
@@ -66,9 +62,7 @@ history_finetune = model.fit(
     epochs=3
 )
 
-# ===============================
 # 7. Save Model
-# ===============================
 model.save("mobilenet_finetuned.h5")
 print("✅ Model saved as mobilenet_finetuned.h5")
 

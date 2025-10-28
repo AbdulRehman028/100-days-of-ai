@@ -56,11 +56,9 @@ history_finetune = model.fit(
     epochs=3
 )
 
-# 7. Save Model
 model.save("mobilenet_finetuned.h5")
 print("✅ Model saved as mobilenet_finetuned.h5")
 
-# 8. Plot Results
 plt.plot(history.history['accuracy'], label='Train Acc')
 plt.plot(history.history['val_accuracy'], label='Val Acc')
 plt.title('Training and Validation Accuracy')

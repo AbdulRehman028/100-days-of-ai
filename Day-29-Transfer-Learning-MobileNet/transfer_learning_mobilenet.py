@@ -27,7 +27,6 @@ val_gen = val_datagen.flow_from_directory(
 base_model = MobileNetV2(weights='imagenet', include_top=False, input_shape=(224, 224, 3))
 base_model.trainable = False  # Freeze base layers
 
-# 3. Build Model
 model = models.Sequential([
     base_model,
     layers.GlobalAveragePooling2D(),

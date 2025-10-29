@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 
 train_dir = "dataset/train"
 val_dir = "dataset/validation"
-
 train_datagen = ImageDataGenerator(rescale=1./255)
 val_datagen = ImageDataGenerator(rescale=1./255)
 

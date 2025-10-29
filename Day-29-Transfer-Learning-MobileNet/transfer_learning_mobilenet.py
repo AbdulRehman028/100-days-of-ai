@@ -44,7 +44,6 @@ history = model.fit(
     validation_data=val_gen,
     epochs=5
 )
-
 base_model.trainable = True
 model.compile(optimizer=tf.keras.optimizers.Adam(1e-5),
               loss='categorical_crossentropy',

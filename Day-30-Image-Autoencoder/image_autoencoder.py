@@ -13,7 +13,6 @@ x_test = x_test.astype("float32") / 255.0
 x_train = x_train.reshape((len(x_train), 28 * 28))
 x_test = x_test.reshape((len(x_test), 28 * 28))
 
-# ===============================
 # 2. Build Autoencoder model
 # ===============================
 input_dim = 784

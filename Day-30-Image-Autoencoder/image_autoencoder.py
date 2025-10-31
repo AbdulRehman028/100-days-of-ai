@@ -31,7 +31,6 @@ autoencoder = Model(input_img, decoded)
 
 # ===============================
 # 3. Compile the model
-# ===============================
 autoencoder.compile(optimizer=Adam(learning_rate=0.001), loss='binary_crossentropy')
 
 # ===============================

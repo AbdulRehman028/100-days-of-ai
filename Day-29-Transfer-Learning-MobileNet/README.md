@@ -3,6 +3,7 @@
 This project demonstrates how to fine-tune a **pre-trained MobileNet** model for a **custom image classification** task using TensorFlow/Keras.
 
 ## 🚀 Features
+
 - Uses MobileNet for fast transfer learning
 - Fine-tunes the last layers for your dataset
 - Visualizes training accuracy and loss
@@ -18,6 +19,7 @@ pip install -r requirements.txt
 ## 📂 Dataset Setup
 
 ### Option 1: Use Synthetic Dataset (Quick Start)
+
 Generate a simple dataset of geometric shapes:
 
 ```powershell
@@ -25,11 +27,14 @@ python create_dataset.py
 ```
 
 This creates:
+
 - 200 training images (100 circles, 100 squares)
 - 60 validation images (30 circles, 30 squares)
 
 ### Option 2: Use Your Own Dataset
+
 Organize your dataset as:
+
 ```
 dataset/
 ├── train/
@@ -41,6 +46,7 @@ dataset/
 ```
 
 **Example:**
+
 - `dataset/train/cats`
 - `dataset/train/dogs`
 - `dataset/validation/cats`

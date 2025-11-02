@@ -68,7 +68,6 @@ autoencoder.save("autoencoder_mnist.h5")
 print("✅ Model saved as autoencoder_mnist.h5")
 
 # 8. Plot training loss
-# ===============================
 plt.figure(figsize=(8,4))
 plt.plot(history.history["loss"], label="Training Loss")
 plt.plot(history.history["val_loss"], label="Validation Loss")

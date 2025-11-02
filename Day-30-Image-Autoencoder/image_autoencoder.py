@@ -1,8 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import tensorflow as tf
 from tensorflow.keras.datasets import mnist
 from tensorflow.keras.models import Model
-from tensorflow.keras import layers, Input
+from tensorflow.keras.layers import Dense, Input
 from tensorflow.keras.optimizers import Adam
 
 # 1. Load and preprocess data
@@ -17,13 +18,13 @@ input_dim = 784
 encoding_dim = 32  # latent space
 
 input_img = Input(shape=(input_dim,))
-encoded = layers.Dense(128, activation='relu')(input_img)
-encoded = layers.Dense(64, activation='relu')(encoded)
-encoded = layers.Dense(encoding_dim, activation='relu')(encoded)
+encoded = Dense(128, activation='relu')(input_img)
+encoded = Dense(64, activation='relu')(encoded)
+encoded = Dense(encoding_dim, activation='relu')(encoded)
 
-decoded = layers.Dense(64, activation='relu')(encoded)
-decoded = layers.Dense(128, activation='relu')(decoded)
-decoded = layers.Dense(input_dim, activation='sigmoid')(decoded)
+decoded = Dense(64, activation='relu')(encoded)
+decoded = Dense(128, activation='relu')(decoded)
+decoded = Dense(input_dim, activation='sigmoid')(decoded)
 
 autoencoder = Model(input_img, decoded)
 

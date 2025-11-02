@@ -42,14 +42,10 @@ history = autoencoder.fit(
     verbose=2
 )
 
-# ===============================
 # 5. Encode and Decode some images
-# ===============================
 decoded_imgs = autoencoder.predict(x_test)
 
-# ===============================
 # 6. Visualize original vs reconstructed
-# ===============================
 n = 10
 plt.figure(figsize=(20, 4))
 for i in range(n):

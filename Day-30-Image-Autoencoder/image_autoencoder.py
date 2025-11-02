@@ -63,13 +63,10 @@ for i in range(n):
 
 plt.show()
 
-# ===============================
 # 7. Save model
-# ===============================
 autoencoder.save("autoencoder_mnist.h5")
 print("✅ Model saved as autoencoder_mnist.h5")
 
-# ===============================
 # 8. Plot training loss
 # ===============================
 plt.figure(figsize=(8,4))

@@ -18,9 +18,8 @@ print(f"Training samples: {len(x_train)}, Test samples: {len(x_test)}")
 x_train = pad_sequences(x_train, maxlen=max_len)
 x_test = pad_sequences(x_test, maxlen=max_len)
 
-# ===============================
 # 2. Build LSTM model
-# ===============================
+
 model = Sequential([
     Embedding(vocab_size, 128, input_length=max_len),
     LSTM(64, dropout=0.2, recurrent_dropout=0.2),
@@ -35,9 +34,8 @@ model.compile(
 
 model.summary()
 
-# ===============================
 # 3. Train the model
-# ===============================
+
 history = model.fit(
     x_train, y_train,
     epochs=4,

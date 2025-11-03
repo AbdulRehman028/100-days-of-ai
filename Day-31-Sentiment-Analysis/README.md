@@ -3,8 +3,6 @@
 A deep learning project that uses an **LSTM** network to predict movie review sentiment (positive/negative)
 from the **IMDB movie review dataset** using Keras.
 
----
-
 ## 🚀 Features
 
 - Built-in IMDB dataset from Keras

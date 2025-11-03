@@ -65,7 +65,7 @@ plt.legend()
 plt.show()
 
 # 6. Try predictions on custom text
-# ===============================
+
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.datasets import imdb

@@ -46,15 +46,13 @@ history = model.fit(
     verbose=2
 )
 
-# ===============================
 # 4. Evaluate model
-# ===============================
+
 test_loss, test_acc = model.evaluate(x_test, y_test, verbose=2)
 print(f"\n✅ Test Accuracy: {test_acc:.4f}")
 
-# ===============================
 # 5. Plot training performance
-# ===============================
+
 plt.figure(figsize=(8,4))
 plt.plot(history.history["accuracy"], label="Train Acc")
 plt.plot(history.history["val_accuracy"], label="Val Acc")

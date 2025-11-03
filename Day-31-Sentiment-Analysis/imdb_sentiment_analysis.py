@@ -64,7 +64,6 @@ plt.title("Training vs Validation Accuracy")
 plt.legend()
 plt.show()
 
-# ===============================
 # 6. Try predictions on custom text
 # ===============================
 from tensorflow.keras.preprocessing.text import Tokenizer

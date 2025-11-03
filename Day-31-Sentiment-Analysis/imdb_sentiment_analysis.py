@@ -6,9 +6,8 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Embedding, LSTM, Dense
 from tensorflow.keras.optimizers import Adam
 
-# ===============================
 # 1. Load and preprocess IMDB dataset
-# ===============================
+
 vocab_size = 10000  # Only use the top 10k words
 max_len = 200       # Each review is padded to 200 words
 

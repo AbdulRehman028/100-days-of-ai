@@ -43,3 +43,6 @@ Modify the `sample` variable in `spam_classifier.py` to test your own messages!
 
 ```python
 sample = ["You won a free iPhone! Claim now!"]
+
+(you can download full dataset from:
+https://archive.ics.uci.edu/dataset/228/sms+spam+collection)

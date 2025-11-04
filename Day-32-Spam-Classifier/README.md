@@ -26,3 +26,20 @@ Build a simple **Spam/Ham Classifier** using Naive Bayes and text vectorization 
 ---
 
 ## 📈 Output Example
+✅ Accuracy: 0.96
+📊 Classification Report:
+precision recall f1-score support
+
+       0       0.97      0.99      0.98       965
+       1       0.93      0.85      0.89       150
+
+accuracy                           0.96      1115
+
+
+---
+
+## 💬 Try It
+Modify the `sample` variable in `spam_classifier.py` to test your own messages!
+
+```python
+sample = ["You won a free iPhone! Claim now!"]

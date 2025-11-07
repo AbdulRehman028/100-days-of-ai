@@ -1,6 +1,7 @@
 # 🛡️ Day 32 — AI Spam Classifier (CLI + Web Interface)
 
 ### 🎯 Goal
+
 Build an **AI-powered Spam/Ham Classifier** with both a beautiful CLI interface and a modern web application using Naive Bayes and text vectorization.
 
 ---
@@ -8,6 +9,7 @@ Build an **AI-powered Spam/Ham Classifier** with both a beautiful CLI interface 
 ## ✨ Features
 
 ### 🎨 CLI Interface
+
 - 🎨 **Beautiful colored CLI interface**
 - 🤖 **AI-powered spam detection**
 - 💬 **Interactive message analysis**
@@ -16,6 +18,7 @@ Build an **AI-powered Spam/Ham Classifier** with both a beautiful CLI interface 
 - ⚡ **Fast and accurate predictions**
 
 ### 🌐 Web Interface
+
 - 🎨 **Modern dark theme with gradient effects**
 - ✨ **Animated background circles**
 - 📝 **Interactive textarea with character counter**
@@ -27,6 +30,7 @@ Build an **AI-powered Spam/Ham Classifier** with both a beautiful CLI interface 
 ---
 
 ## 🧩 Tech Stack
+
 - **Backend:** Python 🐍, Flask
 - **Machine Learning:** scikit-learn (Multinomial Naive Bayes)
 - **Data Processing:** pandas, CountVectorizer
@@ -38,6 +42,7 @@ Build an **AI-powered Spam/Ham Classifier** with both a beautiful CLI interface 
 ## 🚀 How to Run
 
 ### 1. Activate Virtual Environment
+
 ```powershell
 cd "c:\my folder\100-days-of-ai"
 .\venv\Scripts\Activate.ps1
@@ -45,19 +50,23 @@ cd Day-32-Spam-Classifier
 ```
 
 ### 2. Install Dependencies (if needed)
+
 ```powershell
 pip install pandas scikit-learn flask
 ```
 
 ### 3A. Run the CLI Version
+
 ```powershell
 python spam_classifier.py
 ```
 
 ### 3B. Run the Web Interface
+
 ```powershell
 python app.py
 ```
+
 Then open your browser and go to **http://127.0.0.1:5000**
 
 ---
@@ -65,6 +74,7 @@ Then open your browser and go to **http://127.0.0.1:5000**
 ## 🎮 How to Use
 
 ### CLI Version:
+
 1. **Launch the program** - You'll see a beautiful banner
 2. **Wait for training** - The AI model trains on the dataset
 3. **Enter messages** - Type any message you want to check
@@ -73,6 +83,7 @@ Then open your browser and go to **http://127.0.0.1:5000**
 6. **Exit** - Type 'quit' or 'exit' when done
 
 ### Web Version:
+
 1. **Start the Flask server** - Run `python app.py`
 2. **Open browser** - Navigate to http://127.0.0.1:5000
 3. **Enter message** - Type or paste any message in the textarea
@@ -85,6 +96,7 @@ Then open your browser and go to **http://127.0.0.1:5000**
 ## 📊 Example Usage
 
 ### CLI Output:
+
 ```
 Enter a message to analyze: Congratulations! You won $1000!
 
@@ -102,6 +114,7 @@ Enter a message to analyze: Congratulations! You won $1000!
 ```
 
 ### Web Interface:
+
 - Beautiful gradient backgrounds
 - Animated confidence bars
 - Color-coded results (red for spam, green for legitimate)
@@ -110,8 +123,9 @@ Enter a message to analyze: Congratulations! You won $1000!
 ---
 
 ## 📊 Model Performance
+
 - ✅ **Accuracy: 98.88%** on test set
-- 📈 Trained on **5,776 unique messages** 
+- 📈 Trained on **5,776 unique messages**
   - 📧 **4,872 Ham** (legitimate) messages
   - 🚨 **904 Spam** messages
 - 🧠 Uses **Multinomial Naive Bayes** algorithm
@@ -119,14 +133,13 @@ Enter a message to analyze: Congratulations! You won $1000!
 - 💾 **Model persistence** via pickle files (instant loading on restart)
 
 ### Classification Report:
+
 ```
               precision    recall    f1-score
 Ham (Legit)      99%        99%        99%
 Spam             97%        96%        96%
 Overall       98.88% accuracy
 ```
-
----
 
 ## 📁 Datasets Used
 
@@ -143,10 +156,12 @@ After combining and removing duplicates: **5,776 unique messages**
 ## 💾 Model Persistence
 
 The trained model is automatically saved as pickle files:
+
 - `spam_classifier_model.pkl` - The trained classifier
 - `vectorizer.pkl` - The text vectorizer
 
 **Benefits:**
+
 - ⚡ **Instant startup** on subsequent runs
 - 🚫 **No retraining** required unless datasets change
 - 💪 **Production-ready** for deployment
@@ -158,12 +173,14 @@ To retrain the model, simply delete the `.pkl` files and restart the app.
 ## 🧪 Try These Examples
 
 **Spam Messages:**
+
 - "You won a free iPhone! Claim now!"
 - "URGENT! Your account will be suspended"
 - "Get rich quick! Limited time offer"
 - "Congratulations! You won $1000! Click here"
 
 **Legitimate Messages:**
+
 - "Let's meet at 6pm for dinner"
 - "Can you send me the project report?"
 - "Happy birthday! Have a great day"
@@ -174,6 +191,7 @@ To retrain the model, simply delete the `.pkl` files and restart the app.
 ## 🎨 Interface Features
 
 ### CLI:
+
 - 🎨 **Color-coded results** (Red for spam, Green for legitimate)
 - 📊 **Confidence percentages** for each prediction
 - 🔄 **Continuous analysis mode** - no need to restart
@@ -181,6 +199,7 @@ To retrain the model, simply delete the `.pkl` files and restart the app.
 - ✨ **Clean and professional design**
 
 ### Web:
+
 - 🎨 **Modern dark theme** (#0f172a background)
 - 🌈 **Purple/pink gradients** for visual appeal
 - ✨ **Smooth animations** and transitions
@@ -214,6 +233,7 @@ Day-32-Spam-Classifier/
 ## 🔧 Customization
 
 You can enhance the classifier by:
+
 - Adding more training data to the datasets
 - Adjusting the vectorizer parameters in `app.py`
 - Trying different ML algorithms (SVM, Random Forest, etc.)
@@ -228,6 +248,7 @@ You can enhance the classifier by:
 ## 🌐 Web Interface Technical Details
 
 ### Backend (`app.py`):
+
 - **Framework:** Flask with debug mode
 - **Routes:**
   - `/` - Main page
@@ -238,6 +259,7 @@ You can enhance the classifier by:
 - **Host:** 0.0.0.0 (accessible on local network)
 
 ### Frontend:
+
 - **No dependencies** - Pure HTML/CSS/JS
 - **AJAX requests** via Fetch API
 - **Font Awesome** icons for visual appeal
@@ -249,6 +271,7 @@ You can enhance the classifier by:
 ## 📚 Learning Outcomes
 
 From this project, you'll learn:
+
 - ✅ **Text classification** with Naive Bayes
 - ✅ **Feature extraction** with CountVectorizer
 - ✅ **Model persistence** using pickle
@@ -264,6 +287,7 @@ From this project, you'll learn:
 ## 🚀 Future Enhancements
 
 Potential improvements:
+
 - [ ] Add more datasets for better accuracy
 - [ ] Implement deep learning models (LSTM, BERT)
 - [ ] Create a browser extension

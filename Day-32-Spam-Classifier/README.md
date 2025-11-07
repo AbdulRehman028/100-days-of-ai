@@ -151,8 +151,6 @@ The model is trained on **3 combined datasets**:
 
 After combining and removing duplicates: **5,776 unique messages**
 
----
-
 ## 💾 Model Persistence
 
 The trained model is automatically saved as pickle files:
@@ -167,8 +165,6 @@ The trained model is automatically saved as pickle files:
 - 💪 **Production-ready** for deployment
 
 To retrain the model, simply delete the `.pkl` files and restart the app.
-
----
 
 ## 🧪 Try These Examples
 
@@ -185,8 +181,6 @@ To retrain the model, simply delete the `.pkl` files and restart the app.
 - "Can you send me the project report?"
 - "Happy birthday! Have a great day"
 - "Meeting rescheduled to tomorrow at 3pm"
-
----
 
 ## 🎨 Interface Features
 
@@ -207,8 +201,6 @@ To retrain the model, simply delete the `.pkl` files and restart the app.
 - 🎯 **4 Feature cards** explaining benefits
 - 📱 **Mobile responsive** design
 
----
-
 ## 📁 Project Structure
 
 ```
@@ -228,8 +220,6 @@ Day-32-Spam-Classifier/
 └── README.md                      # This file
 ```
 
----
-
 ## 🔧 Customization
 
 You can enhance the classifier by:
@@ -242,8 +232,6 @@ You can enhance the classifier by:
 - Implementing user authentication
 - Adding message history tracking
 - Creating API endpoints for external use
-
----
 
 ## 🌐 Web Interface Technical Details
 
@@ -266,8 +254,6 @@ You can enhance the classifier by:
 - **CSS Grid** for responsive layouts
 - **CSS animations** for smooth transitions
 
----
-
 ## 📚 Learning Outcomes
 
 From this project, you'll learn:
@@ -281,8 +267,6 @@ From this project, you'll learn:
 - ✅ **Modern CSS** techniques (gradients, animations)
 - ✅ **Dataset management** and preprocessing
 - ✅ **Model evaluation** metrics
-
----
 
 ## 🚀 Future Enhancements
 

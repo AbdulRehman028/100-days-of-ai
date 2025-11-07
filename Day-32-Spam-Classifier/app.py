@@ -100,7 +100,7 @@ def train_and_save_model():
     print("\n📊 Loading datasets...")
     data = load_all_datasets()
     
-    # Encode labels
+    
     data["label_num"] = data["label"].map({"ham": 0, "spam": 1})
     
     # Split data

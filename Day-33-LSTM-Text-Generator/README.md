@@ -37,27 +37,34 @@ Build a beautiful modern **web application** that uses the **GPT-2 AI model** to
 
 ## 🚀 Quick Start
 
-### 1. Activate Virtual Environment
+### 1. Install Dependencies
 ```powershell
-cd "c:\my folder\100-days-of-ai"
-.\venv\Scripts\Activate.ps1
-cd Day-33-LSTM-Text-Generator
+pip install -r requirements.txt
 ```
 
-### 2. Install Dependencies
+### 2. Setup API Token
+Create a `.env` file in the project directory:
 ```powershell
-pip install flask transformers torch
+# Copy the example file
+copy .env.example .env
 ```
+
+Then edit `.env` and add your HuggingFace token:
+```
+HF_API_TOKEN=hf_your_actual_token_here
+```
+
+**Get your FREE token:** https://huggingface.co/settings/tokens
 
 ### 3. Run the Web App
 ```powershell
 python app.py
 ```
 
-💡 **Note:** The first run will download the GPT-2 model (~548MB). After that, it will be cached locally for instant startup.
+✅ **No downloads needed** - Uses HuggingFace API (cloud-based)!
 
 ### 4. Open in Browser
-Navigate to **http://127.0.0.1:5000**
+Navigate to **http://127.0.0.1:5000** or **http://localhost:5000**
 
 ---
 

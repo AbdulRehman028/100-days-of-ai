@@ -1,0 +1,30 @@
+# Environment variables (contains API tokens - DO NOT COMMIT!)
+.env
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environment
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Uploads and generated files
+uploads/
+json_files/
+outputs/
+*.log

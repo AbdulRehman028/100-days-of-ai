@@ -1,19 +1,23 @@
 from flask import Flask, render_template, request, jsonify
+from dotenv import load_dotenv
 import requests
 import time
 import os
+
+# Load environment variables from .env file
+load_dotenv()
 
 app = Flask(__name__)
 
 # HuggingFace NEW Router API (OpenAI-compatible endpoint)
 API_URL = "https://router.huggingface.co/v1/chat/completions"
-API_TOKEN = os.environ.get("HF_API_TOKEN", "")
+API_TOKEN = os.getenv("HF_API_TOKEN", "")
 
 if not API_TOKEN:
     print("⚠️  WARNING: No HuggingFace API token found!")
-    print("📝 Set your token: $env:HF_API_TOKEN='your_token_here'")
+    print("📝 Create a .env file with: HF_API_TOKEN=your_token_here")
 else:
-    print("✅ HuggingFace token found!")
+    print("✅ HuggingFace token loaded from .env file!")
     print("💡 Using NEW Router API (OpenAI-compatible)")
     print("🤖 Model: Llama 3.2 3B Instruct (Meta's latest!)")
     print("🆓 Free API - No downloads!")

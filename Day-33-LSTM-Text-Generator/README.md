@@ -2,7 +2,7 @@
 
 ### 🎯 Goal
 
-Build a beautiful modern **web application** that uses the **GPT-2 AI model** to generate creative stories, poems, movie scripts, and adventure quests - all for free!
+Build a beautiful modern **web application** that uses the HuggingFace Transformers to generate creative stories, poems, movie scripts, and adventure quests - all for free!
 
 ---
 
@@ -12,7 +12,7 @@ Build a beautiful modern **web application** that uses the **GPT-2 AI model** to
 
 - 🌈 **Beautiful dark theme** with gradient animations
 - ✨ **Particle background** effects
-- 📝 **4 Content Types**: Stories, Poems, Scripts, Quests
+- 📝 6  **Content Types**: Stories, Poems, Scripts, Quests etc..
 - 🎛️ **Advanced settings**: Temperature & length controls
 - ⚡ **Real-time generation** with loading animations
 - 📱 **Fully responsive** design
@@ -20,10 +20,7 @@ Build a beautiful modern **web application** that uses the **GPT-2 AI model** to
 
 ### � AI Capabilities
 
-- 🧠 **GPT-2 Model** (124M parameters)
 - 🆓 **100% Free & Open Source**
-- � **No API keys** required
-- 💻 **Runs locally** on your machine
 - 🎨 **Creative & diverse** outputs
 - 🎯 **Context-aware** generation
 
@@ -32,10 +29,9 @@ Build a beautiful modern **web application** that uses the **GPT-2 AI model** to
 ## 🧩 Tech Stack
 
 - **Backend:** Python, Flask
-- **AI Model:** HuggingFace Transformers 
+- **AI Model:** HuggingFace Transformers
 - **ML Framework:** PyTorch
 - **Frontend:** HTML5, CSS3, Vanilla JavaScript
-- **No external APIs** - Everything runs locally!
 
 ---
 

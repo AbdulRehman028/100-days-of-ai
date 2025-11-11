@@ -41,7 +41,6 @@ Build a beautiful modern web application that uses AI to generate creative conte
 - **Model:** meta-llama/Llama-3.2-3B-Instruct
 - **Frontend:** HTML5, CSS3, Vanilla JavaScript
 - **Environment:** python-dotenv for secure token management
-- **Deployment:** Pure API-based (no local AI models)
 
 ---
 

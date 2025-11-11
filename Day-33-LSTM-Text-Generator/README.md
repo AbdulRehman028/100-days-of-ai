@@ -387,7 +387,6 @@ This project is for educational purposes as part of the 100 Days of AI challenge
 - **Meta AI** for the Llama 3.2 model
 - **HuggingFace** for the free API
 - **Flask** for the web framework
-- **You** for using this generator!
 
 ---
 

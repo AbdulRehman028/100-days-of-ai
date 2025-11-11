@@ -2,7 +2,7 @@
 
 ### 🎯 Goal
 
-Build a beautiful modern **web application** that uses **AI** to generate creative content - stories, poems, scripts, quests, social media posts, blogs, emails, and articles - all for **FREE** using HuggingFace API!
+**Build a beautiful modern web application that uses AI to generate creative content - stories, poems, scripts, quests, social media posts, blogs, emails, and articles - all for FREE using HuggingFace API!**
 
 ---
 
@@ -395,6 +395,5 @@ This project is for educational purposes as part of the 100 Days of AI challenge
 **Happy Creating! 🎨✨**
 
 Generate amazing stories, poems, and content with the power of AI!
-
 
 ##### Developed with ❤️ By Abdur Rehman Baig

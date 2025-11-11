@@ -2,7 +2,7 @@
 
 ### 🎯 Goal
 
-**Build a beautiful modern web application that uses AI to generate creative content - stories, poems, scripts, quests, social media posts, blogs, emails, and articles - all for FREE using HuggingFace API!**
+Build a beautiful modern web application that uses AI to generate creative content - stories, poems, scripts, quests, social media posts, blogs, emails, and articles - all for FREE using HuggingFace API!
 
 ---
 

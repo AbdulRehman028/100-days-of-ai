@@ -263,10 +263,6 @@ From this project, you'll learn:
 - ✅ **Model persistence** using pickle
 - ✅ **Flask web development** basics
 - ✅ **RESTful API** design
-- ✅ **Frontend-backend** communication
-- ✅ **Modern CSS** techniques (gradients, animations)
-- ✅ **Dataset management** and preprocessing
-- ✅ **Model evaluation** metrics
 
 ## 🚀 Future Enhancements
 

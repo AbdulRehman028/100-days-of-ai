@@ -258,12 +258,6 @@ You can enhance the classifier by:
 
 From this project, you'll learn:
 
-- ✅ **Text classification** with Naive Bayes
-- ✅ **Feature extraction** with CountVectorizer
-- ✅ **Model persistence** using pickle
-- ✅ **Flask web development** basics
-- ✅ **RESTful API** design
-
 ## 🚀 Future Enhancements
 
 Potential improvements:

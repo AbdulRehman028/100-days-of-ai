@@ -124,17 +124,7 @@ function updateCharCount() {
     charCount.textContent = textarea.value.length;
 }
 
-// Load model statistics
-async function loadStats() {
-    try {
-        const response = await fetch('/stats');
-        const data = await response.json();
-        document.getElementById('modelStatus').textContent = data.model.toUpperCase() + ' Ready';
-    } catch (error) {
-        console.error('Error loading stats:', error);
-        document.getElementById('modelStatus').textContent = 'Ready';
-    }
-}
+
 
 // Handle form submission
 async function handleSubmit(e) {

@@ -117,14 +117,13 @@ function updateExamples(type) {
     `).join('');
 }
 
-// Update character counter
 function updateCharCount() {
     const textarea = document.getElementById('promptInput');
     const charCount = document.getElementById('charCount');
     charCount.textContent = textarea.value.length;
 }
 
-// Load model statistics
+// Load model statistics    
 async function loadStats() {
     try {
         const response = await fetch('/stats');

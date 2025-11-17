@@ -159,7 +159,6 @@ async function handleSubmit(e) {
     generateBtn.classList.add('loading');
     generateBtn.disabled = true;
     
-    // Hide previous results
     document.getElementById('resultSection').style.display = 'none';
     
     try {
@@ -197,7 +196,6 @@ async function handleSubmit(e) {
     }
 }
 
-// Display generated result
 function displayResult(data) {
     generatedText = data.generated_text;
     

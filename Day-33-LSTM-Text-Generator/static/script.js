@@ -117,12 +117,14 @@ function updateExamples(type) {
     `).join('');
 }
 
+// Update character counter
 function updateCharCount() {
     const textarea = document.getElementById('promptInput');
     const charCount = document.getElementById('charCount');
     charCount.textContent = textarea.value.length;
 }
 
+// Load model statistics
 async function loadStats() {
     try {
         const response = await fetch('/stats');
@@ -134,6 +136,7 @@ async function loadStats() {
     }
 }
 
+// Handle form submission
 async function handleSubmit(e) {
     e.preventDefault();
     
@@ -150,15 +153,18 @@ async function handleSubmit(e) {
         return;
     }
     
+    // Get settings
     const temperature = parseFloat(document.getElementById('temperature').value);
     const maxLength = parseInt(document.getElementById('maxLength').value);
     
+    // Show loading state
     const generateBtn = document.getElementById('generateBtn');
     const originalContent = generateBtn.innerHTML;
     generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Generating...</span>';
     generateBtn.classList.add('loading');
     generateBtn.disabled = true;
     
+    // Hide previous results
     document.getElementById('resultSection').style.display = 'none';
     
     try {
@@ -196,6 +202,7 @@ async function handleSubmit(e) {
     }
 }
 
+// Display generated result
 function displayResult(data) {
     generatedText = data.generated_text;
     

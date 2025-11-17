@@ -150,11 +150,9 @@ async function handleSubmit(e) {
         return;
     }
     
-    // Get settings
     const temperature = parseFloat(document.getElementById('temperature').value);
     const maxLength = parseInt(document.getElementById('maxLength').value);
     
-    // Show loading state
     const generateBtn = document.getElementById('generateBtn');
     const originalContent = generateBtn.innerHTML;
     generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Generating...</span>';

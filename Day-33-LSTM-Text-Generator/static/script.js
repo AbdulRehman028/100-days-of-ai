@@ -123,7 +123,6 @@ function updateCharCount() {
     charCount.textContent = textarea.value.length;
 }
 
-// Load model statistics    
 async function loadStats() {
     try {
         const response = await fetch('/stats');
@@ -135,7 +134,6 @@ async function loadStats() {
     }
 }
 
-// Handle form submission
 async function handleSubmit(e) {
     e.preventDefault();
     

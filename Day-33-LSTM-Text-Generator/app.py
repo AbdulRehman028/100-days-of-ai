@@ -4,7 +4,6 @@ import requests
 import time
 import os
 
-# Load environment variables from .env file
 load_dotenv()
 
 app = Flask(__name__)
@@ -38,7 +37,6 @@ def generate_text(prompt, text_type="story", max_length=300, temperature=0.9):
     if not API_TOKEN:
         raise Exception("HuggingFace API token required! Set: $env:HF_API_TOKEN='your_token'")
     
-    # Add context based on text type
     type_instructions = {
         "story": f"Write a creative and engaging story: {prompt}",
         "poem": f"Write a beautiful and artistic poem: {prompt}",

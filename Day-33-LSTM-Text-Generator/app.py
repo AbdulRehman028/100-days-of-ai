@@ -65,16 +65,13 @@ def generate_text(prompt, text_type="story", max_length=300, temperature=0.9):
         # Social media posts are short and punchy
         complete_message = f"{user_message}\n\nCreate an engaging social media post with:\n- A catchy hook or opening\n- Key message or value\n- Call-to-action or engaging question\n- Relevant emojis and hashtags\n- Keep it concise (150-300 words max)"
     elif text_type == "email":
-        # Professional email format
         complete_message = f"{user_message}\n\nWrite a professional email with:\n- Clear subject line\n- Proper greeting\n- Well-structured body paragraphs\n- Professional tone\n- Clear call-to-action\n- Professional closing"
     elif text_type == "blog":
-        # Blog post structure
         if max_length >= 1500:
             complete_message = f"{user_message}\n\nWrite a comprehensive blog post (800-1200 words) with:\n- Engaging title\n- Compelling introduction\n- Well-organized sections with subheadings\n- Examples and insights\n- Actionable takeaways\n- Strong conclusion"
         else:
             complete_message = f"{user_message}\n\nWrite a blog post (400-600 words) with clear structure, engaging content, and valuable insights."
     elif text_type == "article":
-        # Article format
         if max_length >= 1500:
             complete_message = f"{user_message}\n\nWrite an informative article (800-1200 words) with:\n- Attention-grabbing headline\n- Strong lead paragraph\n- Well-researched information\n- Clear structure with subheadings\n- Supporting details and examples\n- Concluding summary"
         else:

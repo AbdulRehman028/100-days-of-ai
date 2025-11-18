@@ -55,8 +55,6 @@ def generate_text(prompt, text_type="story", max_length=300, temperature=0.9):
         "Content-Type": "application/json"
     }
     
-    # Cap temperature at safe levels to prevent gibberish
-    # Different content types have different optimal temperatures
     if text_type in ["poem", "script", "social"]:
         safe_temperature = min(temperature, 1.0)  # Max 1.0 for creative content
     else:

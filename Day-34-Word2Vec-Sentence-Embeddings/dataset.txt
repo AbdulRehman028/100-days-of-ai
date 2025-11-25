@@ -1,0 +1,9 @@
+Artificial intelligence is transforming the world.
+Machine learning enables computers to learn from data.
+Deep learning is a branch of machine learning.
+Neural networks are powerful models for pattern recognition.
+Generative models can create realistic text and images.
+Natural language processing helps machines understand language.
+Large language models learn from massive datasets.
+Embeddings represent words as dense numerical vectors.
+Sentence embeddings help capture meaning beyond individual words.

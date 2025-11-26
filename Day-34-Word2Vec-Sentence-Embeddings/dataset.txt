@@ -6,4 +6,4 @@ Generative models can create realistic text and images.
 Natural language processing helps machines understand language.
 Large language models learn from massive datasets.
 Embeddings represent words as dense numerical vectors.
-Sentence embeddings help capture meaning beyond individual words.
+Sentence embeddings help capture meaning beyond individual words

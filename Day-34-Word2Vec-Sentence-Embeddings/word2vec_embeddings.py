@@ -26,9 +26,8 @@ model = Word2Vec(
 
 print("\nTraining complete.")
 
-# -----------------------------
 # Word Embedding Example
-# -----------------------------
+
 print("\nVector for 'language':")
 print(model.wv['language'])
 

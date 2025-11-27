@@ -4,7 +4,6 @@ from sklearn.manifold import TSNE
 import matplotlib.pyplot as plt
 from sklearn.metrics.pairwise import cosine_similarity
 
-# -----------------------------
 # Load Dataset
 with open("dataset.txt", "r", encoding="utf-8") as f:
     corpus = f.read().lower().split("\n")

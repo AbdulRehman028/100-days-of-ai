@@ -6,7 +6,6 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 # -----------------------------
 # Load Dataset
-# -----------------------------
 with open("dataset.txt", "r", encoding="utf-8") as f:
     corpus = f.read().lower().split("\n")
 
@@ -14,7 +13,6 @@ sentences = [line.split() for line in corpus]
 
 # -----------------------------
 # Train Word2Vec Model
-# -----------------------------
 model = Word2Vec(
     sentences=sentences,
     vector_size=50,

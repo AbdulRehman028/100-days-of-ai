@@ -11,7 +11,6 @@ with open("dataset.txt", "r", encoding="utf-8") as f:
 
 sentences = [line.split() for line in corpus]
 
-# -----------------------------
 # Train Word2Vec Model
 model = Word2Vec(
     sentences=sentences,

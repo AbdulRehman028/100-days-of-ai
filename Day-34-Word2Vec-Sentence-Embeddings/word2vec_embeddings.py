@@ -4,7 +4,6 @@ from sklearn.manifold import TSNE
 import matplotlib.pyplot as plt
 from sklearn.metrics.pairwise import cosine_similarity
 
-# Load Dataset
 with open("dataset.txt", "r", encoding="utf-8") as f:
     corpus = f.read().lower().split("\n")
 
@@ -24,12 +23,9 @@ print("\nTraining complete.")
 print("\nVector for 'language':")
 print(model.wv['language'])
 
-# Word Similarity
 print("\nSimilarity between 'machine' and 'learning':")
 print(model.wv.similarity('machine', 'learning'))
-
-# Sentence Embedding (avg of words)
-
+        
 def sentence_embedding(sentence):
     words = sentence.lower().split()
     vecs = [model.wv[word] for word in words if word in model.wv]

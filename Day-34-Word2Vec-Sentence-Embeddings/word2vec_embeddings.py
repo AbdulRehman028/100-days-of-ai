@@ -23,8 +23,6 @@ model = Word2Vec(
 
 print("\nTraining complete.")
 
-# Word Embedding Example
-
 print("\nVector for 'language':")
 print(model.wv['language'])
 
@@ -52,7 +50,6 @@ e1 = sentence_embedding(s1)
 e2 = sentence_embedding(s2)
 e3 = sentence_embedding(s3)
 
-# Cosine similarity between sentences
 print("\nSentence Similarity (s1 vs s2):", cosine_similarity([e1], [e2])[0][0])
 print("Sentence Similarity (s1 vs s3):", cosine_similarity([e1], [e3])[0][0])
 

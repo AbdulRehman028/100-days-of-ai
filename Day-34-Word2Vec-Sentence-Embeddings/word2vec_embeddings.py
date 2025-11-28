@@ -56,7 +56,6 @@ e3 = sentence_embedding(s3)
 print("\nSentence Similarity (s1 vs s2):", cosine_similarity([e1], [e2])[0][0])
 print("Sentence Similarity (s1 vs s3):", cosine_similarity([e1], [e3])[0][0])
 
-# Visualization with t-SNE
 
 words = list(model.wv.index_to_key)
 X = np.array([model.wv[word] for word in words])

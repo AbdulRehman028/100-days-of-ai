@@ -47,7 +47,6 @@ s1 = "machine learning enables computers"
 s2 = "deep learning is a branch of ai"
 s3 = "generative models create text"
 
-# Get embeddings
 
 e1 = sentence_embedding(s1)
 e2 = sentence_embedding(s2)

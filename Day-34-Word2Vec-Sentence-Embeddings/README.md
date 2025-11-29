@@ -41,6 +41,7 @@ def sentence_embedding(sentence):
     return np.mean(vecs, axis=1)
 
 # Example Sentences
+
 s1 = "machine learning enables computers"
 s2 = "deep learning is a branch of ai"
 s3 = "generative models create text"

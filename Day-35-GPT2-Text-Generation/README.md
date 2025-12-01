@@ -2,8 +2,6 @@
 
 This project fine-tunes GPT-2 on a custom dataset and generates new text based on your prompt.
 
----
-
 ## 🚀 Features
 - Fine-tune GPT-2 on any text file  
 - Save & reuse the trained model  

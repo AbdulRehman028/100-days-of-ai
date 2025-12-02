@@ -6,7 +6,8 @@ dataset = load_dataset("text", data_files={"train": "data.txt"})
 # Load GPT-2 Model & Tokenizer
 
 tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
-tokenizer.pad_token = tokenizer.eos_token  # GPT-2 has no pad token
+tokenizer.pad_token = tokenizer.eos_token  
+# GPT-2 has no pad token
 
 model = GPT2LMHeadModel.from_pretrained("gpt2")
 

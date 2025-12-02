@@ -1,21 +1,17 @@
 from datasets import load_dataset
 from transformers import GPT2LMHeadModel, GPT2Tokenizer, Trainer, TrainingArguments
 
-# ----------------------------------
-# Load Dataset
-# ----------------------------------
 dataset = load_dataset("text", data_files={"train": "data.txt"})
 
-# ----------------------------------
 # Load GPT-2 Model & Tokenizer
-# ----------------------------------
+
 tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
 tokenizer.pad_token = tokenizer.eos_token  # GPT-2 has no pad token
 
 model = GPT2LMHeadModel.from_pretrained("gpt2")
 
 # Tokenization
-# ----------------------------------
+
 def tokenize(example):
     return tokenizer(example["text"], truncation=True, padding="max_length", max_length=128)
 

@@ -19,9 +19,8 @@ tokenized_dataset = dataset.map(tokenize, batched=True)
 tokenized_dataset = tokenized_dataset.remove_columns(["text"])
 tokenized_dataset.set_format(type="torch")
 
-# ----------------------------------
 # Training Configuration
-# ----------------------------------
+
 training_args = TrainingArguments(
     output_dir="./gpt2-finetuned",
     overwrite_output_dir=True,

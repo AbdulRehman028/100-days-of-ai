@@ -11,7 +11,6 @@ tokenizer.pad_token = tokenizer.eos_token  # GPT-2 has no pad token
 model = GPT2LMHeadModel.from_pretrained("gpt2")
 
 # Tokenization
-
 def tokenize(example):
     return tokenizer(example["text"], truncation=True, padding="max_length", max_length=128)
 

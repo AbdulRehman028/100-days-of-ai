@@ -115,8 +115,8 @@ function displayResult(data) {
     // Set result text
     document.getElementById('resultText').textContent = data.text;
     
-    // Set emoji count
-    document.getElementById('emojiCount').textContent = data.count || 0;
+    // Set emoji count (use actual displayed emoji count)
+    document.getElementById('emojiCount').textContent = predictedEmojis.length;
     
     // Set generation time
     document.getElementById('resultTime').innerHTML = 

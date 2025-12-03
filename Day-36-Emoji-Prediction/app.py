@@ -174,27 +174,32 @@ def extract_emojis(text):
     """
     Extract emoji characters from text using Unicode ranges
     """
-    # Unicode ranges for emojis
+    # Improved emoji pattern that handles multi-character emojis
     emoji_pattern = re.compile(
-        "["
-        "\U0001F600-\U0001F64F"  # emoticons
-        "\U0001F300-\U0001F5FF"  # symbols & pictographs
-        "\U0001F680-\U0001F6FF"  # transport & map symbols
-        "\U0001F1E0-\U0001F1FF"  # flags
-        "\U00002702-\U000027B0"  # dingbats
-        "\U000024C2-\U0001F251"  # enclosed characters
-        "\U0001F900-\U0001F9FF"  # supplemental symbols
-        "\U0001FA00-\U0001FA6F"  # extended pictographs
-        "\U00002600-\U000026FF"  # miscellaneous symbols
-        "]+",
+        "(?:"
+        "[\U0001F600-\U0001F64F]|"  # emoticons
+        "[\U0001F300-\U0001F5FF]|"  # symbols & pictographs
+        "[\U0001F680-\U0001F6FF]|"  # transport & map symbols
+        "[\U0001F1E0-\U0001F1FF]|"  # flags
+        "[\U00002702-\U000027B0]|"  # dingbats
+        "[\U000024C2-\U0001F251]|"  # enclosed characters
+        "[\U0001F900-\U0001F9FF]|"  # supplemental symbols
+        "[\U0001FA00-\U0001FA6F]|"  # extended pictographs
+        "[\U00002600-\U000026FF]"   # miscellaneous symbols
+        ")(?:[\U0001F3FB-\U0001F3FF]|[\U0000FE0F\U0000200D]|[\U00002640\U00002642\U000026A7\U0001F3F3\U0001F308])*",
         flags=re.UNICODE
     )
     
+    # Find all emoji matches
     emojis = emoji_pattern.findall(text)
-    # Split combined emojis and clean up
+    
+    # Remove duplicates while preserving order
+    seen = set()
     result = []
     for emoji in emojis:
-        result.extend(list(emoji))
+        if emoji not in seen and emoji.strip():
+            seen.add(emoji)
+            result.append(emoji)
     
     return result[:8]  # Limit to 8 emojis
 

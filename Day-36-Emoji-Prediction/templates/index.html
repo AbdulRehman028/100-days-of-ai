@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>😀 Emoji Prediction - AI Powered</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <!-- Particle Background -->
+    <div class="particles-background">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <span class="emoji-icon">😀</span>
+                <h1>Emoji Prediction</h1>
+            </div>
+            <p class="subtitle">AI-powered emoji suggestions for your text</p>
+            <div class="model-badge">
+                <i class="fas fa-robot"></i>
+                <span id="modelStatus">Loading...</span>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Input Section -->
+            <section class="input-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-keyboard"></i> Enter Your Text</h2>
+                </div>
+
+                <form id="predictionForm">
+                    <div class="input-group">
+                        <label for="textInput">
+                            <i class="fas fa-comment-dots"></i>
+                            What's on your mind?
+                        </label>
+                        <textarea id="textInput"
+                            placeholder="Type something... (e.g., 'I love pizza and coffee!' or 'Feeling happy today!')"
+                            rows="4" maxlength="500" required></textarea>
+                        <div class="input-meta">
+                            <span class="char-counter">
+                                <span id="charCount">0</span>/500 characters
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Example Prompts -->
+                    <div class="examples-section">
+                        <p class="examples-label">
+                            <i class="fas fa-lightbulb"></i> Try these examples:
+                        </p>
+                        <div class="examples-grid">
+                            <button type="button" class="example-btn"
+                                onclick="tryExample('I just got a promotion at work! So excited!')">
+                                <span>Work Success</span>
+                            </button>
+                            <button type="button" class="example-btn"
+                                onclick="tryExample('Feeling sad and lonely today')">
+                                <span>Feeling Down</span>
+                            </button>
+                            <button type="button" class="example-btn"
+                                onclick="tryExample('Going to the beach tomorrow! Can\'t wait!')">
+                                <span>Beach Trip</span>
+                            </button>
+
+                            <button type="button" class="example-btn"
+                                onclick="tryExample('I love pizza, burgers, and ice cream!')">
+                                <span>Food Love</span>
+                            </button>
+                            <button type="button" class="example-btn"
+                                onclick="tryExample('Happy birthday! Wishing you all the best!')">
+                                <span>Birthday Wish</span>
+                            </button>
+                            <button type="button" class="example-btn"
+                                onclick="tryExample('My cat is so cute and fluffy!')">
+                                <span>Pet Love</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Predict Button -->
+                    <button type="submit" class="btn-predict" id="predictBtn">
+                        <i class="fas fa-magic"></i>
+                        <span>Predict Emojis</span>
+                    </button>
+                </form>
+            </section>
+
+            <!-- Result Section -->
+            <section id="resultSection" class="result-section" style="display: none;">
+                <div class="section-header">
+                    <h2><i class="fas fa-smile-beam"></i> Predicted Emojis</h2>
+                </div>
+
+                <div class="result-card">
+                    <div class="result-header">
+                        <div class="result-info">
+                            <span class="result-label">Your Text:</span>
+                            <p id="resultText" class="result-text"></p>
+                        </div>
+                        <div class="result-meta">
+                            <span id="resultTime" class="time-badge"></span>
+                            <span class="emoji-count">
+                                <i class="fas fa-smile"></i>
+                                <span id="emojiCount">0</span> emojis
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="emoji-display" id="emojiDisplay">
+                        <!-- Emojis will be inserted here -->
+                    </div>
+
+                    <div class="result-actions">
+                        <button class="action-btn" onclick="copyEmojis()" title="Copy emojis">
+                            <i class="fas fa-copy"></i>
+                            <span>Copy Emojis</span>
+                        </button>
+                        <button class="action-btn" onclick="copyWithText()" title="Copy text with emojis">
+                            <i class="fas fa-file-alt"></i>
+                            <span>Copy with Text</span>
+                        </button>
+                        <button class="action-btn" onclick="predictAgain()" title="Predict again">
+                            <i class="fas fa-redo"></i>
+                            <span>Try Again</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Features Section -->
+            <section class="features-section">
+                <h3><i class="fas fa-star"></i> Features</h3>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🤖</div>
+                        <h4>AI-Powered</h4>
+                        <p>Uses Llama 3.2 LLM for intelligent emoji prediction</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🎯</div>
+                        <h4>Context-Aware</h4>
+                        <p>Understands emotions, topics, and text context</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <h4>Fast Prediction</h4>
+                        <p>Get emoji suggestions in seconds</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">😊</div>
+                        <h4>1000+ Emojis</h4>
+                        <p>Comprehensive emoji database across categories</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Built with ❤️ for Day 36 of 100 Days of AI</p>
+            <p class="tech-stack">
+                <i class="fab fa-python"></i> Flask •
+                <i class="fas fa-brain"></i> Llama 3.2 •
+                <i class="fas fa-code"></i> JavaScript
+            </p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+
+</html>

@@ -5,7 +5,6 @@ import time
 import os
 import re
 
-# Load environment variables from .env file
 load_dotenv()
 
 app = Flask(__name__)

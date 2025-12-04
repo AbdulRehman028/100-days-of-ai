@@ -89,7 +89,6 @@ def predict_emojis_with_llm(text):
     if not API_TOKEN:
         return {"error": "API token not configured"}, 400
     
-    # Build a comprehensive prompt for the LLM
     prompt = f"""Analyze this text and suggest the most relevant emojis:
 
 Text: "{text}"

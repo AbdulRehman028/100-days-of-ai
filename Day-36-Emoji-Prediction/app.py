@@ -5,10 +5,12 @@ import time
 import os
 import re
 
+# Load environment variables from .env file
 load_dotenv()
 
 app = Flask(__name__)
 
+# HuggingFace Router API (OpenAI-compatible endpoint)
 API_URL = "https://router.huggingface.co/v1/chat/completions"
 API_TOKEN = os.getenv("HF_API_TOKEN", "")
 
@@ -21,6 +23,7 @@ else:
     print("🤖 Model: Llama 3.2 3B Instruct")
     print("😀 Emoji Prediction Ready!")
 
+# Comprehensive emoji database organized by categories
 EMOJI_DATABASE = {
     "emotions": {
         "happy": ["😊", "😃", "😄", "😁", "🤗", "😍", "🥰", "😘", "🤩", "☺️"],
@@ -89,6 +92,7 @@ def predict_emojis_with_llm(text):
     if not API_TOKEN:
         return {"error": "API token not configured"}, 400
     
+    # Build a comprehensive prompt for the LLM
     prompt = f"""Analyze this text and suggest the most relevant emojis:
 
 Text: "{text}"
@@ -141,8 +145,10 @@ Now analyze the text above and return only the emojis:"""
         data = response.json()
         emoji_text = data['choices'][0]['message']['content'].strip()
         
+        # Extract only emoji characters from the response
         emojis = extract_emojis(emoji_text)
         
+        # Fallback: if no emojis found, use keyword matching
         if not emojis:
             emojis = fallback_emoji_prediction(text)
         
@@ -168,6 +174,7 @@ def extract_emojis(text):
     """
     Extract emoji characters from text using Unicode ranges
     """
+    # Improved emoji pattern that handles multi-character emojis
     emoji_pattern = re.compile(
         "(?:"
         "[\U0001F600-\U0001F64F]|"  # emoticons

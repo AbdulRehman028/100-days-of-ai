@@ -141,7 +141,6 @@ Now analyze the text above and return only the emojis:"""
         data = response.json()
         emoji_text = data['choices'][0]['message']['content'].strip()
         
-        # Extract only emoji characters from the response
         emojis = extract_emojis(emoji_text)
         
         # Fallback: if no emojis found, use keyword matching

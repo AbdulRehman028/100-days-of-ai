@@ -21,7 +21,6 @@ else:
     print("🤖 Model: Llama 3.2 3B Instruct")
     print("😀 Emoji Prediction Ready!")
 
-# Comprehensive emoji database organized by categories
 EMOJI_DATABASE = {
     "emotions": {
         "happy": ["😊", "😃", "😄", "😁", "🤗", "😍", "🥰", "😘", "🤩", "☺️"],

@@ -9,7 +9,6 @@ load_dotenv()
 
 app = Flask(__name__)
 
-# HuggingFace Router API (OpenAI-compatible endpoint)
 API_URL = "https://router.huggingface.co/v1/chat/completions"
 API_TOKEN = os.getenv("HF_API_TOKEN", "")
 

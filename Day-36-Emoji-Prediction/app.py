@@ -168,7 +168,6 @@ def extract_emojis(text):
     """
     Extract emoji characters from text using Unicode ranges
     """
-    # Improved emoji pattern that handles multi-character emojis
     emoji_pattern = re.compile(
         "(?:"
         "[\U0001F600-\U0001F64F]|"  # emoticons

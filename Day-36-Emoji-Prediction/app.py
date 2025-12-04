@@ -143,7 +143,6 @@ Now analyze the text above and return only the emojis:"""
         
         emojis = extract_emojis(emoji_text)
         
-        # Fallback: if no emojis found, use keyword matching
         if not emojis:
             emojis = fallback_emoji_prediction(text)
         

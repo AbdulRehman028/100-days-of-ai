@@ -311,7 +311,6 @@ if __name__ == '__main__':
     print("\n" + "="*80)
     print("😀 Emoji Prediction Web App")
     print("="*80)
-    print("🤖 LLM-powered intelligent emoji suggestions")
     print("🌐 Opening web interface at http://127.0.0.1:5000")
     print("="*80 + "\n")
     

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>😂 Meme Caption Generator - AI Powered</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <!-- Animated Background -->
+    <div class="meme-background">
+        <div class="float-emoji">😂</div>
+        <div class="float-emoji">🤣</div>
+        <div class="float-emoji">💀</div>
+        <div class="float-emoji">😭</div>
+        <div class="float-emoji">🔥</div>
+    </div>
+
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <span class="logo-emoji">😂</span>
+                <h1>Meme Caption Generator</h1>
+            </div>
+            <p class="subtitle">AI-powered meme captions that hit different</p>
+            <div class="model-badge">
+                <i class="fas fa-robot"></i>
+                <span id="modelStatus">Loading...</span>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Input Section -->
+            <section class="input-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-image"></i> Describe Your Meme</h2>
+                </div>
+
+                <form id="captionForm">
+                    <div class="input-group">
+                        <label for="description">
+                            <i class="fas fa-comment-dots"></i>
+                            What's in the image?
+                        </label>
+                        <textarea id="description" 
+                            placeholder="Describe your meme image... (e.g., 'A dog staring at a laptop looking confused' or 'Person running away from responsibilities')"
+                            rows="4" 
+                            maxlength="500" 
+                            required></textarea>
+                        <div class="input-meta">
+                            <span class="char-counter">
+                                <span id="charCount">0</span>/500 characters
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Caption Style -->
+                    <div class="input-group">
+                        <label for="style">
+                            <i class="fas fa-palette"></i>
+                            Caption Style
+                        </label>
+                        <select id="style" class="style-select">
+                            <option value="funny">😂 Funny - Classic humor</option>
+                            <option value="relatable">😌 Relatable - Everyday situations</option>
+                            <option value="sarcastic">😏 Sarcastic - Witty & clever</option>
+                            <option value="motivational">💪 Motivational - Inspirational</option>
+                            <option value="dark_humor">💀 Dark Humor - Edgy comedy</option>
+                            <option value="wholesome">🥰 Wholesome - Heartwarming</option>
+                            <option value="absurd">🤪 Absurd - Surreal & random</option>
+                            <option value="pop_culture">🎬 Pop Culture - Trendy references</option>
+                        </select>
+                    </div>
+
+                    <!-- Caption Count -->
+                    <div class="input-group">
+                        <label for="count">
+                            <i class="fas fa-list-ol"></i>
+                            Number of Captions: <span id="countValue">5</span>
+                        </label>
+                        <input type="range" id="count" min="1" max="10" value="5" class="range-slider">
+                    </div>
+
+                    <!-- Example Prompts -->
+                    <div class="examples-section">
+                        <p class="examples-label">
+                            <i class="fas fa-lightbulb"></i> Try these examples:
+                        </p>
+                        <div class="examples-grid">
+                            <button type="button" class="example-btn" 
+                                onclick="tryExample('A cat sitting at a desk with a laptop looking stressed')">
+                                <span>😾 Stressed Cat</span>
+                            </button>
+                            <button type="button" class="example-btn" 
+                                onclick="tryExample('A person running away while being chased by responsibilities')">
+                                <span>🏃 Avoiding Work</span>
+                            </button>
+                            <button type="button" class="example-btn" 
+                                onclick="tryExample('Two buttons: one says sleep, one says stay up. Hand hovering over stay up')">
+                                <span>😴 Sleep Struggle</span>
+                            </button>
+                            <button type="button" class="example-btn" 
+                                onclick="tryExample('Dog with googly eyes staring at the camera looking confused')">
+                                <span>🐕 Confused Dog</span>
+                            </button>
+                            <button type="button" class="example-btn" 
+                                onclick="tryExample('Person checking their bank account with horrified expression')">
+                                <span>💸 Broke Life</span>
+                            </button>
+                            <button type="button" class="example-btn" 
+                                onclick="tryExample('Drake refusing one thing and pointing at another thing')">
+                                <span>🎤 Drake Meme</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Generate Button -->
+                    <button type="submit" class="btn-generate" id="generateBtn">
+                        <i class="fas fa-magic"></i>
+                        <span>Generate Captions</span>
+                    </button>
+                </form>
+            </section>
+
+            <!-- Results Section -->
+            <section id="resultSection" class="result-section" style="display: none;">
+                <div class="section-header">
+                    <h2><i class="fas fa-laugh-beam"></i> Your Meme Captions</h2>
+                </div>
+
+                <div class="result-card">
+                    <div class="result-header">
+                        <div class="result-info">
+                            <span class="result-label">Image Description:</span>
+                            <p id="resultDescription" class="result-text"></p>
+                        </div>
+                        <div class="result-meta">
+                            <span id="resultTime" class="time-badge"></span>
+                            <span class="caption-count">
+                                <i class="fas fa-quote-left"></i>
+                                <span id="captionCount">0</span> captions
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="captions-list" id="captionsList">
+                        <!-- Captions will be inserted here -->
+                    </div>
+
+                    <div class="result-actions">
+                        <button class="action-btn" onclick="copyAllCaptions()" title="Copy all captions">
+                            <i class="fas fa-copy"></i>
+                            <span>Copy All</span>
+                        </button>
+                        <button class="action-btn" onclick="downloadCaptions()" title="Download as text file">
+                            <i class="fas fa-download"></i>
+                            <span>Download</span>
+                        </button>
+                        <button class="action-btn" onclick="generateAgain()" title="Generate new captions">
+                            <i class="fas fa-redo"></i>
+                            <span>Try Again</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Features Section -->
+            <section class="features-section">
+                <h3><i class="fas fa-star"></i> Features</h3>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🤖</div>
+                        <h4>AI-Powered</h4>
+                        <p>Uses Llama 3.2 LLM for creative caption generation</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🎨</div>
+                        <h4>8 Styles</h4>
+                        <p>From funny to wholesome, sarcastic to motivational</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <h4>Fast Generation</h4>
+                        <p>Get multiple caption options in seconds</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔥</div>
+                        <h4>Viral Ready</h4>
+                        <p>Captions designed to be shareable and engaging</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Built with 😂 By Abdur Rehman Baig for Day 37 of 100 Days of AI</p>
+            <p class="tech-stack">
+                <i class="fab fa-python"></i> Flask •
+                <i class="fas fa-brain"></i> Llama 3.2 •
+                <i class="fas fa-code"></i> JavaScript
+            </p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+
+</html>

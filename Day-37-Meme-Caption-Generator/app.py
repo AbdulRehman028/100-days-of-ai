@@ -11,7 +11,6 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
-# HuggingFace Router API
 API_URL = "https://router.huggingface.co/v1/chat/completions"
 API_TOKEN = os.getenv("HF_API_TOKEN", "")
 
@@ -23,7 +22,6 @@ else:
     print("🤖 Model: Llama 3.2 3B Instruct")
     print("😂 Meme Caption Generator Ready!")
 
-# Meme caption styles/templates
 CAPTION_STYLES = {
     "funny": "Generate a funny, humorous caption that would make people laugh",
     "relatable": "Generate a relatable caption that captures everyday situations",

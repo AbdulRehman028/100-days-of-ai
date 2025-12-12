@@ -261,7 +261,7 @@ textarea:focus {
     border-radius: 5px;
     background: var(--background);
     outline: none;
-    -webkit-appearance: none;
+    appearance: none;
 }
 
 .range-slider::-webkit-slider-thumb {

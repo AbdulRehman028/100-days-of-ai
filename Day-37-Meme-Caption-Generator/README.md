@@ -15,17 +15,20 @@ AI-powered meme caption generator using Llama 3.2 LLM. Generate creative, funny,
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - Python 3.8+
 - HuggingFace API Token (free at https://huggingface.co/settings/tokens)
 
 ### Installation
 
 1. **Install dependencies:**
+
 ```bash
 pip install -r requirements.txt
 ```
 
 2. **Setup environment variables:**
+
 ```bash
 # Copy example file
 copy .env.example .env
@@ -35,11 +38,13 @@ HF_API_TOKEN=your_token_here
 ```
 
 3. **Run the app:**
+
 ```bash
 python app.py
 ```
 
 4. **Open in browser:**
+
 ```
 http://localhost:5000
 ```
@@ -66,22 +71,23 @@ http://localhost:5000
 
 ## 🎨 Caption Styles
 
-| Style | Description | Best For |
-|-------|-------------|----------|
-| 😂 Funny | Classic humor | General memes |
-| 😌 Relatable | Everyday situations | Life memes |
-| 😏 Sarcastic | Witty & clever | Edgy content |
-| 💪 Motivational | Inspirational | Positive vibes |
-| 💀 Dark Humor | Edgy comedy | Adult humor |
-| 🥰 Wholesome | Heartwarming | Feel-good content |
-| 🤪 Absurd | Surreal & random | Weird memes |
-| 🎬 Pop Culture | Trendy references | Current events |
+| Style           | Description         | Best For          |
+| --------------- | ------------------- | ----------------- |
+| 😂 Funny        | Classic humor       | General memes     |
+| 😌 Relatable    | Everyday situations | Life memes        |
+| 😏 Sarcastic    | Witty & clever      | Edgy content      |
+| 💪 Motivational | Inspirational       | Positive vibes    |
+| 💀 Dark Humor   | Edgy comedy         | Adult humor       |
+| 🥰 Wholesome    | Heartwarming        | Feel-good content |
+| 🤪 Absurd       | Surreal & random    | Weird memes       |
+| 🎬 Pop Culture  | Trendy references   | Current events    |
 
 ## 📊 Example Output
 
 **Description:** "A cat staring at a laptop looking confused"
 
 **Generated Captions (Funny Style):**
+
 1. When you realize it's Monday tomorrow
 2. Me trying to understand my life choices
 3. POV: You're checking your exam results
@@ -118,11 +124,13 @@ Day-37-Meme-Caption-Generator/
 ## 🔧 Configuration
 
 ### Environment Variables
+
 ```env
 HF_API_TOKEN=your_huggingface_token_here
 ```
 
 ### API Settings (in app.py)
+
 - **Model**: `meta-llama/Llama-3.2-3B-Instruct`
 - **Max Tokens**: 500
 - **Temperature**: 0.9 (creative)
@@ -132,12 +140,14 @@ HF_API_TOKEN=your_huggingface_token_here
 ## 🎯 Features Breakdown
 
 ### Caption Generation
+
 - Uses LLM with specialized prompts for each style
 - Parses numbered captions from response
 - Fallback captions if parsing fails
 - Removes duplicates and cleans formatting
 
 ### User Interface
+
 - Two-column layout on large screens
 - Sticky result section
 - Animated emoji background
@@ -148,6 +158,7 @@ HF_API_TOKEN=your_huggingface_token_here
 - Download as text file
 
 ### Copy Functionality
+
 - Modern Clipboard API
 - Fallback for older browsers
 - Toast notifications
@@ -156,26 +167,32 @@ HF_API_TOKEN=your_huggingface_token_here
 ## 🐛 Troubleshooting
 
 **Problem:** "No HuggingFace API token found!"
+
 - **Solution**: Create `.env` file with `HF_API_TOKEN=your_token`
 
 **Problem:** Captions not generating
+
 - **Solution**: Check internet connection and API token validity
 
 **Problem:** Copy button doesn't work
+
 - **Solution**: Use HTTPS or localhost (required for Clipboard API)
 
 **Problem:** Slow generation
+
 - **Solution**: First API call takes longer, subsequent calls are faster
 
 ## 🚀 Deployment
 
 ### Render.com
+
 1. Create new Web Service
 2. Connect GitHub repository
 3. Add environment variable: `HF_API_TOKEN`
 4. Deploy!
 
 ### HuggingFace Spaces
+
 1. Create new Space (Gradio/Streamlit)
 2. Upload all files
 3. Add secret: `HF_API_TOKEN`
@@ -203,6 +220,7 @@ MIT License - feel free to use for learning
 ## 👨‍💻 Author
 
 **Abdur Rehman Baig**
+
 - Day 37 of 100 Days of AI Challenge
 - Built with 😂 and lots of coffee ☕
 
@@ -214,6 +232,6 @@ MIT License - feel free to use for learning
 
 ---
 
-**Made with ❤️ for the Day 37 of 100 Days of AI Challenge**
+**Made with ❤️ for the Day 37 of 100 Days of AI Challenge By Abdur Rehman Baig**
 
 *Keep calm and meme on!* 😂🚀

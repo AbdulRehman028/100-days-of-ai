@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✍️ Handwriting to Text - AI Powered</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6366f1',
+                        secondary: '#8b5cf6',
+                        accent: '#ec4899',
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body class="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 min-h-screen text-white">
+    <!-- Animated Background -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-20 left-10 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+        <div class="absolute top-40 right-10 w-72 h-72 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+        <div class="absolute bottom-20 left-1/3 w-72 h-72 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+    </div>
+
+    <div class="container mx-auto px-4 py-8 relative z-10">
+        <!-- Header -->
+        <header class="text-center mb-12 animate-fade-in-down">
+            <div class="flex items-center justify-center gap-4 mb-4">
+                <span class="text-6xl animate-bounce">✍️</span>
+                <h1 class="text-5xl md:text-6xl font-bold bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                    Handwriting to Text
+                </h1>
+            </div>
+            <p class="text-xl text-purple-200 mb-4">AI-powered handwriting recognition</p>
+            <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-lg px-4 py-2 rounded-full border border-purple-500/30">
+                <i class="fas fa-robot text-purple-400"></i>
+                <span id="modelStatus" class="text-sm">Loading...</span>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="grid lg:grid-cols-2 gap-8 max-w-7xl mx-auto">
+            <!-- Input Section -->
+            <div class="space-y-6 animate-fade-in-left">
+                <!-- Tabs -->
+                <div class="flex gap-2 bg-white/5 backdrop-blur-lg p-2 rounded-xl border border-purple-500/30">
+                    <button onclick="switchTab('canvas')" id="canvasTab" class="tab-btn active flex-1 px-6 py-3 rounded-lg font-semibold transition-all">
+                        <i class="fas fa-pen mr-2"></i>Draw
+                    </button>
+                    <button onclick="switchTab('upload')" id="uploadTab" class="tab-btn flex-1 px-6 py-3 rounded-lg font-semibold transition-all">
+                        <i class="fas fa-upload mr-2"></i>Upload
+                    </button>
+                </div>
+
+                <!-- Canvas Section -->
+                <div id="canvasSection" class="tab-content">
+                    <div class="bg-white/10 backdrop-blur-lg p-6 rounded-2xl border border-purple-500/30 shadow-2xl">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-2xl font-bold flex items-center gap-2">
+                                <i class="fas fa-paint-brush text-purple-400"></i>
+                                Draw Your Text
+                            </h2>
+                            <button onclick="clearCanvas()" class="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded-lg transition-all border border-red-500/30">
+                                <i class="fas fa-trash mr-2"></i>Clear
+                            </button>
+                        </div>
+                        
+                        <div class="bg-white rounded-xl overflow-hidden shadow-inner mb-4">
+                            <canvas id="drawingCanvas" width="600" height="300" class="cursor-crosshair w-full"></canvas>
+                        </div>
+
+                        <div class="flex gap-4 mb-4">
+                            <div class="flex-1">
+                                <label class="block text-sm font-medium mb-2">Pen Size</label>
+                                <input type="range" id="penSize" min="1" max="20" value="3" class="w-full accent-purple-500">
+                            </div>
+                            <div class="flex-1">
+                                <label class="block text-sm font-medium mb-2">Color</label>
+                                <input type="color" id="penColor" value="#000000" class="w-full h-10 rounded-lg cursor-pointer">
+                            </div>
+                        </div>
+
+                        <button onclick="recognizeCanvas()" id="canvasBtn" class="w-full py-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all transform hover:scale-105">
+                            <i class="fas fa-magic mr-2"></i>Recognize Text
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Upload Section -->
+                <div id="uploadSection" class="tab-content hidden">
+                    <div class="bg-white/10 backdrop-blur-lg p-6 rounded-2xl border border-purple-500/30 shadow-2xl">
+                        <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
+                            <i class="fas fa-cloud-upload-alt text-purple-400"></i>
+                            Upload Image
+                        </h2>
+
+                        <div class="border-2 border-dashed border-purple-500/50 rounded-xl p-8 text-center hover:border-purple-400 transition-all cursor-pointer bg-white/5" id="dropZone">
+                            <i class="fas fa-image text-6xl text-purple-400 mb-4"></i>
+                            <p class="text-lg mb-2">Drag & drop your image here</p>
+                            <p class="text-sm text-purple-300 mb-4">or</p>
+                            <label class="inline-block px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg cursor-pointer transition-all">
+                                <i class="fas fa-folder-open mr-2"></i>Browse Files
+                                <input type="file" id="fileInput" accept="image/*" class="hidden">
+                            </label>
+                            <p class="text-xs text-purple-300 mt-4">Supports: PNG, JPG, JPEG, GIF, BMP</p>
+                        </div>
+
+                        <div id="imagePreview" class="hidden mt-4">
+                            <img id="previewImg" class="w-full rounded-xl shadow-lg">
+                            <button onclick="recognizeUpload()" id="uploadBtn" class="w-full mt-4 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all transform hover:scale-105">
+                                <i class="fas fa-magic mr-2"></i>Recognize Text
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Examples -->
+                <div class="bg-white/10 backdrop-blur-lg p-6 rounded-2xl border border-purple-500/30">
+                    <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+                        <i class="fas fa-lightbulb text-yellow-400"></i>
+                        Try These Examples
+                    </h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="drawExample('note')" class="px-4 py-3 bg-purple-600/30 hover:bg-purple-600/50 rounded-lg transition-all border border-purple-500/30">
+                            📝 Note
+                        </button>
+                        <button onclick="drawExample('signature')" class="px-4 py-3 bg-purple-600/30 hover:bg-purple-600/50 rounded-lg transition-all border border-purple-500/30">
+                            ✒️ Signature
+                        </button>
+                        <button onclick="drawExample('list')" class="px-4 py-3 bg-purple-600/30 hover:bg-purple-600/50 rounded-lg transition-all border border-purple-500/30">
+                            📋 List
+                        </button>
+                        <button onclick="drawExample('quote')" class="px-4 py-3 bg-purple-600/30 hover:bg-purple-600/50 rounded-lg transition-all border border-purple-500/30">
+                            💬 Quote
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div id="resultSection" class="hidden animate-fade-in-right">
+                <div class="bg-white/10 backdrop-blur-lg p-6 rounded-2xl border border-purple-500/30 shadow-2xl sticky top-8">
+                    <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
+                        <i class="fas fa-check-circle text-green-400"></i>
+                        Recognized Text
+                    </h2>
+
+                    <!-- Stats -->
+                    <div class="grid grid-cols-4 gap-3 mb-6">
+                        <div class="bg-white/5 p-3 rounded-lg text-center border border-purple-500/20">
+                            <div class="text-2xl font-bold text-purple-400" id="wordCount">0</div>
+                            <div class="text-xs text-purple-300">Words</div>
+                        </div>
+                        <div class="bg-white/5 p-3 rounded-lg text-center border border-purple-500/20">
+                            <div class="text-2xl font-bold text-indigo-400" id="lineCount">0</div>
+                            <div class="text-xs text-purple-300">Lines</div>
+                        </div>
+                        <div class="bg-white/5 p-3 rounded-lg text-center border border-purple-500/20">
+                            <div class="text-2xl font-bold text-pink-400" id="charCount">0</div>
+                            <div class="text-xs text-purple-300">Chars</div>
+                        </div>
+                        <div class="bg-white/5 p-3 rounded-lg text-center border border-purple-500/20">
+                            <div class="text-2xl font-bold text-green-400" id="confidence">0%</div>
+                            <div class="text-xs text-purple-300">Score</div>
+                        </div>
+                    </div>
+
+                    <!-- Text Output -->
+                    <div class="bg-white/5 p-4 rounded-xl mb-4 border border-purple-500/20">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm text-purple-300">Output Text</span>
+                            <span class="text-xs text-purple-400" id="processingTime">0.0s</span>
+                        </div>
+                        <div id="recognizedText" class="text-lg leading-relaxed min-h-[100px] max-h-[300px] overflow-y-auto custom-scrollbar">
+                            <!-- Text will appear here -->
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="copyText()" class="px-4 py-3 bg-green-600/30 hover:bg-green-600/50 rounded-lg transition-all border border-green-500/30 font-semibold">
+                            <i class="fas fa-copy mr-2"></i>Copy
+                        </button>
+                        <button onclick="downloadText()" class="px-4 py-3 bg-blue-600/30 hover:bg-blue-600/50 rounded-lg transition-all border border-blue-500/30 font-semibold">
+                            <i class="fas fa-download mr-2"></i>Download
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <section class="mt-16 animate-fade-in-up">
+            <div class="bg-white/10 backdrop-blur-lg p-8 rounded-2xl border border-purple-500/30">
+                <h3 class="text-3xl font-bold text-center mb-8 flex items-center justify-center gap-2">
+                    <i class="fas fa-star text-yellow-400"></i>
+                    Features
+                </h3>
+                <div class="grid md:grid-cols-4 gap-6">
+                    <div class="text-center p-6 bg-white/5 rounded-xl border border-purple-500/20 hover:border-purple-400/50 transition-all">
+                        <div class="text-4xl mb-3">🎨</div>
+                        <h4 class="font-bold text-lg mb-2">Draw & Write</h4>
+                        <p class="text-sm text-purple-300">Canvas with adjustable pen settings</p>
+                    </div>
+                    <div class="text-center p-6 bg-white/5 rounded-xl border border-purple-500/20 hover:border-purple-400/50 transition-all">
+                        <div class="text-4xl mb-3">📸</div>
+                        <h4 class="font-bold text-lg mb-2">Upload Images</h4>
+                        <p class="text-sm text-purple-300">Support for multiple formats</p>
+                    </div>
+                    <div class="text-center p-6 bg-white/5 rounded-xl border border-purple-500/20 hover:border-purple-400/50 transition-all">
+                        <div class="text-4xl mb-3">🤖</div>
+                        <h4 class="font-bold text-lg mb-2">AI Powered</h4>
+                        <p class="text-sm text-purple-300">Llama 3.2 LLM recognition</p>
+                    </div>
+                    <div class="text-center p-6 bg-white/5 rounded-xl border border-purple-500/20 hover:border-purple-400/50 transition-all">
+                        <div class="text-4xl mb-3">⚡</div>
+                        <h4 class="font-bold text-lg mb-2">Fast Processing</h4>
+                        <p class="text-sm text-purple-300">Real-time text recognition</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="text-center mt-12 text-purple-300">
+            <p class="mb-2">Built with ✍️ by Abdur Rehman Baig for Day 38 of 100 Days of AI</p>
+            <p class="text-sm flex items-center justify-center gap-2 flex-wrap">
+                <i class="fab fa-python"></i> Flask •
+                <i class="fas fa-brain"></i> Llama 3.2 •
+                <i class="fas fa-code"></i> Tailwind CSS
+            </p>
+        </footer>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="hidden fixed bottom-8 right-8 bg-green-500 text-white px-6 py-4 rounded-lg shadow-2xl animate-slide-in-right z-50">
+        <i class="fas fa-check-circle mr-2"></i>
+        <span id="toastMessage">Success!</span>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+
+</html>

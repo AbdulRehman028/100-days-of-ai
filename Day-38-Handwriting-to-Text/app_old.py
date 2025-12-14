@@ -18,8 +18,9 @@ try:
         tesseract_path = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
         if os.path.exists(tesseract_path):
             pytesseract.pytesseract.tesseract_cmd = tesseract_path
-except (ImportError, Exception):
+except ImportError:
     TESSERACT_AVAILABLE = False
+    print("⚠️  pytesseract not installed - using LLM simulation mode")
 
 # Load environment variables
 load_dotenv()
@@ -69,8 +70,8 @@ def recognize_canvas():
         if 'base64,' in image_data:
             image_data = image_data.split('base64,')[1]
         
-        # Use OCR or LLM
-        result = recognize_with_ocr(image_data, "canvas drawing")
+        # Use LLM to simulate handwriting recognition
+        result = recognize_with_llm(image_data, "canvas drawing")
         
         if isinstance(result, tuple):
             return jsonify(result[0]), result[1]
@@ -107,8 +108,8 @@ def recognize_upload():
         # Clean up
         os.remove(filepath)
         
-        # Recognize with OCR or LLM
-        result = recognize_with_ocr(image_data, filename)
+        # Recognize with LLM
+        result = recognize_with_llm(image_data, filename)
         
         if isinstance(result, tuple):
             return jsonify(result[0]), result[1]
@@ -118,7 +119,7 @@ def recognize_upload():
     except Exception as e:
         return jsonify({"error": f"Upload error: {str(e)}"}), 500
 
-def recognize_with_ocr(image_data, source):
+def recognize_with_llm(image_data, source):
     """Recognize handwriting using Tesseract OCR or LLM fallback"""
     
     # Try Tesseract OCR first if available
@@ -164,6 +165,37 @@ def recognize_with_ocr(image_data, source):
             print(f"OCR Error: {e}, falling back to LLM simulation")
     
     # Fallback to LLM simulation if OCR not available or failed
+            processing_time = round(time.time() - start_time, 2)
+            
+            # Calculate stats
+            words = recognized_text.split()
+            lines = [line for line in recognized_text.split('\n') if line.strip()]
+            
+            # Calculate confidence based on text quality
+            confidence = calculate_confidence(recognized_text)
+            
+            return {
+                "success": True,
+                "text": recognized_text,
+                "word_count": len(words),
+                "line_count": len(lines),
+                "char_count": len(recognized_text),
+                "confidence": confidence,
+                "processing_time": processing_time,
+                "source": source,
+                "method": "Tesseract OCR"
+            }
+        
+        # If no text found, fall back to LLM simulation
+        return recognize_with_llm_fallback()
+        
+    except Exception as e:
+        print(f"OCR Error: {str(e)}")
+        # Fallback to LLM if OCR fails
+        return recognize_with_llm_fallback()
+
+def recognize_with_llm_fallback():
+    """Fallback: Simulate handwriting recognition using LLM"""
     if not API_TOKEN:
         return {"error": "API token not configured"}, 400
     
@@ -235,7 +267,7 @@ Sarah Johnson
         
         # Extract words and lines
         words = recognized_text.split()
-        lines = [line for line in recognized_text.split('\n') if line.strip()]
+        lines = recognized_text.split('\n')
         
         return {
             "success": True,
@@ -245,8 +277,7 @@ Sarah Johnson
             "char_count": len(recognized_text),
             "confidence": confidence,
             "processing_time": processing_time,
-            "source": source,
-            "method": "LLM Simulation"
+            "source": source
         }
         
     except requests.exceptions.Timeout:

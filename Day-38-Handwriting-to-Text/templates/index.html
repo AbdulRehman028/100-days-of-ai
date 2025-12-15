@@ -35,16 +35,16 @@
         <!-- Header -->
         <header class="text-center mb-12 animate-fade-in-down">
             <div class="flex items-center justify-center gap-4 mb-4">
-                <span class="text-6xl animate-bounce">✍️</span>
+                <span class="text-6xl ">✍️</span>
                 <h1 class="text-5xl md:text-6xl font-bold bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
                     Handwriting to Text
                 </h1>
             </div>
             <p class="text-xl text-purple-200 mb-4">AI-powered handwriting recognition</p>
-            <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-lg px-4 py-2 rounded-full border border-purple-500/30">
+            <!-- <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-lg px-4 py-2 rounded-full border border-purple-500/30">
                 <i class="fas fa-robot text-purple-400"></i>
                 <span id="modelStatus" class="text-sm">Loading...</span>
-            </div>
+            </div> -->
         </header>
 
         <!-- Main Content -->
@@ -75,7 +75,7 @@
                         </div>
                         
                         <div class="bg-white rounded-xl overflow-hidden shadow-inner mb-4">
-                            <canvas id="drawingCanvas" width="600" height="300" class="cursor-crosshair w-full"></canvas>
+                            <canvas id="drawingCanvas" width="800" height="400" class="cursor-crosshair w-full"></canvas>
                         </div>
 
                         <div class="flex gap-4 mb-4">
@@ -92,6 +92,28 @@
                         <button onclick="recognizeCanvas()" id="canvasBtn" class="w-full py-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all transform hover:scale-105">
                             <i class="fas fa-magic mr-2"></i>Recognize Text
                         </button>
+
+                        <!-- Examples -->
+                        <div class="mt-6 pt-6 border-t border-purple-500/30">
+                            <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+                                <i class="fas fa-lightbulb text-yellow-400"></i>
+                                Try These Examples
+                            </h3>
+                            <div class="grid grid-cols-2 gap-3">
+                                <button onclick="drawExample('note')" class="px-4 py-3 bg-purple-600/30 hover:bg-purple-600/50 rounded-lg transition-all border border-purple-500/30">
+                                    📝 Note
+                                </button>
+                                <button onclick="drawExample('signature')" class="px-4 py-3 bg-purple-600/30 hover:bg-purple-600/50 rounded-lg transition-all border border-purple-500/30">
+                                    ✒️ Signature
+                                </button>
+                                <button onclick="drawExample('list')" class="px-4 py-3 bg-purple-600/30 hover:bg-purple-600/50 rounded-lg transition-all border border-purple-500/30">
+                                    📋 List
+                                </button>
+                                <button onclick="drawExample('quote')" class="px-4 py-3 bg-purple-600/30 hover:bg-purple-600/50 rounded-lg transition-all border border-purple-500/30">
+                                    💬 Quote
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -115,39 +137,17 @@
                         </div>
 
                         <div id="imagePreview" class="hidden mt-4">
-                            <img id="previewImg" class="w-full rounded-xl shadow-lg">
-                            <button onclick="recognizeUpload()" id="uploadBtn" class="w-full mt-4 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all transform hover:scale-105">
+                            <img id="previewImg" class="w-full rounded-xl shadow-lg mb-4">
+                            <button onclick="recognizeUpload()" id="uploadBtn" class="w-full py-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all transform hover:scale-105">
                                 <i class="fas fa-magic mr-2"></i>Recognize Text
                             </button>
                         </div>
                     </div>
                 </div>
-
-                <!-- Examples -->
-                <div class="bg-white/10 backdrop-blur-lg p-6 rounded-2xl border border-purple-500/30">
-                    <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
-                        <i class="fas fa-lightbulb text-yellow-400"></i>
-                        Try These Examples
-                    </h3>
-                    <div class="grid grid-cols-2 gap-3">
-                        <button onclick="drawExample('note')" class="px-4 py-3 bg-purple-600/30 hover:bg-purple-600/50 rounded-lg transition-all border border-purple-500/30">
-                            📝 Note
-                        </button>
-                        <button onclick="drawExample('signature')" class="px-4 py-3 bg-purple-600/30 hover:bg-purple-600/50 rounded-lg transition-all border border-purple-500/30">
-                            ✒️ Signature
-                        </button>
-                        <button onclick="drawExample('list')" class="px-4 py-3 bg-purple-600/30 hover:bg-purple-600/50 rounded-lg transition-all border border-purple-500/30">
-                            📋 List
-                        </button>
-                        <button onclick="drawExample('quote')" class="px-4 py-3 bg-purple-600/30 hover:bg-purple-600/50 rounded-lg transition-all border border-purple-500/30">
-                            💬 Quote
-                        </button>
-                    </div>
-                </div>
             </div>
 
             <!-- Results Section -->
-            <div id="resultSection" class="hidden animate-fade-in-right">
+            <div id="resultSection" class="animate-fade-in-right">
                 <div class="bg-white/10 backdrop-blur-lg p-6 rounded-2xl border border-purple-500/30 shadow-2xl sticky top-8">
                     <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
                         <i class="fas fa-check-circle text-green-400"></i>
@@ -181,7 +181,11 @@
                             <span class="text-xs text-purple-400" id="processingTime">0.0s</span>
                         </div>
                         <div id="recognizedText" class="text-lg leading-relaxed min-h-[100px] max-h-[300px] overflow-y-auto custom-scrollbar">
-                            <!-- Text will appear here -->
+                            <div class="flex flex-col items-center justify-center h-full text-center py-8">
+                                <i class="fas fa-pen-fancy text-6xl text-purple-400/30 mb-4"></i>
+                                <p class="text-purple-300/60 text-base">Draw or upload an image to recognize text</p>
+                                <p class="text-purple-400/40 text-sm mt-2">Your recognized text will appear here</p>
+                            </div>
                         </div>
                     </div>
 
@@ -232,12 +236,12 @@
 
         <!-- Footer -->
         <footer class="text-center mt-12 text-purple-300">
-            <p class="mb-2">Built with ✍️ by Abdur Rehman Baig for Day 38 of 100 Days of AI</p>
-            <p class="text-sm flex items-center justify-center gap-2 flex-wrap">
+            <p class="mb-2">Built with ❤️ by Abdur Rehman Baig for Day 38 of 100 Days of AI</p>
+            <!-- <p class="text-sm flex items-center justify-center gap-2 flex-wrap">
                 <i class="fab fa-python"></i> Flask •
                 <i class="fas fa-brain"></i> Llama 3.2 •
                 <i class="fas fa-code"></i> Tailwind CSS
-            </p>
+            </p> -->
         </footer>
     </div>
 

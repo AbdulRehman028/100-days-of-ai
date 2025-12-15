@@ -118,7 +118,6 @@ function handleTouch(e) {
 function clearCanvas() {
     ctx.fillStyle = 'white';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    document.getElementById('resultSection').classList.add('hidden');
 }
 
 // File handling
@@ -269,9 +268,6 @@ function displayResult(data) {
     }
     
     typeWriter();
-    
-    // Show result section
-    document.getElementById('resultSection').classList.remove('hidden');
     
     // Scroll to result on mobile
     if (window.innerWidth < 1024) {

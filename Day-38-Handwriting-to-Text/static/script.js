@@ -156,10 +156,19 @@ function displayImagePreview(file) {
     reader.onload = function(e) {
         const img = document.getElementById('previewImg');
         img.src = e.target.result;
+        document.getElementById('dropZone').classList.add('hidden');
         document.getElementById('imagePreview').classList.remove('hidden');
     };
     
     reader.readAsDataURL(file);
+}
+
+function clearUpload() {
+    selectedFile = null;
+    document.getElementById('fileInput').value = '';
+    document.getElementById('previewImg').src = '';
+    document.getElementById('imagePreview').classList.add('hidden');
+    document.getElementById('dropZone').classList.remove('hidden');
 }
 
 // Recognition functions

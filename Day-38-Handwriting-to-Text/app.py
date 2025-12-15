@@ -217,9 +217,9 @@ def clean_ocr_text(text):
     return text
 
 def recognize_with_ocr(image_data, source):
-    """Recognize handwriting using Tesseract OCR or LLM fallback"""
+    """Recognize handwriting using Tesseract OCR - English only"""
     
-    # Try Tesseract OCR first if available
+    # Try Tesseract OCR
     if TESSERACT_AVAILABLE:
         try:
             # Decode base64 image
@@ -231,36 +231,40 @@ def recognize_with_ocr(image_data, source):
             
             start_time = time.time()
             
-            # Try multiple OCR configurations for better results
+            print("🔍 Running OCR with English language...")
+            
+            # Try multiple configurations
             configs = [
-                '--psm 3',  # Fully automatic page segmentation
-                '--psm 6',  # Assume uniform block of text
-                '--psm 4',  # Assume single column of text
-                '--psm 11', # Sparse text. Find as much text as possible
+                '--psm 3',  # Fully automatic
+                '--psm 6',  # Uniform block of text
+                '--psm 4',  # Single column
             ]
             
             recognized_text = ""
             best_length = 0
             
             for config in configs:
-                # Try with original image
-                text1 = pytesseract.image_to_string(image, config=config)
-                # Try with preprocessed image
-                text2 = pytesseract.image_to_string(processed_image, config=config)
-                
-                # Pick the longer result
-                if len(text1.strip()) > best_length:
-                    recognized_text = text1.strip()
-                    best_length = len(recognized_text)
-                if len(text2.strip()) > best_length:
-                    recognized_text = text2.strip()
-                    best_length = len(recognized_text)
+                try:
+                    # Try with original image
+                    text1 = pytesseract.image_to_string(image, lang='eng', config=config)
+                    # Try with preprocessed image
+                    text2 = pytesseract.image_to_string(processed_image, lang='eng', config=config)
+                    
+                    # Pick the longer result
+                    if len(text1.strip()) > best_length:
+                        recognized_text = text1.strip()
+                        best_length = len(recognized_text)
+                    if len(text2.strip()) > best_length:
+                        recognized_text = text2.strip()
+                        best_length = len(recognized_text)
+                except Exception as e:
+                    continue
             
-            print(f"🔍 OCR Debug - Raw result: '{recognized_text}' (length: {len(recognized_text)})")
+            print(f"🔍 OCR Result: '{recognized_text}' (length: {len(recognized_text)})")
             
-            # If OCR found text, use it (even single characters)
+            # If OCR found text, return it
             if recognized_text and len(recognized_text) > 0:
-                # Clean up common OCR errors
+                # Clean up the text
                 recognized_text = clean_ocr_text(recognized_text)
                 
                 processing_time = round(time.time() - start_time, 2)
@@ -268,8 +272,6 @@ def recognize_with_ocr(image_data, source):
                 # Calculate stats
                 words = recognized_text.split()
                 lines = [line for line in recognized_text.split('\n') if line.strip()]
-                
-                # Calculate confidence based on text quality
                 confidence = calculate_confidence(recognized_text)
                 
                 return {
@@ -281,14 +283,13 @@ def recognize_with_ocr(image_data, source):
                     "confidence": confidence,
                     "processing_time": processing_time,
                     "source": source,
-                    "method": "Tesseract OCR"
+                    "method": "Tesseract OCR (English)"
                 }
             else:
-                print("⚠️ OCR returned empty text - no text detected")
-                # Return a helpful message instead of random LLM text
+                print("⚠️ OCR returned empty text")
                 return {
-                    "success": True,
-                    "text": "No text detected. Try:\n- Writing larger and clearer\n- Using darker/thicker strokes\n- Writing full words instead of single letters",
+                    "success": False,
+                    "text": "No text detected. Try:\n- Writing larger and clearer\n- Using darker strokes\n- Better image quality",
                     "word_count": 0,
                     "line_count": 0,
                     "char_count": 0,
@@ -299,10 +300,9 @@ def recognize_with_ocr(image_data, source):
                 }
         except Exception as e:
             print(f"❌ OCR Error: {e}")
-            # Return error message instead of random LLM text
             return {
                 "success": False,
-                "text": f"OCR Error: {str(e)}\n\nTry:\n- Clearer handwriting\n- Better lighting in photo\n- Higher contrast",
+                "text": f"OCR Error: {str(e)}",
                 "word_count": 0,
                 "line_count": 0,
                 "char_count": 0,
@@ -312,10 +312,10 @@ def recognize_with_ocr(image_data, source):
                 "method": "OCR (Error)"
             }
     
-    # If Tesseract not available, inform user
+    # If Tesseract not available
     return {
         "success": False,
-        "text": "Tesseract OCR not installed.\n\nDownload from:\nhttps://github.com/UB-Mannheim/tesseract/wiki\n\nInstall and restart the app.",
+        "text": "Tesseract OCR not installed.\n\nDownload from:\nhttps://github.com/UB-Mannheim/tesseract/wiki",
         "word_count": 0,
         "line_count": 0,
         "char_count": 0,

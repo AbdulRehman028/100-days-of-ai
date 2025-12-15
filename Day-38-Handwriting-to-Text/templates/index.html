@@ -33,14 +33,14 @@
 
     <div class="container mx-auto px-4 py-8 relative z-10">
         <!-- Header -->
-        <header class="text-center mb-12 animate-fade-in-down">
-            <div class="flex items-center justify-center gap-4 mb-4">
-                <span class="text-6xl ">✍️</span>
-                <h1 class="text-5xl md:text-6xl font-bold bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+        <header class="text-center mb-8 md:mb-12 animate-fade-in-down">
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 mb-4">
+                <span class="text-4xl sm:text-5xl md:text-6xl">✍️</span>
+                <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
                     Handwriting to Text
                 </h1>
             </div>
-            <p class="text-xl text-purple-200 mb-4">AI-powered handwriting recognition</p>
+            <p class="text-base sm:text-lg md:text-xl text-purple-200 mb-4 px-4">AI-powered handwriting recognition</p>
             <!-- <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-lg px-4 py-2 rounded-full border border-purple-500/30">
                 <i class="fas fa-robot text-purple-400"></i>
                 <span id="modelStatus" class="text-sm">Loading...</span>
@@ -48,7 +48,7 @@
         </header>
 
         <!-- Main Content -->
-        <div class="grid lg:grid-cols-2 gap-8 max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 max-w-7xl mx-auto">
             <!-- Input Section -->
             <div class="space-y-6 animate-fade-in-left">
                 <!-- Tabs -->
@@ -74,8 +74,8 @@
                             </button>
                         </div>
                         
-                        <div class="bg-white rounded-xl overflow-hidden shadow-inner mb-4">
-                            <canvas id="drawingCanvas" width="800" height="400" class="cursor-crosshair w-full"></canvas>
+                        <div class="bg-white rounded-xl overflow-hidden shadow-inner mb-4 max-w-full">
+                            <canvas id="drawingCanvas" width="800" height="400" class="cursor-crosshair w-full max-w-full h-auto"></canvas>
                         </div>
 
                         <div class="flex gap-4 mb-4">
@@ -208,40 +208,68 @@
         </div>
 
         <!-- Features Section -->
-        <section class="mt-16 animate-fade-in-up">
-            <div class="bg-white/10 backdrop-blur-lg p-8 rounded-2xl border border-purple-500/30">
-                <h3 class="text-3xl font-bold text-center mb-8 flex items-center justify-center gap-2">
-                    <i class="fas fa-star text-yellow-400"></i>
-                    Features
+        <section class="mt-12 md:mt-16 animate-fade-in-up">
+            <div class="text-center mb-8 md:mb-12 px-4">
+                <h3 class="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 md:mb-4 bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-400 bg-clip-text text-transparent">
+                    Powerful Features
                 </h3>
-                <div class="grid md:grid-cols-4 gap-6">
-                    <div class="text-center p-6 bg-white/5 rounded-xl border border-purple-500/20 hover:border-purple-400/50 transition-all">
-                        <div class="text-4xl mb-3">🎨</div>
-                        <h4 class="font-bold text-lg mb-2">Draw & Write</h4>
-                        <p class="text-sm text-purple-300">Canvas with adjustable pen settings</p>
+                <p class="text-purple-300 text-base md:text-lg">Everything you need for handwriting recognition</p>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+                <!-- Feature 1 -->
+                <div class="group relative h-full">
+                    <div class="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl blur opacity-25 group-hover:opacity-40 transition-opacity"></div>
+                    <div class="relative bg-white/10 backdrop-blur-lg p-6 md:p-8 rounded-2xl border border-purple-500/30 hover:border-purple-400/60 transition-all transform hover:scale-105 hover:-translate-y-2 h-full flex flex-col">
+                        <div class="w-14 h-14 md:w-16 md:h-16 mx-auto mb-3 md:mb-4 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center text-2xl md:text-3xl shadow-lg">
+                            🎨
+                        </div>
+                        <h4 class="font-bold text-lg md:text-xl mb-2 md:mb-3 text-white text-center">Draw & Write</h4>
+                        <p class="text-sm text-purple-300 leading-relaxed text-center flex-grow">Interactive canvas with customizable pen size and colors for natural drawing</p>
                     </div>
-                    <div class="text-center p-6 bg-white/5 rounded-xl border border-purple-500/20 hover:border-purple-400/50 transition-all">
-                        <div class="text-4xl mb-3">📸</div>
-                        <h4 class="font-bold text-lg mb-2">Upload Images</h4>
-                        <p class="text-sm text-purple-300">Support for multiple formats</p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="group relative h-full">
+                    <div class="absolute inset-0 bg-gradient-to-r from-indigo-600 to-blue-600 rounded-2xl blur opacity-25 group-hover:opacity-40 transition-opacity"></div>
+                    <div class="relative bg-white/10 backdrop-blur-lg p-6 md:p-8 rounded-2xl border border-purple-500/30 hover:border-indigo-400/60 transition-all transform hover:scale-105 hover:-translate-y-2 h-full flex flex-col">
+                        <div class="w-14 h-14 md:w-16 md:h-16 mx-auto mb-3 md:mb-4 bg-gradient-to-br from-indigo-500 to-blue-500 rounded-xl flex items-center justify-center text-2xl md:text-3xl shadow-lg">
+                            📸
+                        </div>
+                        <h4 class="font-bold text-lg md:text-xl mb-2 md:mb-3 text-white text-center">Upload Images</h4>
+                        <p class="text-sm text-purple-300 leading-relaxed text-center flex-grow">Drag & drop support for PNG, JPG, JPEG, GIF and BMP formats</p>
                     </div>
-                    <div class="text-center p-6 bg-white/5 rounded-xl border border-purple-500/20 hover:border-purple-400/50 transition-all">
-                        <div class="text-4xl mb-3">🤖</div>
-                        <h4 class="font-bold text-lg mb-2">AI Powered</h4>
-                        <p class="text-sm text-purple-300">Llama 3.2 LLM recognition</p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="group relative h-full">
+                    <div class="absolute inset-0 bg-gradient-to-r from-green-600 to-teal-600 rounded-2xl blur opacity-25 group-hover:opacity-40 transition-opacity"></div>
+                    <div class="relative bg-white/10 backdrop-blur-lg p-6 md:p-8 rounded-2xl border border-purple-500/30 hover:border-green-400/60 transition-all transform hover:scale-105 hover:-translate-y-2 h-full flex flex-col">
+                        <div class="w-14 h-14 md:w-16 md:h-16 mx-auto mb-3 md:mb-4 bg-gradient-to-br from-green-500 to-teal-500 rounded-xl flex items-center justify-center text-2xl md:text-3xl shadow-lg">
+                            🤖
+                        </div>
+                        <h4 class="font-bold text-lg md:text-xl mb-2 md:mb-3 text-white text-center">OCR Powered</h4>
+                        <p class="text-sm text-purple-300 leading-relaxed text-center flex-grow">Advanced Tesseract OCR engine for accurate text recognition</p>
                     </div>
-                    <div class="text-center p-6 bg-white/5 rounded-xl border border-purple-500/20 hover:border-purple-400/50 transition-all">
-                        <div class="text-4xl mb-3">⚡</div>
-                        <h4 class="font-bold text-lg mb-2">Fast Processing</h4>
-                        <p class="text-sm text-purple-300">Real-time text recognition</p>
+                </div>
+
+                <!-- Feature 4 -->
+                <div class="group relative h-full">
+                    <div class="absolute inset-0 bg-gradient-to-r from-yellow-600 to-orange-600 rounded-2xl blur opacity-25 group-hover:opacity-40 transition-opacity"></div>
+                    <div class="relative bg-white/10 backdrop-blur-lg p-6 md:p-8 rounded-2xl border border-purple-500/30 hover:border-yellow-400/60 transition-all transform hover:scale-105 hover:-translate-y-2 h-full flex flex-col">
+                        <div class="w-14 h-14 md:w-16 md:h-16 mx-auto mb-3 md:mb-4 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-xl flex items-center justify-center text-2xl md:text-3xl shadow-lg">
+                            ⚡
+                        </div>
+                        <h4 class="font-bold text-lg md:text-xl mb-2 md:mb-3 text-white text-center">Fast Processing</h4>
+                        <p class="text-sm text-purple-300 leading-relaxed text-center flex-grow">Real-time text recognition with instant results and statistics</p>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- Footer -->
-        <footer class="text-center mt-12 text-purple-300">
-            <p class="mb-2">Built with ❤️ by Abdur Rehman Baig for Day 38 of 100 Days of AI</p>
+        <footer class="text-center mt-8 md:mt-12 text-purple-300 px-4">
+            <p class="mb-2 text-sm md:text-base">Built with ❤️ by Abdur Rehman Baig for Day 38 of 100 Days of AI</p>
             <!-- <p class="text-sm flex items-center justify-center gap-2 flex-wrap">
                 <i class="fab fa-python"></i> Flask •
                 <i class="fas fa-brain"></i> Llama 3.2 •

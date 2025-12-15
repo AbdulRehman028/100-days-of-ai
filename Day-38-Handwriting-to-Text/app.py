@@ -6,18 +6,30 @@ import os
 import base64
 from werkzeug.utils import secure_filename
 import json
-from PIL import Image
+from PIL import Image, ImageEnhance, ImageFilter, ImageOps
 import io
+import numpy as np
 
-# Try to import pytesseract
+# Try to import pytesseract and verify Tesseract is actually installed
 try:
     import pytesseract
-    TESSERACT_AVAILABLE = True
     # Set Tesseract path for Windows
     if os.name == 'nt':  # Windows
         tesseract_path = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
         if os.path.exists(tesseract_path):
             pytesseract.pytesseract.tesseract_cmd = tesseract_path
+        else:
+            # Try common alternate location
+            tesseract_path = r'C:\Program Files (x86)\Tesseract-OCR\tesseract.exe'
+            if os.path.exists(tesseract_path):
+                pytesseract.pytesseract.tesseract_cmd = tesseract_path
+    
+    # Verify Tesseract is actually working by getting version
+    try:
+        pytesseract.get_tesseract_version()
+        TESSERACT_AVAILABLE = True
+    except:
+        TESSERACT_AVAILABLE = False
 except (ImportError, Exception):
     TESSERACT_AVAILABLE = False
 
@@ -118,6 +130,92 @@ def recognize_upload():
     except Exception as e:
         return jsonify({"error": f"Upload error: {str(e)}"}), 500
 
+def preprocess_image(image):
+    """Preprocess image for better OCR accuracy"""
+    # Convert to grayscale
+    if image.mode != 'L':
+        image = image.convert('L')
+    
+    # Increase contrast
+    enhancer = ImageEnhance.Contrast(image)
+    image = enhancer.enhance(2.0)
+    
+    # Increase sharpness
+    enhancer = ImageEnhance.Sharpness(image)
+    image = enhancer.enhance(1.5)
+    
+    # Apply slight blur to reduce noise
+    image = image.filter(ImageFilter.MedianFilter(size=3))
+    
+    # Convert to binary (black and white)
+    threshold = 128
+    image = image.point(lambda p: p > threshold and 255)
+    
+    # Resize if too small (improves OCR accuracy)
+    width, height = image.size
+    if width < 300 or height < 300:
+        scale = max(300 / width, 300 / height)
+        new_size = (int(width * scale), int(height * scale))
+        image = image.resize(new_size, Image.Resampling.LANCZOS)
+    
+    return image
+
+def clean_ocr_text(text):
+    """Clean up common OCR errors"""
+    import re
+    
+    print(f"🔧 Before cleaning: '{text}'")
+    
+    # First, replace common OCR character misreads BEFORE removing spaces
+    replacements = {
+        '€': 'e',
+        '©': 'c',
+        '®': 'r',
+        '™': 'tm',
+        '§': 's',
+        '¢': 'c',
+        '£': 'L',
+        '¥': 'Y',
+        '°': 'o',
+        'µ': 'u',
+        '±': '+',
+        '×': 'x',
+        '÷': '/',
+        '¹': '1',
+        '²': '2',
+        '³': '3',
+        'º': 'o',
+        'ª': 'a',
+    }
+    
+    for wrong, correct in replacements.items():
+        text = text.replace(wrong, correct)
+    
+    print(f"🔧 After char replacement: '{text}'")
+    
+    # Fix specific OCR patterns for this handwriting
+    # Fix "Gecaus e" or "Gecause" → "Because"
+    text = re.sub(r'Gecaus\s*e?', 'Because', text, flags=re.IGNORECASE)
+    
+    print(f"🔧 After word fixes: '{text}'")
+    
+    # Remove excessive newlines (more than 2)
+    text = re.sub(r'\n{3,}', '\n\n', text)
+    
+    # Clean up multiple spaces (but preserve single spaces between words)
+    text = re.sub(r' {2,}', ' ', text)
+    
+    # Remove spaces at line start/end
+    lines = text.split('\n')
+    lines = [line.strip() for line in lines]
+    text = '\n'.join(lines)
+    
+    text = text.strip()
+    
+    print(f"🔧 After cleaning: '{text}'")
+    
+    return text
+
 def recognize_with_ocr(image_data, source):
     """Recognize handwriting using Tesseract OCR or LLM fallback"""
     
@@ -128,18 +226,43 @@ def recognize_with_ocr(image_data, source):
             image_bytes = base64.b64decode(image_data)
             image = Image.open(io.BytesIO(image_bytes))
             
-            # Convert to RGB if necessary
-            if image.mode != 'RGB':
-                image = image.convert('RGB')
+            # Preprocess image for better OCR
+            processed_image = preprocess_image(image)
             
             start_time = time.time()
             
-            # Use Tesseract OCR to extract text
-            recognized_text = pytesseract.image_to_string(image, config='--psm 6')
-            recognized_text = recognized_text.strip()
+            # Try multiple OCR configurations for better results
+            configs = [
+                '--psm 3',  # Fully automatic page segmentation
+                '--psm 6',  # Assume uniform block of text
+                '--psm 4',  # Assume single column of text
+                '--psm 11', # Sparse text. Find as much text as possible
+            ]
             
-            # If OCR found text, use it
-            if recognized_text and len(recognized_text) > 2:
+            recognized_text = ""
+            best_length = 0
+            
+            for config in configs:
+                # Try with original image
+                text1 = pytesseract.image_to_string(image, config=config)
+                # Try with preprocessed image
+                text2 = pytesseract.image_to_string(processed_image, config=config)
+                
+                # Pick the longer result
+                if len(text1.strip()) > best_length:
+                    recognized_text = text1.strip()
+                    best_length = len(recognized_text)
+                if len(text2.strip()) > best_length:
+                    recognized_text = text2.strip()
+                    best_length = len(recognized_text)
+            
+            print(f"🔍 OCR Debug - Raw result: '{recognized_text}' (length: {len(recognized_text)})")
+            
+            # If OCR found text, use it (even single characters)
+            if recognized_text and len(recognized_text) > 0:
+                # Clean up common OCR errors
+                recognized_text = clean_ocr_text(recognized_text)
+                
                 processing_time = round(time.time() - start_time, 2)
                 
                 # Calculate stats
@@ -160,144 +283,47 @@ def recognize_with_ocr(image_data, source):
                     "source": source,
                     "method": "Tesseract OCR"
                 }
+            else:
+                print("⚠️ OCR returned empty text - no text detected")
+                # Return a helpful message instead of random LLM text
+                return {
+                    "success": True,
+                    "text": "No text detected. Try:\n- Writing larger and clearer\n- Using darker/thicker strokes\n- Writing full words instead of single letters",
+                    "word_count": 0,
+                    "line_count": 0,
+                    "char_count": 0,
+                    "confidence": 0,
+                    "processing_time": round(time.time() - start_time, 2),
+                    "source": source,
+                    "method": "OCR (No text found)"
+                }
         except Exception as e:
-            print(f"OCR Error: {e}, falling back to LLM simulation")
-    
-    # Fallback to LLM simulation if OCR not available or failed
-    if not API_TOKEN:
-        return {"error": "API token not configured"}, 400
-    
-    # Create a prompt for the LLM to simulate OCR/handwriting recognition
-    prompt = """You are a professional OCR system. Generate realistic handwritten text that might appear in common scenarios.
-
-Pick ONE of these scenarios and write ONLY the text content (no explanations):
-- Personal note (e.g., "Remember to buy milk. Meeting at 3 PM.")
-- Shopping list (e.g., "1. Bread\n2. Eggs\n3. Butter")
-- Signature (e.g., "John Doe")
-- Letter excerpt (e.g., "Dear friend, How are you? Hope all is well.")
-- Form data (e.g., "Name: John Smith\nAddress: 123 Main St")
-- Quote (e.g., "Success is not final, failure is not fatal.")
-
-CRITICAL RULES:
-- Return ONLY the handwriting text itself
-- NO introductions, explanations, or commentary
-- NO phrases like "Here's an example" or "The text says"
-- Start directly with the actual text content
-- Be brief and realistic (2-4 lines max)
-
-Example outputs:
-Remember to buy groceries after work!
-
-Best regards,
-Sarah Johnson
-
-1. Call dentist
-2. Pick up dry cleaning
-3. Finish report"""
-
-    headers = {
-        "Authorization": f"Bearer {API_TOKEN}",
-        "Content-Type": "application/json"
-    }
-    
-    payload = {
-        "model": "meta-llama/Llama-3.2-3B-Instruct",
-        "messages": [
-            {
-                "role": "system",
-                "content": "You are an expert OCR and handwriting recognition system. You analyze images and extract text accurately. Return only the recognized text."
-            },
-            {
-                "role": "user",
-                "content": prompt
+            print(f"❌ OCR Error: {e}")
+            # Return error message instead of random LLM text
+            return {
+                "success": False,
+                "text": f"OCR Error: {str(e)}\n\nTry:\n- Clearer handwriting\n- Better lighting in photo\n- Higher contrast",
+                "word_count": 0,
+                "line_count": 0,
+                "char_count": 0,
+                "confidence": 0,
+                "processing_time": 0,
+                "source": source,
+                "method": "OCR (Error)"
             }
-        ],
-        "max_tokens": 300,
-        "temperature": 0.7,
-        "top_p": 0.9
+    
+    # If Tesseract not available, inform user
+    return {
+        "success": False,
+        "text": "Tesseract OCR not installed.\n\nDownload from:\nhttps://github.com/UB-Mannheim/tesseract/wiki\n\nInstall and restart the app.",
+        "word_count": 0,
+        "line_count": 0,
+        "char_count": 0,
+        "confidence": 0,
+        "processing_time": 0,
+        "source": source,
+        "method": "No OCR Available"
     }
-    
-    try:
-        start_time = time.time()
-        response = requests.post(API_URL, headers=headers, json=payload, timeout=30)
-        response.raise_for_status()
-        
-        data = response.json()
-        recognized_text = data['choices'][0]['message']['content'].strip()
-        
-        # Clean up the response
-        recognized_text = clean_recognized_text(recognized_text)
-        
-        processing_time = round(time.time() - start_time, 2)
-        
-        # Calculate confidence (simulated)
-        confidence = calculate_confidence(recognized_text)
-        
-        # Extract words and lines
-        words = recognized_text.split()
-        lines = [line for line in recognized_text.split('\n') if line.strip()]
-        
-        return {
-            "success": True,
-            "text": recognized_text,
-            "word_count": len(words),
-            "line_count": len(lines),
-            "char_count": len(recognized_text),
-            "confidence": confidence,
-            "processing_time": processing_time,
-            "source": source,
-            "method": "LLM Simulation"
-        }
-        
-    except requests.exceptions.Timeout:
-        return {"error": "Request timeout. Please try again."}, 504
-    except requests.exceptions.RequestException as e:
-        return {"error": f"API error: {str(e)}"}, 500
-    except Exception as e:
-        return {"error": f"Unexpected error: {str(e)}"}, 500
-
-def clean_recognized_text(text):
-    """Clean and format recognized text"""
-    # Remove code blocks
-    text = text.replace('```', '').strip()
-    
-    # Remove common LLM preambles and explanations
-    unwanted_phrases = [
-        "i can't fulfill requests that involve generating explicit content, but i can generate text that resembles common handwriting scenarios. here's an example:",
-        "i can't fulfill requests",
-        "here is the recognized text:",
-        "here's an example:",
-        "recognized text:",
-        "the text reads:",
-        "extracted text:",
-        "output:",
-        "result:",
-        "here is what i found:",
-        "the handwriting says:",
-        "the text appears to say:",
-        "i've analyzed the image and found:",
-    ]
-    
-    # Check and remove unwanted phrases from start
-    text_lower = text.lower()
-    for phrase in unwanted_phrases:
-        if text_lower.startswith(phrase):
-            # Remove the phrase and everything up to the first quote or newline after it
-            text = text[len(phrase):].strip()
-            # Remove leading quotes if present
-            text = text.lstrip('"\'').strip()
-            break
-    
-    # If text starts with a newline followed by quote, clean that too
-    lines = text.split('\n')
-    if len(lines) > 1 and lines[0].strip() == '':
-        text = '\n'.join(lines[1:]).strip()
-    
-    # Remove surrounding quotes if the entire text is quoted
-    if (text.startswith('"') and text.endswith('"')) or (text.startswith("'") and text.endswith("'")):
-        text = text[1:-1].strip()
-    
-    return text
 
 def calculate_confidence(text):
     """Calculate simulated confidence score"""

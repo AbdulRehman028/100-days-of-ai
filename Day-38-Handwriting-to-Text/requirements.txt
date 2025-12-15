@@ -4,5 +4,3 @@ python-dotenv
 werkzeug
 pillow
 pytesseract
-pillow
-pytesseract

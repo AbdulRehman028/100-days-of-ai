@@ -1,11 +1,9 @@
 from flask import Flask, render_template, request, jsonify
 from dotenv import load_dotenv
-import requests
 import time
 import os
 import base64
 from werkzeug.utils import secure_filename
-import json
 from PIL import Image, ImageEnhance, ImageFilter, ImageOps
 import io
 import numpy as np

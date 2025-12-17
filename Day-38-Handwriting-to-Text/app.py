@@ -75,7 +75,7 @@ def recognize_canvas():
         if not image_data:
             return jsonify({"error": "No image data provided"}), 400
         
-        # Remove data URL prefix
+        # Remove data URL prefixes
         if 'base64,' in image_data:
             image_data = image_data.split('base64,')[1]
         

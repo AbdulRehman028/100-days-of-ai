@@ -8,6 +8,7 @@ from PIL import Image, ImageEnhance, ImageFilter, ImageOps
 import io
 import numpy as np
 
+# Try to import pytesseract and verify Tesseract is actually installed
 try:
     import pytesseract
     # Set Tesseract path for Windows

@@ -45,7 +45,7 @@ API_TOKEN = os.getenv("HF_API_TOKEN", "")
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'bmp'}
 
 if not API_TOKEN:
-    print("⚠️  WARNING: No HuggingFace API token found!")
+    print("⚠️  WARNING: No HuggingFace API token found! please provide one in the .env file to enable LLM simulation fallback.")
 else:
     print("✅ HuggingFace token loaded!")
 

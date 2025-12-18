@@ -192,7 +192,7 @@ def clean_ocr_text(text):
     print(f"🔧 After char replacement: '{text}'")
     
     # Fix specific OCR patterns for this handwriting
-    # Fix "Gecaus e" or "Gecause" → "Because"
+    # Fix "Gecau e" or "Gecause" → "Because"
     text = re.sub(r'Gecaus\s*e?', 'Because', text, flags=re.IGNORECASE)
     
     print(f"🔧 After word fixes: '{text}'")

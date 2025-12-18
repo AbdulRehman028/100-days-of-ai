@@ -110,7 +110,7 @@ def recognize_upload():
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(filepath)
         
-        # Read and encode image
+        # Read and encode image 
         with open(filepath, 'rb') as f:
             image_data = base64.b64encode(f.read()).decode('utf-8')
         

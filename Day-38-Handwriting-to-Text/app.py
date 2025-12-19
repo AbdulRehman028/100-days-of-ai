@@ -203,7 +203,7 @@ def clean_ocr_text(text):
     # Clean up multiple spaces (but preserve single spaces between words)
     text = re.sub(r' {2,}', ' ', text)
     
-    # Remove spaces at line start/e
+    # Remove spaces at line start/end
     lines = text.split('\n')
     lines = [line.strip() for line in lines]
     text = '\n'.join(lines)

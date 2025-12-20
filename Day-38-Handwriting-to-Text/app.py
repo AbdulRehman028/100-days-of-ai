@@ -235,7 +235,7 @@ def recognize_with_ocr(image_data, source):
             configs = [
                 '--psm 3',  # Fully automatic
                 '--psm 6',  # Uniform block of text
-                '--psm 4',  # Single column
+                '--psm 4',  
             ]
             
             recognized_text = ""

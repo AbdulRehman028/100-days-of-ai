@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔧 Denoising Autoencoder - AI Powered</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6366f1',
+                        secondary: '#8b5cf6',
+                        accent: '#ec4899',
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body class="bg-gradient-to-br from-slate-900 via-indigo-900 to-slate-900 min-h-screen text-white">
+    <!-- Animated Background -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-20 left-10 w-72 h-72 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+        <div class="absolute top-40 right-10 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+        <div class="absolute bottom-20 left-1/3 w-72 h-72 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+    </div>
+
+    <div class="container mx-auto px-4 py-8 relative z-10">
+        <!-- Header -->
+        <header class="text-center mb-8 md:mb-12 animate-fade-in-down">
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 mb-4">
+                <span class="text-4xl sm:text-5xl md:text-6xl">🔧</span>
+                <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                    Denoising Autoencoder
+                </h1>
+            </div>
+            <p class="text-base sm:text-lg md:text-xl text-purple-200 mb-4 px-4">Remove noise from text and images using deep learning</p>
+            
+            <!-- Model Status -->
+            <div class="inline-flex items-center gap-4">
+                <div id="imageModelStatus" class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-lg px-4 py-2 rounded-full border border-purple-500/30">
+                    <i class="fas fa-image text-purple-400"></i>
+                    <span class="text-sm">Image Model: <span class="font-bold">Loading...</span></span>
+                </div>
+                <div id="textModelStatus" class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-lg px-4 py-2 rounded-full border border-purple-500/30">
+                    <i class="fas fa-font text-indigo-400"></i>
+                    <span class="text-sm">Text Model: <span class="font-bold">Loading...</span></span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Tabs -->
+        <div class="flex gap-2 bg-white/5 backdrop-blur-lg p-2 rounded-xl border border-purple-500/30 max-w-md mx-auto mb-8">
+            <button onclick="switchMode('image')" id="imageTab" class="mode-tab active flex-1 px-6 py-3 rounded-lg font-semibold transition-all">
+                <i class="fas fa-image mr-2"></i>Image
+            </button>
+            <button onclick="switchMode('text')" id="textTab" class="mode-tab flex-1 px-6 py-3 rounded-lg font-semibold transition-all">
+                <i class="fas fa-font mr-2"></i>Text
+            </button>
+        </div>
+
+        <!-- Main Content -->
+        <div class="max-w-7xl mx-auto">
+            
+            <!-- IMAGE MODE -->
+            <div id="imageMode" class="mode-content">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
+                    <!-- Input Section -->
+                    <div class="space-y-6 animate-fade-in-left">
+                        <div class="bg-white/10 backdrop-blur-lg p-6 rounded-2xl border border-purple-500/30 shadow-2xl">
+                            <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
+                                <i class="fas fa-upload text-purple-400"></i>
+                                Upload Image
+                            </h2>
+
+                            <!-- Canvas for drawing -->
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-2">Draw a digit (0-9)</label>
+                                <div class="bg-white rounded-xl overflow-hidden shadow-inner">
+                                    <canvas id="drawingCanvas" width="280" height="280" class="cursor-crosshair w-full border-2 border-gray-300"></canvas>
+                                </div>
+                                <div class="flex gap-2 mt-2">
+                                    <button onclick="clearCanvas()" class="flex-1 px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded-lg transition-all border border-red-500/30">
+                                        <i class="fas fa-trash mr-2"></i>Clear
+                                    </button>
+                                    <button onclick="useCanvasImage()" class="flex-1 px-4 py-2 bg-green-500/20 hover:bg-green-500/30 text-green-300 rounded-lg transition-all border border-green-500/30">
+                                        <i class="fas fa-check mr-2"></i>Use Drawing
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="text-center my-4 text-purple-300">OR</div>
+
+                            <!-- File Upload -->
+                            <div class="border-2 border-dashed border-purple-500/50 rounded-xl p-6 text-center hover:border-purple-400 transition-all cursor-pointer bg-white/5" id="imageDropZone">
+                                <i class="fas fa-cloud-upload-alt text-5xl text-purple-400 mb-3"></i>
+                                <p class="text-lg mb-2">Upload an image</p>
+                                <label class="inline-block px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg cursor-pointer transition-all">
+                                    <i class="fas fa-folder-open mr-2"></i>Browse Files
+                                    <input type="file" id="imageFileInput" accept="image/*" class="hidden">
+                                </label>
+                            </div>
+
+                            <!-- Noise Control -->
+                            <div class="mt-6">
+                                <label class="block text-sm font-medium mb-2">Noise Level: <span id="noiseValue">0.3</span></label>
+                                <input type="range" id="noiseSlider" min="0.1" max="0.8" step="0.1" value="0.3" class="w-full accent-purple-500">
+                            </div>
+
+                            <button onclick="denoiseImage()" id="imageDenoiseBtn" class="w-full mt-6 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all transform hover:scale-105">
+                                <i class="fas fa-magic mr-2"></i>Denoise Image
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Results Section -->
+                    <div id="imageResults" class="animate-fade-in-right">
+                        <div class="bg-white/10 backdrop-blur-lg p-6 rounded-2xl border border-purple-500/30 shadow-2xl">
+                            <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
+                                <i class="fas fa-images text-green-400"></i>
+                                Results
+                            </h2>
+
+                            <!-- Image Comparison -->
+                            <div class="grid grid-cols-3 gap-4 mb-6">
+                                <div class="text-center">
+                                    <p class="text-sm text-purple-300 mb-2">Original</p>
+                                    <div class="bg-white/5 rounded-lg p-2 border border-purple-500/20 aspect-square flex items-center justify-center">
+                                        <img id="originalImage" class="max-w-full max-h-full" style="display: none;">
+                                        <i class="fas fa-image text-4xl text-purple-400/30" id="originalPlaceholder"></i>
+                                    </div>
+                                </div>
+                                <div class="text-center">
+                                    <p class="text-sm text-red-300 mb-2">Noisy</p>
+                                    <div class="bg-white/5 rounded-lg p-2 border border-red-500/20 aspect-square flex items-center justify-center">
+                                        <img id="noisyImage" class="max-w-full max-h-full" style="display: none;">
+                                        <i class="fas fa-image text-4xl text-red-400/30" id="noisyPlaceholder"></i>
+                                    </div>
+                                </div>
+                                <div class="text-center">
+                                    <p class="text-sm text-green-300 mb-2">Denoised</p>
+                                    <div class="bg-white/5 rounded-lg p-2 border border-green-500/20 aspect-square flex items-center justify-center">
+                                        <img id="denoisedImage" class="max-w-full max-h-full" style="display: none;">
+                                        <i class="fas fa-image text-4xl text-green-400/30" id="denoisedPlaceholder"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Metrics -->
+                            <div class="grid grid-cols-3 gap-3">
+                                <div class="bg-white/5 p-4 rounded-lg text-center border border-purple-500/20">
+                                    <div class="text-2xl font-bold text-red-400" id="mseNoisy">-</div>
+                                    <div class="text-xs text-purple-300">MSE (Noisy)</div>
+                                </div>
+                                <div class="bg-white/5 p-4 rounded-lg text-center border border-purple-500/20">
+                                    <div class="text-2xl font-bold text-green-400" id="mseDenoised">-</div>
+                                    <div class="text-xs text-purple-300">MSE (Denoised)</div>
+                                </div>
+                                <div class="bg-white/5 p-4 rounded-lg text-center border border-purple-500/20">
+                                    <div class="text-2xl font-bold text-yellow-400" id="improvement">-</div>
+                                    <div class="text-xs text-purple-300">Improvement</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TEXT MODE -->
+            <div id="textMode" class="mode-content hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
+                    <!-- Input Section -->
+                    <div class="space-y-6 animate-fade-in-left">
+                        <div class="bg-white/10 backdrop-blur-lg p-6 rounded-2xl border border-purple-500/30 shadow-2xl">
+                            <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
+                                <i class="fas fa-keyboard text-indigo-400"></i>
+                                Enter Text
+                            </h2>
+
+                            <textarea id="textInput" rows="6" class="w-full bg-white/5 border border-purple-500/30 rounded-xl p-4 text-white placeholder-purple-300/50 focus:border-purple-400 focus:outline-none" placeholder="Enter text to denoise (max 50 characters)..."></textarea>
+
+                            <!-- Quick Examples -->
+                            <div class="mt-4">
+                                <label class="block text-sm font-medium mb-2">Quick Examples</label>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <button onclick="setTextExample('The quick brown fox jumps over the lazy dog')" class="px-4 py-2 bg-purple-600/30 hover:bg-purple-600/50 rounded-lg transition-all border border-purple-500/30 text-sm">
+                                        Fox Example
+                                    </button>
+                                    <button onclick="setTextExample('Machine learning is awesome')" class="px-4 py-2 bg-purple-600/30 hover:bg-purple-600/50 rounded-lg transition-all border border-purple-500/30 text-sm">
+                                        ML Example
+                                    </button>
+                                    <button onclick="setTextExample('Deep learning models are powerful')" class="px-4 py-2 bg-purple-600/30 hover:bg-purple-600/50 rounded-lg transition-all border border-purple-500/30 text-sm">
+                                        DL Example
+                                    </button>
+                                    <button onclick="setTextExample('Python programming language')" class="px-4 py-2 bg-purple-600/30 hover:bg-purple-600/50 rounded-lg transition-all border border-purple-500/30 text-sm">
+                                        Python Example
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Noise Level -->
+                            <div class="mt-6">
+                                <label class="block text-sm font-medium mb-2">Noise Level: <span id="textNoiseValue">0.2</span></label>
+                                <input type="range" id="textNoiseSlider" min="0.1" max="0.5" step="0.05" value="0.2" class="w-full accent-indigo-500">
+                            </div>
+
+                            <button onclick="denoiseText()" id="textDenoiseBtn" class="w-full mt-6 py-4 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all transform hover:scale-105">
+                                <i class="fas fa-magic mr-2"></i>Denoise Text
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Results Section -->
+                    <div id="textResults" class="animate-fade-in-right">
+                        <div class="bg-white/10 backdrop-blur-lg p-6 rounded-2xl border border-purple-500/30 shadow-2xl">
+                            <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
+                                <i class="fas fa-check-circle text-green-400"></i>
+                                Results
+                            </h2>
+
+                            <!-- Text Comparison -->
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm text-purple-300 mb-2">Original Text</label>
+                                    <div id="originalText" class="bg-white/5 p-4 rounded-lg border border-purple-500/20 min-h-[80px] text-white/80">
+                                        <i class="fas fa-pen-fancy text-purple-400/30"></i>
+                                        <span class="text-purple-400/50 ml-2">Enter text and click denoise</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-red-300 mb-2">Noisy Text</label>
+                                    <div id="noisyText" class="bg-white/5 p-4 rounded-lg border border-red-500/20 min-h-[80px] text-red-300/80">
+                                        -
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-green-300 mb-2">Denoised Text</label>
+                                    <div id="denoisedText" class="bg-white/5 p-4 rounded-lg border border-green-500/20 min-h-[80px] text-green-300/80">
+                                        -
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Metrics -->
+                            <div class="grid grid-cols-2 gap-3 mt-6">
+                                <div class="bg-white/5 p-4 rounded-lg text-center border border-purple-500/20">
+                                    <div class="text-2xl font-bold text-green-400" id="textAccuracy">-</div>
+                                    <div class="text-xs text-purple-300">Accuracy</div>
+                                </div>
+                                <div class="bg-white/5 p-4 rounded-lg text-center border border-purple-500/20">
+                                    <div class="text-2xl font-bold text-yellow-400" id="textNoiseLevel">-</div>
+                                    <div class="text-xs text-purple-300">Noise Level</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <section class="mt-12 md:mt-16 animate-fade-in-up">
+            <div class="text-center mb-8 md:mb-12 px-4">
+                <h3 class="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 md:mb-4 bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                    Key Features
+                </h3>
+                <p class="text-purple-300 text-base md:text-lg">Powered by deep learning autoencoders</p>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+                <div class="group relative h-full">
+                    <div class="absolute inset-0 bg-gradient-to-r from-indigo-600 to-blue-600 rounded-2xl blur opacity-25 group-hover:opacity-40 transition-opacity"></div>
+                    <div class="relative bg-white/10 backdrop-blur-lg p-6 md:p-8 rounded-2xl border border-purple-500/30 hover:border-indigo-400/60 transition-all transform hover:scale-105 hover:-translate-y-2 h-full flex flex-col">
+                        <div class="w-14 h-14 md:w-16 md:h-16 mx-auto mb-3 md:mb-4 bg-gradient-to-br from-indigo-500 to-blue-500 rounded-xl flex items-center justify-center text-2xl md:text-3xl shadow-lg">
+                            🖼️
+                        </div>
+                        <h4 class="font-bold text-lg md:text-xl mb-2 md:mb-3 text-white text-center">Image Denoising</h4>
+                        <p class="text-sm text-purple-300 leading-relaxed text-center flex-grow">Convolutional autoencoder trained on MNIST dataset</p>
+                    </div>
+                </div>
+
+                <div class="group relative h-full">
+                    <div class="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl blur opacity-25 group-hover:opacity-40 transition-opacity"></div>
+                    <div class="relative bg-white/10 backdrop-blur-lg p-6 md:p-8 rounded-2xl border border-purple-500/30 hover:border-purple-400/60 transition-all transform hover:scale-105 hover:-translate-y-2 h-full flex flex-col">
+                        <div class="w-14 h-14 md:w-16 md:h-16 mx-auto mb-3 md:mb-4 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center text-2xl md:text-3xl shadow-lg">
+                            📝
+                        </div>
+                        <h4 class="font-bold text-lg md:text-xl mb-2 md:mb-3 text-white text-center">Text Denoising</h4>
+                        <p class="text-sm text-purple-300 leading-relaxed text-center flex-grow">LSTM autoencoder for character-level text recovery</p>
+                    </div>
+                </div>
+
+                <div class="group relative h-full">
+                    <div class="absolute inset-0 bg-gradient-to-r from-green-600 to-teal-600 rounded-2xl blur opacity-25 group-hover:opacity-40 transition-opacity"></div>
+                    <div class="relative bg-white/10 backdrop-blur-lg p-6 md:p-8 rounded-2xl border border-purple-500/30 hover:border-green-400/60 transition-all transform hover:scale-105 hover:-translate-y-2 h-full flex flex-col">
+                        <div class="w-14 h-14 md:w-16 md:h-16 mx-auto mb-3 md:mb-4 bg-gradient-to-br from-green-500 to-teal-500 rounded-xl flex items-center justify-center text-2xl md:text-3xl shadow-lg">
+                            🎯
+                        </div>
+                        <h4 class="font-bold text-lg md:text-xl mb-2 md:mb-3 text-white text-center">Real-time Processing</h4>
+                        <p class="text-sm text-purple-300 leading-relaxed text-center flex-grow">Instant denoising with live metrics and evaluation</p>
+                    </div>
+                </div>
+
+                <div class="group relative h-full">
+                    <div class="absolute inset-0 bg-gradient-to-r from-yellow-600 to-orange-600 rounded-2xl blur opacity-25 group-hover:opacity-40 transition-opacity"></div>
+                    <div class="relative bg-white/10 backdrop-blur-lg p-6 md:p-8 rounded-2xl border border-purple-500/30 hover:border-yellow-400/60 transition-all transform hover:scale-105 hover:-translate-y-2 h-full flex flex-col">
+                        <div class="w-14 h-14 md:w-16 md:h-16 mx-auto mb-3 md:mb-4 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-xl flex items-center justify-center text-2xl md:text-3xl shadow-lg">
+                            🔬
+                        </div>
+                        <h4 class="font-bold text-lg md:text-xl mb-2 md:mb-3 text-white text-center">Performance Metrics</h4>
+                        <p class="text-sm text-purple-300 leading-relaxed text-center flex-grow">MSE, accuracy, and improvement measurements</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="text-center mt-8 md:mt-12 text-purple-300 px-4">
+            <p class="mb-2 text-sm md:text-base">Built with ❤️ by Abdur Rehman Baig for Day 39 of 100 Days of AI</p>
+        </footer>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="hidden fixed bottom-8 right-8 bg-green-500 text-white px-6 py-4 rounded-lg shadow-2xl animate-slide-in-right z-50">
+        <i class="fas fa-check-circle mr-2"></i>
+        <span id="toastMessage">Success!</span>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

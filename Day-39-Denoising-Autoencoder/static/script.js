@@ -120,11 +120,26 @@ function handleTouch(e) {
 function clearCanvas() {
     ctx.fillStyle = 'white';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // Clear the selected image if it was from canvas
+    if (selectedImageFile && typeof selectedImageFile === 'string') {
+        selectedImageFile = null;
+    }
 }
 
 function useCanvasImage() {
     selectedImageFile = canvas.toDataURL('image/png');
-    showToast('Drawing ready! Click "Denoise Image" to process.');
+    showToast('Drawing ready! Click "Denoise Image" to process.', 'success');
+}
+
+function isCanvasBlank() {
+    const blank = document.createElement('canvas');
+    blank.width = canvas.width;
+    blank.height = canvas.height;
+    const blankCtx = blank.getContext('2d');
+    blankCtx.fillStyle = 'white';
+    blankCtx.fillRect(0, 0, blank.width, blank.height);
+    
+    return canvas.toDataURL() === blank.toDataURL();
 }
 
 // File handling
@@ -177,6 +192,11 @@ function clearUpload() {
 
 // Image denoising
 async function denoiseImage() {
+    // Auto-use canvas if something is drawn and no file is selected
+    if (!selectedImageFile && !isCanvasBlank()) {
+        useCanvasImage();
+    }
+    
     if (!selectedImageFile) {
         showToast('Please draw a digit or upload an image first!', 'error');
         return;

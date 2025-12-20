@@ -200,7 +200,7 @@ def clean_ocr_text(text):
     # Remove excessive newlines (more than 2)
     text = re.sub(r'\n{3,}', '\n\n', text)
     
-    # Clean up multiple spaces (but preserve single spaces between words
+    # Clean up multiple spaces (but preserve single spaces between words)
     text = re.sub(r' {2,}', ' ', text)
     
     # Remove spaces at line start/end

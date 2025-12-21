@@ -24,6 +24,13 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max
 os.makedirs('uploads', exist_ok=True)
 os.makedirs('models', exist_ok=True)
 
+# TRAINING MODE CONFIGURATION
+# Options:
+#   'auto'   - Load saved models if they exist, train only if missing (DEFAULT)
+#   'always' - Always retrain models from scratch (ignores saved models)
+#   'never'  - Never train, only use existing models (fails if models don't exist)
+TRAINING_MODE = 'never'  # Change this to 'always' or 'never' as needed
+
 # Global variables for models
 image_autoencoder = None
 text_autoencoder = None
@@ -109,6 +116,22 @@ def load_image_autoencoder():
     global image_autoencoder
     model_path = 'models/image_autoencoder.h5'
     
+    # Check training mode
+    if TRAINING_MODE == 'always':
+        print("🔄 TRAINING_MODE='always' - Retraining image autoencoder from scratch...")
+        train_image_autoencoder()
+        return True
+    
+    if TRAINING_MODE == 'never':
+        if not os.path.exists(model_path):
+            raise FileNotFoundError(f"TRAINING_MODE='never' but model not found at {model_path}")
+        print("📦 TRAINING_MODE='never' - Loading existing model only...")
+        image_autoencoder = keras.models.load_model(model_path, compile=False)
+        image_autoencoder.compile(optimizer='adam', loss='mse', metrics=['mae'])
+        print("Image autoencoder loaded!")
+        return True
+    
+    # Auto mode (default)
     if os.path.exists(model_path):
         print("Loading pre-trained image autoencoder...")
         try:
@@ -268,6 +291,24 @@ def load_text_autoencoder():
     model_path = 'models/text_autoencoder.h5'
     vocab_path = 'models/text_vocab.npy'
     
+    # Mode: Always retrain
+    if TRAINING_MODE == 'always':
+        print("🔄 TRAINING_MODE='always' - Retraining text autoencoder from scratch...")
+        train_text_autoencoder()
+        return True
+    
+    # Mode: Never train (must use existing)
+    if TRAINING_MODE == 'never':
+        if not os.path.exists(model_path) or not os.path.exists(vocab_path):
+            raise FileNotFoundError(f"❌ TRAINING_MODE='never' but model/vocab not found")
+        print("📦 TRAINING_MODE='never' - Loading existing model only...")
+        text_autoencoder = keras.models.load_model(model_path, compile=False)
+        text_autoencoder.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+        text_vocab = tuple(np.load(vocab_path, allow_pickle=True))
+        print("Text autoencoder loaded!")
+        return True
+    
+    # Mode: Auto (default) - load if exists, train if missing
     if os.path.exists(model_path) and os.path.exists(vocab_path):
         print("Loading pre-trained text autoencoder...")
         try:
@@ -369,10 +410,24 @@ def denoise_image():
         noisy_b64 = img_to_base64(noisy_img)
         denoised_b64 = img_to_base64(denoised_img)
         
-        # Calculate metrics
-        mse_noisy = np.mean((img_array - noisy_img) ** 2)
-        mse_denoised = np.mean((img_array - denoised_img) ** 2)
-        improvement = ((mse_noisy - mse_denoised) / mse_noisy * 100) if mse_noisy > 0 else 0
+        # Calculate metrics (compare to original)
+        mse_noisy = float(np.mean((img_array - noisy_img) ** 2))
+        mse_denoised = float(np.mean((img_array - denoised_img) ** 2))
+        
+        # Improvement: positive means better, negative means worse
+        if mse_noisy > 0:
+            improvement = ((mse_noisy - mse_denoised) / mse_noisy * 100)
+        else:
+            improvement = 0
+        
+        # Debug logging
+        print(f"📊 Metrics:")
+        print(f"   Original range: [{img_array.min():.3f}, {img_array.max():.3f}]")
+        print(f"   Noisy range: [{noisy_img.min():.3f}, {noisy_img.max():.3f}]")
+        print(f"   Denoised range: [{denoised_img.min():.3f}, {denoised_img.max():.3f}]")
+        print(f"   MSE Noisy: {mse_noisy:.4f}")
+        print(f"   MSE Denoised: {mse_denoised:.4f}")
+        print(f"   Improvement: {improvement:.1f}%")
         
         return jsonify({
             'success': True,

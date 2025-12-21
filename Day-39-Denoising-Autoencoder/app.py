@@ -24,7 +24,7 @@ os.makedirs('models', exist_ok=True)
 #   'auto'   - Load saved models if they exist, train only if missing (DEFAULT)
 #   'always' - Always retrain models from scratch (ignores saved models)
 #   'never'  - Never train, only use existing models (fails if models don't exist)
-TRAINING_MODE = 'never'  # Change this to 'always' or 'never' as needed
+TRAINING_MODE = 'auto'  # Change this to 'always' or 'never' as needed
 
 # Global variables for models
 image_autoencoder = None

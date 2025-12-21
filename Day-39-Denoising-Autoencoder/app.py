@@ -24,7 +24,7 @@ os.makedirs('models', exist_ok=True)
 #   'auto'   - Load saved models if they exist, train only if missing (DEFAULT)
 #   'always' - Always retrain models from scratch (ignores saved models)
 #   'never'  - Never train, only use existing models (fails if models don't exist)
-TRAINING_MODE = 'always'  # Change this to 'always' or 'never' as needed
+TRAINING_MODE = 'never'  # Change this to 'always' or 'never' as needed
 
 # Global variables for models
 image_autoencoder = None
@@ -384,7 +384,20 @@ def denoise_image():
         # Resize to 28x28
         img = img.resize((28, 28))
         img_array = np.array(img).astype('float32') / 255.0
+        
+        # IMPORTANT: MNIST has WHITE digits on BLACK background
+        # If user draws black on white, we need to invert
+        # Check if background is mostly white (canvas drawing)
+        was_inverted = False
+        if np.mean(img_array) > 0.5:
+            img_array = 1.0 - img_array  # Invert: black background, white digit
+            was_inverted = True
+            print("🔄 Inverted image (canvas mode: black→white digit)")
+        
         img_array = np.expand_dims(img_array, axis=(0, -1))
+        
+        # Store the clean inverted image for metrics
+        clean_img = img_array.copy()
         
         # Add noise
         noise_factor = float(request.form.get('noise_factor', 0.3))
@@ -392,6 +405,9 @@ def denoise_image():
         
         # Denoise
         denoised_img = image_autoencoder.predict(noisy_img, verbose=0)
+        
+        # Clip values to valid range
+        denoised_img = np.clip(denoised_img, 0.0, 1.0)
         
         # Convert to base64
         def img_to_base64(img_arr):
@@ -401,13 +417,13 @@ def denoise_image():
             img_pil.save(buffered, format='PNG')
             return base64.b64encode(buffered.getvalue()).decode()
         
-        original_b64 = img_to_base64(img_array)
+        original_b64 = img_to_base64(clean_img)
         noisy_b64 = img_to_base64(noisy_img)
         denoised_b64 = img_to_base64(denoised_img)
         
-        # Calculate metrics (compare to original)
-        mse_noisy = float(np.mean((img_array - noisy_img) ** 2))
-        mse_denoised = float(np.mean((img_array - denoised_img) ** 2))
+        # Calculate metrics (all in MNIST format - inverted if needed)
+        mse_noisy = float(np.mean((clean_img - noisy_img) ** 2))
+        mse_denoised = float(np.mean((clean_img - denoised_img) ** 2))
         
         # Improvement: positive means better, negative means worse
         if mse_noisy > 0:
@@ -417,7 +433,8 @@ def denoise_image():
         
         # Debug logging
         print(f"📊 Metrics:")
-        print(f"   Original range: [{img_array.min():.3f}, {img_array.max():.3f}]")
+        print(f"   Was inverted: {was_inverted}")
+        print(f"   Clean range: [{clean_img.min():.3f}, {clean_img.max():.3f}]")
         print(f"   Noisy range: [{noisy_img.min():.3f}, {noisy_img.max():.3f}]")
         print(f"   Denoised range: [{denoised_img.min():.3f}, {denoised_img.max():.3f}]")
         print(f"   MSE Noisy: {mse_noisy:.4f}")

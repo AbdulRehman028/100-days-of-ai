@@ -1,8 +1,3 @@
-"""
-Day 39: Denoising Autoencoder for Text/Images
-Train autoencoders to denoise noisy inputs with real-time evaluation
-"""
-
 import os
 import io
 import base64
@@ -29,7 +24,7 @@ os.makedirs('models', exist_ok=True)
 #   'auto'   - Load saved models if they exist, train only if missing (DEFAULT)
 #   'always' - Always retrain models from scratch (ignores saved models)
 #   'never'  - Never train, only use existing models (fails if models don't exist)
-TRAINING_MODE = 'never'  # Change this to 'always' or 'never' as needed
+TRAINING_MODE = 'always'  # Change this to 'always' or 'never' as needed
 
 # Global variables for models
 image_autoencoder = None
@@ -97,7 +92,7 @@ def train_image_autoencoder():
     print("Training model...")
     history = image_autoencoder.fit(
         x_train_noisy, x_train,
-        epochs=10,
+        epochs=15,
         batch_size=128,
         shuffle=True,
         validation_data=(x_test_noisy, x_test),

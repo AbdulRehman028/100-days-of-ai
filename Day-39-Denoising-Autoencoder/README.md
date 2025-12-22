@@ -11,7 +11,7 @@ A comprehensive end-to-end deep learning project that implements denoising autoe
 - **Image Denoising**: Remove noise from handwritten digits using a Convolutional Autoencoder trained on MNIST
 - **Text Denoising**: Recover corrupted text using an LSTM-based Autoencoder
 - **Real-time Evaluation**: View metrics like MSE, accuracy, and improvement percentages
-- **Interactive Interface**: Draw digits or upload images, enter text with adjustable noise levels.
+- **Interactive Interface**: Draw digits or upload images, enter text with adjustable noise levels
 
 ## 🚀 Features
 

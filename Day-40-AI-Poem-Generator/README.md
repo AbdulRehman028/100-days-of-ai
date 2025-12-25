@@ -19,10 +19,12 @@ Fine-tune GPT-2 on poetry data to generate beautiful poems from themes.
 
 ## 📦 Installation
 
-```bash
+```
+
 cd Day-40-AI-Poem-Generator
 pip install -r requirements.txt
 python app.py
+
 ```
 
 ## 🚀 Usage

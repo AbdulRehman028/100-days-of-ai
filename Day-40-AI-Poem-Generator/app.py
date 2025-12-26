@@ -29,9 +29,9 @@ model = None
 tokenizer = None
 generator = None
 
-# ===============================
+
 # TRAINING MODE CONFIGURATION
-# ===============================
+
 # Options:
 #   'auto'   - Load fine-tuned model if exists, train only if missing (DEFAULT)
 #   'always' - Always retrain model from scratch

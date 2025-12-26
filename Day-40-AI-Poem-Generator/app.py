@@ -37,8 +37,6 @@ generator = None
 #   'always' - Always retrain model from scratch
 #   'never'  - Never train, only use existing model (fails if not found)
 TRAINING_MODE = 'auto'
-# ===============================
-
 
 def create_poetry_dataset():
     """Create poetry dataset for fine-tuning"""

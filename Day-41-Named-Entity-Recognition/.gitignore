@@ -1,0 +1,33 @@
+# Model files (too large for GitHub)
+models/
+*.h5
+*.pt
+*.pth
+*.bin
+*.safetensors
+*.ckpt
+
+# spaCy models (downloaded separately)
+en_core_web_*
+
+# Cache
+__pycache__/
+*.py[cod]
+*$py.class
+.cache/
+.spacy/
+
+# Virtual environment
+venv/
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

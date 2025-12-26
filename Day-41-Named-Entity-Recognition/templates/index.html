@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Named Entity Recognition | Day 41</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            min-height: 100vh;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .entity-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin: 4px;
+            transition: all 0.2s ease;
+        }
+        .entity-tag:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        .annotated-text {
+            line-height: 2.2;
+            font-size: 1.1rem;
+        }
+        .annotated-text mark {
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .annotated-text mark:hover {
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+        .analyze-btn {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            transition: all 0.3s ease;
+        }
+        .analyze-btn:hover:not(:disabled) {
+            transform: scale(1.02);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5);
+        }
+        .analyze-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .stat-card {
+            transition: all 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-4px);
+        }
+        .legend-item {
+            transition: all 0.2s ease;
+        }
+        .legend-item:hover {
+            transform: scale(1.05);
+        }
+        .sample-btn {
+            transition: all 0.2s ease;
+        }
+        .sample-btn:hover {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: #3b82f6;
+        }
+        .toast {
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .loading-text {
+            animation: pulse 1.5s infinite;
+        }
+    </style>
+</head>
+<body class="text-white min-h-screen">
+    <!-- Toast Container -->
+    <div id="toastContainer" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+    <div class="container mx-auto px-4 py-8 max-w-7xl">
+        <!-- Header -->
+        <header class="text-center mb-10">
+            <div class="flex items-center justify-center gap-4 mb-4">
+                <i class="fas fa-tags text-5xl text-blue-400"></i>
+                <h1 class="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400 bg-clip-text text-transparent">
+                    Named Entity Recognition
+                </h1>
+            </div>
+            <p class="text-blue-300 text-xl">Day 41 • spaCy + LLM Integration</p>
+            <div class="mt-4 flex items-center justify-center gap-4">
+                <span id="spacyStatus" class="px-4 py-1 rounded-full text-sm glass">
+                    <i class="fas fa-circle text-yellow-400 mr-2"></i>spaCy: Loading...
+                </span>
+                <span id="llmStatus" class="px-4 py-1 rounded-full text-sm glass">
+                    <i class="fas fa-circle text-yellow-400 mr-2"></i>LLM: Loading...
+                </span>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Input Section -->
+            <div class="lg:col-span-1 space-y-6">
+                <!-- Text Input -->
+                <div class="glass rounded-2xl p-6">
+                    <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                        <i class="fas fa-keyboard text-blue-400"></i>
+                        Input Text
+                    </h2>
+                    
+                    <textarea id="textInput" rows="8" 
+                              placeholder="Enter or paste text to analyze for named entities..."
+                              class="w-full px-4 py-3 rounded-xl bg-white/10 border border-blue-500/30 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400/30 resize-none"></textarea>
+                    
+                    <!-- Options -->
+                    <div class="mt-4 flex items-center gap-4">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" id="useLLM" checked 
+                                   class="w-4 h-4 rounded accent-blue-500">
+                            <span class="text-sm text-blue-300">
+                                <i class="fas fa-brain mr-1"></i>LLM Enhancement
+                            </span>
+                        </label>
+                    </div>
+                    
+                    <!-- Analyze Button -->
+                    <button onclick="analyzeText()" id="analyzeBtn" 
+                            class="analyze-btn w-full mt-4 py-3 rounded-xl font-bold text-lg shadow-lg">
+                        <i class="fas fa-search mr-2"></i>Extract Entities
+                    </button>
+                </div>
+
+                <!-- Sample Texts -->
+                <div class="glass rounded-2xl p-6">
+                    <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+                        <i class="fas fa-file-alt text-purple-400"></i>
+                        Sample Texts
+                    </h2>
+                    <div id="sampleTexts" class="space-y-2">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Entity Legend -->
+                <div class="glass rounded-2xl p-6">
+                    <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+                        <i class="fas fa-palette text-green-400"></i>
+                        Entity Types
+                    </h2>
+                    <div id="entityLegend" class="space-y-2 max-h-64 overflow-y-auto pr-2">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Output Section -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Statistics -->
+                <div id="statsContainer" class="hidden">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                        <div class="stat-card glass rounded-xl p-4 text-center">
+                            <div id="totalEntities" class="text-3xl font-bold text-blue-400">0</div>
+                            <div class="text-sm text-blue-300">Total Entities</div>
+                        </div>
+                        <div class="stat-card glass rounded-xl p-4 text-center">
+                            <div id="uniqueTypes" class="text-3xl font-bold text-purple-400">0</div>
+                            <div class="text-sm text-purple-300">Entity Types</div>
+                        </div>
+                        <div class="stat-card glass rounded-xl p-4 text-center">
+                            <div id="sentenceCount" class="text-3xl font-bold text-green-400">0</div>
+                            <div class="text-sm text-green-300">Sentences</div>
+                        </div>
+                        <div class="stat-card glass rounded-xl p-4 text-center">
+                            <div id="llmEnhanced" class="text-3xl font-bold text-yellow-400">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div class="text-sm text-yellow-300">LLM Enhanced</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Annotated Text -->
+                <div class="glass rounded-2xl p-6">
+                    <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                        <i class="fas fa-highlighter text-yellow-400"></i>
+                        Annotated Text
+                    </h2>
+                    <div id="annotatedContainer" class="min-h-[200px]">
+                        <div id="annotatedPlaceholder" class="text-center text-blue-400 py-12">
+                            <i class="fas fa-search text-4xl mb-4 block opacity-50"></i>
+                            <p>Annotated text will appear here...</p>
+                            <p class="text-sm mt-2">Enter text and click "Extract Entities"</p>
+                        </div>
+                        <div id="annotatedText" class="annotated-text hidden bg-white/5 rounded-xl p-6"></div>
+                    </div>
+                </div>
+
+                <!-- Entity Details -->
+                <div id="entityDetailsContainer" class="glass rounded-2xl p-6 hidden">
+                    <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                        <i class="fas fa-list-ul text-teal-400"></i>
+                        Extracted Entities
+                    </h2>
+                    <div id="entityDetails" class="space-y-4">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Entity by Type -->
+                <div id="entityByTypeContainer" class="glass rounded-2xl p-6 hidden">
+                    <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                        <i class="fas fa-chart-pie text-pink-400"></i>
+                        Entities by Type
+                    </h2>
+                    <div id="entityByType" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="text-center mt-8 text-blue-400 text-sm">
+            <p>Day 41 of 100 Days of AI • Named Entity Recognition with spaCy + LLM</p>
+        </footer>
+    </div>
+
+    <script>
+        // DOM Elements
+        const textInput = document.getElementById('textInput');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const useLLMCheckbox = document.getElementById('useLLM');
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadEntityTypes();
+            loadSampleTexts();
+            checkModelStatus();
+            
+            textInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && e.ctrlKey) analyzeText();
+            });
+        });
+
+        // Check model status
+        async function checkModelStatus() {
+            try {
+                const response = await fetch('/model-status');
+                const data = await response.json();
+                
+                const spacyStatus = document.getElementById('spacyStatus');
+                const llmStatus = document.getElementById('llmStatus');
+                
+                if (data.spacy_loaded) {
+                    spacyStatus.innerHTML = `<i class="fas fa-circle text-green-400 mr-2"></i>spaCy: ${data.spacy_model}`;
+                } else {
+                    spacyStatus.innerHTML = '<i class="fas fa-circle text-yellow-400 mr-2"></i>spaCy: Loading...';
+                }
+                
+                if (data.llm_loaded) {
+                    llmStatus.innerHTML = '<i class="fas fa-circle text-green-400 mr-2"></i>LLM: Ready';
+                } else if (data.llm_enabled) {
+                    llmStatus.innerHTML = '<i class="fas fa-circle text-yellow-400 mr-2"></i>LLM: Will load on use';
+                } else {
+                    llmStatus.innerHTML = '<i class="fas fa-circle text-gray-400 mr-2"></i>LLM: Disabled';
+                }
+            } catch (error) {
+                console.error('Error checking status:', error);
+            }
+        }
+
+        // Load entity types for legend
+        async function loadEntityTypes() {
+            try {
+                const response = await fetch('/entity-types');
+                const data = await response.json();
+                
+                const container = document.getElementById('entityLegend');
+                container.innerHTML = data.types.map(type => `
+                    <div class="legend-item flex items-center gap-2 p-2 rounded-lg hover:bg-white/5">
+                        <span class="w-4 h-4 rounded" style="background-color: ${type.color}"></span>
+                        <span class="font-bold text-sm">${type.label}</span>
+                        <span class="text-xs text-gray-400 flex-1">${type.description}</span>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading entity types:', error);
+            }
+        }
+
+        // Load sample texts
+        async function loadSampleTexts() {
+            try {
+                const response = await fetch('/sample-texts');
+                const data = await response.json();
+                
+                const container = document.getElementById('sampleTexts');
+                container.innerHTML = data.samples.map((sample, idx) => `
+                    <button onclick="useSample(${idx})" 
+                            class="sample-btn w-full text-left px-4 py-2 rounded-lg glass border border-white/10 text-sm">
+                        <i class="fas fa-file-alt mr-2 text-purple-400"></i>${sample.title}
+                    </button>
+                `).join('');
+                
+                // Store samples for later use
+                window.sampleTexts = data.samples;
+            } catch (error) {
+                console.error('Error loading samples:', error);
+            }
+        }
+
+        // Use sample text
+        function useSample(index) {
+            if (window.sampleTexts && window.sampleTexts[index]) {
+                textInput.value = window.sampleTexts[index].text;
+                showToast(`Loaded: ${window.sampleTexts[index].title}`, 'success');
+            }
+        }
+
+        // Analyze text
+        async function analyzeText() {
+            const text = textInput.value.trim();
+            
+            if (!text) {
+                showToast('Please enter text to analyze', 'error');
+                textInput.focus();
+                return;
+            }
+
+            // Update UI
+            analyzeBtn.disabled = true;
+            analyzeBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Analyzing...';
+            
+            const placeholder = document.getElementById('annotatedPlaceholder');
+            const annotatedText = document.getElementById('annotatedText');
+            
+            placeholder.innerHTML = `
+                <i class="fas fa-cog fa-spin text-4xl mb-4 block text-blue-400"></i>
+                <p class="loading-text">Extracting entities...</p>
+                <p class="text-sm mt-2">This may take a moment with LLM enhancement</p>
+            `;
+            placeholder.classList.remove('hidden');
+            annotatedText.classList.add('hidden');
+
+            try {
+                const response = await fetch('/extract', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        text: text,
+                        use_llm: useLLMCheckbox.checked
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    displayResults(data);
+                    showToast(`Found ${data.total_entities} entities!`, 'success');
+                } else {
+                    showToast(data.error || 'Analysis failed', 'error');
+                    placeholder.innerHTML = `
+                        <i class="fas fa-exclamation-circle text-4xl mb-4 block text-red-400"></i>
+                        <p>Error analyzing text</p>
+                        <p class="text-sm mt-2">${data.error}</p>
+                    `;
+                }
+            } catch (error) {
+                showToast('Network error. Please try again.', 'error');
+                placeholder.innerHTML = `
+                    <i class="fas fa-wifi text-4xl mb-4 block text-red-400"></i>
+                    <p>Network error</p>
+                `;
+            } finally {
+                analyzeBtn.disabled = false;
+                analyzeBtn.innerHTML = '<i class="fas fa-search mr-2"></i>Extract Entities';
+            }
+        }
+
+        // Display results
+        function displayResults(data) {
+            // Show statistics
+            document.getElementById('statsContainer').classList.remove('hidden');
+            document.getElementById('totalEntities').textContent = data.total_entities;
+            document.getElementById('uniqueTypes').textContent = data.unique_types;
+            document.getElementById('sentenceCount').textContent = data.sentences.length;
+            document.getElementById('llmEnhanced').innerHTML = data.llm_enhanced 
+                ? '<i class="fas fa-check text-green-400"></i>' 
+                : '<i class="fas fa-times text-gray-400"></i>';
+
+            // Show annotated text
+            const placeholder = document.getElementById('annotatedPlaceholder');
+            const annotatedText = document.getElementById('annotatedText');
+            
+            placeholder.classList.add('hidden');
+            annotatedText.classList.remove('hidden');
+            annotatedText.innerHTML = data.annotated_text;
+
+            // Show entity details
+            const detailsContainer = document.getElementById('entityDetailsContainer');
+            const detailsDiv = document.getElementById('entityDetails');
+            
+            if (data.entities.length > 0) {
+                detailsContainer.classList.remove('hidden');
+                detailsDiv.innerHTML = data.entities.map(ent => `
+                    <div class="flex items-center justify-between p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-all">
+                        <div class="flex items-center gap-3">
+                            <span class="entity-tag" style="background-color: ${ent.color}20; color: ${ent.color}; border: 1px solid ${ent.color}">
+                                ${ent.text}
+                            </span>
+                            <span class="px-2 py-1 rounded text-xs font-bold" style="background-color: ${ent.color}; color: #000">
+                                ${ent.label}
+                            </span>
+                        </div>
+                        <div class="text-right">
+                            ${ent.context ? `
+                                <div class="text-sm text-gray-300">${ent.context}</div>
+                                <div class="text-xs text-gray-500">${ent.confidence}% confidence</div>
+                            ` : `
+                                <div class="text-sm text-gray-400">${ent.description}</div>
+                            `}
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                detailsContainer.classList.add('hidden');
+            }
+
+            // Show entities by type
+            const byTypeContainer = document.getElementById('entityByTypeContainer');
+            const byTypeDiv = document.getElementById('entityByType');
+            
+            if (Object.keys(data.statistics).length > 0) {
+                byTypeContainer.classList.remove('hidden');
+                byTypeDiv.innerHTML = Object.entries(data.statistics).map(([label, info]) => `
+                    <div class="p-4 rounded-xl" style="background-color: ${info.color}15; border: 1px solid ${info.color}40">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-bold" style="color: ${info.color}">${label}</span>
+                            <span class="px-2 py-1 rounded text-sm font-bold" style="background-color: ${info.color}">${info.count}</span>
+                        </div>
+                        <div class="flex flex-wrap gap-1">
+                            ${info.entities.map(e => `
+                                <span class="text-xs px-2 py-1 rounded bg-white/10">${e}</span>
+                            `).join('')}
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                byTypeContainer.classList.add('hidden');
+            }
+        }
+
+        // Toast notification
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            
+            const bgColor = type === 'success' ? 'bg-green-500' : 'bg-red-500';
+            const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+            
+            toast.className = `toast ${bgColor} text-white px-4 py-3 rounded-lg shadow-lg flex items-center gap-2`;
+            toast.innerHTML = `<i class="fas ${icon}"></i>${message}`;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideIn 0.3s ease reverse';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

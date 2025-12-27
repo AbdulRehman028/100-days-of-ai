@@ -1,8 +1,3 @@
-"""
-Day 41: Named Entity Recognition (spaCy + LLM Integration)
-Use spaCy for NER, enhance with LLM for context-aware entity extraction
-"""
-
 import os
 import json
 import spacy

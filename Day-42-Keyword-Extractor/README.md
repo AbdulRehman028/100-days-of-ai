@@ -11,6 +11,8 @@ Extract keywords using semantic embeddings and clustering algorithms.
 - **Context Snippets**: Shows where keywords appear in text
 - **Interactive UI**: Keyword cloud with relevance-based sizing
 
+![alt text](image.png)
+
 ## 🛠️ Tech Stack
 
 - **Backend**: Python, Flask

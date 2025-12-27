@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keyword Extractor | Day 42</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #0c1222 0%, #1a1f35 50%, #0c1222 100%);
+            min-height: 100vh;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .keyword-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-weight: 500;
+            margin: 6px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .keyword-tag:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+        .extract-btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+            transition: all 0.3s ease;
+        }
+        .extract-btn:hover:not(:disabled) {
+            transform: scale(1.02);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.5);
+        }
+        .extract-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .relevance-bar {
+            height: 6px;
+            border-radius: 3px;
+            background: linear-gradient(90deg, #10b981, #34d399);
+            transition: width 0.5s ease;
+        }
+        .method-btn {
+            transition: all 0.2s ease;
+        }
+        .method-btn.active {
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-color: #10b981;
+        }
+        .cluster-card {
+            transition: all 0.3s ease;
+        }
+        .cluster-card:hover {
+            transform: translateY(-4px);
+        }
+        .toast {
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .keyword-animate {
+            animation: fadeIn 0.5s ease forwards;
+        }
+        .sample-btn:hover {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: #10b981;
+        }
+    </style>
+</head>
+<body class="text-white min-h-screen">
+    <!-- Toast Container -->
+    <div id="toastContainer" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+    <div class="container mx-auto px-4 py-8 max-w-7xl">
+        <!-- Header -->
+        <header class="text-center mb-10">
+            <div class="flex items-center justify-center gap-4 mb-4">
+                <i class="fas fa-key text-5xl text-emerald-400"></i>
+                <h1 class="text-4xl md:text-5xl font-bold bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-400 bg-clip-text text-transparent">
+                    Keyword Extractor
+                </h1>
+            </div>
+            <p class="text-emerald-300 text-xl">Day 42 • Embeddings + Clustering</p>
+            <div class="mt-4 flex items-center justify-center gap-2">
+                <span id="modelStatus" class="px-4 py-1 rounded-full text-sm glass">
+                    <i class="fas fa-circle text-yellow-400 mr-2"></i>Loading model...
+                </span>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Input Section -->
+            <div class="lg:col-span-1 space-y-6">
+                <!-- Text Input -->
+                <div class="glass rounded-2xl p-6">
+                    <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                        <i class="fas fa-file-alt text-emerald-400"></i>
+                        Input Text
+                    </h2>
+                    
+                    <textarea id="textInput" rows="10" 
+                              placeholder="Enter or paste text to extract keywords from..."
+                              class="w-full px-4 py-3 rounded-xl bg-white/10 border border-emerald-500/30 focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-400/30 resize-none"></textarea>
+                    
+                    <div class="mt-2 text-sm text-gray-400">
+                        <span id="charCount">0</span> characters • <span id="wordCount">0</span> words
+                    </div>
+                </div>
+
+                <!-- Options -->
+                <div class="glass rounded-2xl p-6">
+                    <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+                        <i class="fas fa-cog text-teal-400"></i>
+                        Options
+                    </h2>
+                    
+                    <!-- Method Selection -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-2 text-emerald-300">
+                            Extraction Method
+                        </label>
+                        <div class="flex gap-2">
+                            <button onclick="setMethod('embedding')" 
+                                    class="method-btn flex-1 px-4 py-2 rounded-lg glass border border-emerald-500/30 active" 
+                                    data-method="embedding">
+                                <i class="fas fa-vector-square mr-2"></i>Embedding
+                            </button>
+                            <button onclick="setMethod('clustering')" 
+                                    class="method-btn flex-1 px-4 py-2 rounded-lg glass border border-emerald-500/30" 
+                                    data-method="clustering">
+                                <i class="fas fa-project-diagram mr-2"></i>Clustering
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Number of Keywords -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-2 text-emerald-300">
+                            <i class="fas fa-hashtag mr-1"></i>Number of Keywords: <span id="numValue">10</span>
+                        </label>
+                        <input type="range" id="numKeywords" min="5" max="15" value="10"
+                               class="w-full accent-emerald-500">
+                    </div>
+                    
+                    <!-- Diversity Slider -->
+                    <div class="mb-4" id="diversityContainer">
+                        <label class="block text-sm font-medium mb-2 text-emerald-300">
+                            <i class="fas fa-random mr-1"></i>Diversity: <span id="divValue">0.5</span>
+                        </label>
+                        <input type="range" id="diversity" min="0" max="1" step="0.1" value="0.5"
+                               class="w-full accent-emerald-500">
+                        <div class="flex justify-between text-xs text-gray-400 mt-1">
+                            <span>Relevant</span>
+                            <span>Diverse</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Extract Button -->
+                    <button onclick="extractKeywords()" id="extractBtn" 
+                            class="extract-btn w-full py-3 rounded-xl font-bold text-lg shadow-lg">
+                        <i class="fas fa-magic mr-2"></i>Extract Keywords
+                    </button>
+                </div>
+
+                <!-- Sample Texts -->
+                <div class="glass rounded-2xl p-6">
+                    <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+                        <i class="fas fa-lightbulb text-yellow-400"></i>
+                        Sample Texts
+                    </h2>
+                    <div id="sampleTexts" class="space-y-2">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Output Section -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Statistics -->
+                <div id="statsContainer" class="hidden">
+                    <div class="grid grid-cols-3 gap-4 mb-6">
+                        <div class="glass rounded-xl p-4 text-center">
+                            <div id="keywordsFound" class="text-3xl font-bold text-emerald-400">0</div>
+                            <div class="text-sm text-emerald-300">Keywords Found</div>
+                        </div>
+                        <div class="glass rounded-xl p-4 text-center">
+                            <div id="inputWords" class="text-3xl font-bold text-teal-400">0</div>
+                            <div class="text-sm text-teal-300">Input Words</div>
+                        </div>
+                        <div class="glass rounded-xl p-4 text-center">
+                            <div id="methodUsed" class="text-2xl font-bold text-cyan-400">
+                                <i class="fas fa-vector-square"></i>
+                            </div>
+                            <div class="text-sm text-cyan-300">Method</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Keywords Cloud -->
+                <div class="glass rounded-2xl p-6">
+                    <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                        <i class="fas fa-cloud text-emerald-400"></i>
+                        Extracted Keywords
+                    </h2>
+                    <div id="keywordsContainer" class="min-h-[150px]">
+                        <div id="keywordsPlaceholder" class="text-center text-emerald-400 py-12">
+                            <i class="fas fa-key text-4xl mb-4 block opacity-50"></i>
+                            <p>Keywords will appear here...</p>
+                            <p class="text-sm mt-2">Enter text and click "Extract Keywords"</p>
+                        </div>
+                        <div id="keywordsCloud" class="hidden flex flex-wrap justify-center"></div>
+                    </div>
+                </div>
+
+                <!-- Keywords Details -->
+                <div id="detailsContainer" class="glass rounded-2xl p-6 hidden">
+                    <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                        <i class="fas fa-list-ol text-teal-400"></i>
+                        Keyword Details
+                    </h2>
+                    <div id="keywordsDetails" class="space-y-3">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Clusters (for clustering method) -->
+                <div id="clustersContainer" class="glass rounded-2xl p-6 hidden">
+                    <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                        <i class="fas fa-object-group text-purple-400"></i>
+                        Keyword Clusters
+                    </h2>
+                    <div id="clustersGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- How It Works -->
+        <div class="mt-8 glass rounded-2xl p-6">
+            <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+                <i class="fas fa-info-circle text-emerald-400"></i>
+                How It Works
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm text-gray-300">
+                <div>
+                    <h4 class="font-bold text-emerald-400 mb-2"><i class="fas fa-vector-square mr-2"></i>Embedding Method</h4>
+                    <p>Uses Sentence Transformers to compute semantic embeddings, then applies MMR (Maximal Marginal Relevance) to select keywords that are both relevant and diverse.</p>
+                </div>
+                <div>
+                    <h4 class="font-bold text-emerald-400 mb-2"><i class="fas fa-project-diagram mr-2"></i>Clustering Method</h4>
+                    <p>Groups similar keywords using K-Means clustering, then selects the most representative keyword from each cluster based on document relevance.</p>
+                </div>
+                <div>
+                    <h4 class="font-bold text-emerald-400 mb-2"><i class="fas fa-code mr-2"></i>Tech Stack</h4>
+                    <p>Sentence Transformers (all-MiniLM-L6-v2), Scikit-learn for clustering, Flask backend, and TailwindCSS for the UI.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="text-center mt-8 text-emerald-400 text-sm">
+            <p>Day 42 of 100 Days of AI • Keyword Extraction with Embeddings</p>
+        </footer>
+    </div>
+
+    <script>
+        // State
+        let selectedMethod = 'embedding';
+        let sampleTextsData = [];
+
+        // DOM Elements
+        const textInput = document.getElementById('textInput');
+        const numKeywords = document.getElementById('numKeywords');
+        const diversity = document.getElementById('diversity');
+        const extractBtn = document.getElementById('extractBtn');
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSampleTexts();
+            checkModelStatus();
+            
+            textInput.addEventListener('input', updateCounts);
+            numKeywords.addEventListener('input', () => {
+                document.getElementById('numValue').textContent = numKeywords.value;
+            });
+            diversity.addEventListener('input', () => {
+                document.getElementById('divValue').textContent = diversity.value;
+            });
+            
+            textInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && e.ctrlKey) extractKeywords();
+            });
+        });
+
+        // Update character/word counts
+        function updateCounts() {
+            const text = textInput.value;
+            document.getElementById('charCount').textContent = text.length;
+            document.getElementById('wordCount').textContent = text.trim() ? text.trim().split(/\s+/).length : 0;
+        }
+
+        // Check model status
+        async function checkModelStatus() {
+            try {
+                const response = await fetch('/model-status');
+                const data = await response.json();
+                
+                const status = document.getElementById('modelStatus');
+                if (data.model_loaded) {
+                    status.innerHTML = `<i class="fas fa-circle text-green-400 mr-2"></i>${data.model_name}`;
+                } else {
+                    status.innerHTML = '<i class="fas fa-circle text-yellow-400 mr-2"></i>Loading on first use';
+                }
+            } catch (error) {
+                console.error('Error checking status:', error);
+            }
+        }
+
+        // Load sample texts
+        async function loadSampleTexts() {
+            try {
+                const response = await fetch('/sample-texts');
+                const data = await response.json();
+                sampleTextsData = data.samples;
+                
+                const container = document.getElementById('sampleTexts');
+                container.innerHTML = data.samples.map((sample, idx) => `
+                    <button onclick="useSample(${idx})" 
+                            class="sample-btn w-full text-left px-4 py-2 rounded-lg glass border border-white/10 text-sm transition-all">
+                        <i class="fas fa-file-alt mr-2 text-emerald-400"></i>${sample.title}
+                    </button>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading samples:', error);
+            }
+        }
+
+        // Use sample text
+        function useSample(index) {
+            if (sampleTextsData[index]) {
+                textInput.value = sampleTextsData[index].text;
+                updateCounts();
+                showToast(`Loaded: ${sampleTextsData[index].title}`, 'success');
+            }
+        }
+
+        // Set extraction method
+        function setMethod(method) {
+            selectedMethod = method;
+            document.querySelectorAll('.method-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.method === method) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Show/hide diversity slider (only for embedding method)
+            document.getElementById('diversityContainer').style.display = 
+                method === 'embedding' ? 'block' : 'none';
+        }
+
+        // Extract keywords
+        async function extractKeywords() {
+            const text = textInput.value.trim();
+            
+            if (!text) {
+                showToast('Please enter text to analyze', 'error');
+                textInput.focus();
+                return;
+            }
+            
+            if (text.length < 50) {
+                showToast('Please enter at least 50 characters', 'error');
+                return;
+            }
+
+            // Update UI
+            extractBtn.disabled = true;
+            extractBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Extracting...';
+            
+            const placeholder = document.getElementById('keywordsPlaceholder');
+            const cloud = document.getElementById('keywordsCloud');
+            
+            placeholder.innerHTML = `
+                <i class="fas fa-cog fa-spin text-4xl mb-4 block text-emerald-400"></i>
+                <p>Computing embeddings...</p>
+            `;
+            placeholder.classList.remove('hidden');
+            cloud.classList.add('hidden');
+
+            try {
+                const response = await fetch('/extract', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        text: text,
+                        method: selectedMethod,
+                        num_keywords: parseInt(numKeywords.value),
+                        diversity: parseFloat(diversity.value)
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    displayResults(data);
+                    showToast(`Extracted ${data.keywords.length} keywords!`, 'success');
+                } else {
+                    showToast(data.error || 'Extraction failed', 'error');
+                    placeholder.innerHTML = `
+                        <i class="fas fa-exclamation-circle text-4xl mb-4 block text-red-400"></i>
+                        <p>${data.error}</p>
+                    `;
+                }
+            } catch (error) {
+                showToast('Network error. Please try again.', 'error');
+            } finally {
+                extractBtn.disabled = false;
+                extractBtn.innerHTML = '<i class="fas fa-magic mr-2"></i>Extract Keywords';
+            }
+        }
+
+        // Display results
+        function displayResults(data) {
+            // Show statistics
+            document.getElementById('statsContainer').classList.remove('hidden');
+            document.getElementById('keywordsFound').textContent = data.keywords.length;
+            document.getElementById('inputWords').textContent = data.statistics.word_count;
+            document.getElementById('methodUsed').innerHTML = data.method === 'embedding' 
+                ? '<i class="fas fa-vector-square"></i>' 
+                : '<i class="fas fa-project-diagram"></i>';
+
+            // Show keywords cloud
+            const placeholder = document.getElementById('keywordsPlaceholder');
+            const cloud = document.getElementById('keywordsCloud');
+            
+            placeholder.classList.add('hidden');
+            cloud.classList.remove('hidden');
+            
+            // Generate colors based on relevance
+            cloud.innerHTML = data.keywords.map((kw, idx) => {
+                const hue = 150 + (kw.relevance * 30); // Green to teal spectrum
+                const saturation = 60 + (kw.relevance * 40);
+                const lightness = 45 + (kw.relevance * 15);
+                const size = 0.9 + (kw.relevance * 0.4);
+                
+                return `
+                    <span class="keyword-tag keyword-animate" 
+                          style="background: hsla(${hue}, ${saturation}%, ${lightness}%, 0.2); 
+                                 color: hsl(${hue}, ${saturation}%, ${lightness}%);
+                                 border: 1px solid hsla(${hue}, ${saturation}%, ${lightness}%, 0.5);
+                                 font-size: ${size}rem;
+                                 animation-delay: ${idx * 0.05}s;"
+                          title="Relevance: ${(kw.relevance * 100).toFixed(1)}%">
+                        <i class="fas fa-hashtag mr-1 text-xs opacity-50"></i>
+                        ${kw.keyword}
+                    </span>
+                `;
+            }).join('');
+
+            // Show details
+            const detailsContainer = document.getElementById('detailsContainer');
+            const details = document.getElementById('keywordsDetails');
+            
+            detailsContainer.classList.remove('hidden');
+            details.innerHTML = data.keywords.map((kw, idx) => `
+                <div class="p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-all">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="font-bold text-emerald-400">
+                            ${idx + 1}. ${kw.keyword}
+                        </span>
+                        <span class="text-sm text-gray-400">
+                            ${(kw.relevance * 100).toFixed(1)}% relevance
+                        </span>
+                    </div>
+                    <div class="w-full bg-white/10 rounded-full h-1.5 mb-2">
+                        <div class="relevance-bar" style="width: ${kw.relevance * 100}%"></div>
+                    </div>
+                    ${kw.context ? `
+                        <p class="text-sm text-gray-400 italic">"${kw.context}"</p>
+                    ` : ''}
+                </div>
+            `).join('');
+
+            // Show clusters (if clustering method)
+            const clustersContainer = document.getElementById('clustersContainer');
+            const clustersGrid = document.getElementById('clustersGrid');
+            
+            if (data.cluster_info && data.cluster_info.length > 0) {
+                clustersContainer.classList.remove('hidden');
+                
+                const colors = ['#10b981', '#06b6d4', '#8b5cf6', '#f59e0b', '#ef4444', '#ec4899'];
+                
+                clustersGrid.innerHTML = data.cluster_info.map((cluster, idx) => `
+                    <div class="cluster-card p-4 rounded-xl" 
+                         style="background: ${colors[idx % colors.length]}15; border: 1px solid ${colors[idx % colors.length]}40">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="font-bold" style="color: ${colors[idx % colors.length]}">
+                                <i class="fas fa-layer-group mr-2"></i>Cluster ${cluster.cluster_id + 1}
+                            </span>
+                            <span class="text-xs px-2 py-1 rounded" style="background: ${colors[idx % colors.length]}30">
+                                ${cluster.size} terms
+                            </span>
+                        </div>
+                        <div class="text-sm mb-2">
+                            <span class="text-gray-400">Representative:</span>
+                            <span class="font-bold text-white">${cluster.representative}</span>
+                        </div>
+                        <div class="flex flex-wrap gap-1">
+                            ${cluster.members.map(m => `
+                                <span class="text-xs px-2 py-1 rounded bg-white/10">${m}</span>
+                            `).join('')}
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                clustersContainer.classList.add('hidden');
+            }
+        }
+
+        // Toast notification
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            
+            const bgColor = type === 'success' ? 'bg-emerald-500' : 'bg-red-500';
+            const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+            
+            toast.className = `toast ${bgColor} text-white px-4 py-3 rounded-lg shadow-lg flex items-center gap-2`;
+            toast.innerHTML = `<i class="fas ${icon}"></i>${message}`;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideIn 0.3s ease reverse';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

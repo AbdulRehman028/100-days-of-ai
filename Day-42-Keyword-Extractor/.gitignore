@@ -1,0 +1,33 @@
+# Model files (too large for GitHub)
+models/
+*.h5
+*.pt
+*.pth
+*.bin
+*.safetensors
+*.ckpt
+
+# Sentence Transformers cache
+.cache/
+sentence-transformers/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environment
+venv/
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

@@ -11,6 +11,10 @@ Use spaCy for NER, enhanced with LLM for context-aware entity extraction.
 - **Entity Statistics**: Counts, groupings, and analysis
 - **Sample Texts**: Pre-loaded examples for testing
 
+
+![alt text](image.png)
+
+
 ## 🛠️ Tech Stack
 
 - **Backend**: Python, Flask

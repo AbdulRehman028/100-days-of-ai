@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Language Detector | Day 43</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #1a1a2e 100%);
+            min-height: 100vh;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .detect-btn {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            transition: all 0.3s ease;
+        }
+        .detect-btn:hover:not(:disabled) {
+            transform: scale(1.02);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.5);
+        }
+        .detect-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .language-card {
+            transition: all 0.3s ease;
+        }
+        .language-card:hover {
+            transform: translateY(-4px);
+        }
+        .confidence-bar {
+            height: 8px;
+            border-radius: 4px;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            transition: width 0.5s ease;
+        }
+        .flag-large {
+            font-size: 4rem;
+            line-height: 1;
+        }
+        .sample-btn {
+            transition: all 0.2s ease;
+        }
+        .sample-btn:hover {
+            background: rgba(99, 102, 241, 0.2);
+            border-color: #6366f1;
+        }
+        .toast {
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .bounce {
+            animation: bounce 1s ease infinite;
+        }
+        .result-animate {
+            animation: fadeIn 0.5s ease forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="text-white min-h-screen">
+    <!-- Toast Container -->
+    <div id="toastContainer" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <!-- Header -->
+        <header class="text-center mb-10">
+            <div class="flex items-center justify-center gap-4 mb-4">
+                <i class="fas fa-globe text-5xl text-indigo-400"></i>
+                <h1 class="text-4xl md:text-5xl font-bold bg-gradient-to-r from-indigo-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent">
+                    Language Detector
+                </h1>
+            </div>
+            <p class="text-indigo-300 text-xl">Day 43 • Zero-Shot Multilingual Detection</p>
+            <div class="mt-4 flex items-center justify-center gap-4">
+                <span id="modelStatus" class="px-4 py-1 rounded-full text-sm glass">
+                    <i class="fas fa-circle text-yellow-400 mr-2"></i>Loading model...
+                </span>
+                <span id="langCount" class="px-4 py-1 rounded-full text-sm glass">
+                    <i class="fas fa-language mr-2 text-purple-400"></i>30 Languages
+                </span>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Input Section -->
+            <div class="space-y-6">
+                <!-- Text Input -->
+                <div class="glass rounded-2xl p-6">
+                    <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                        <i class="fas fa-keyboard text-indigo-400"></i>
+                        Input Text
+                    </h2>
+                    
+                    <textarea id="textInput" rows="8" 
+                              placeholder="Enter text in any language to detect..."
+                              class="w-full px-4 py-3 rounded-xl bg-white/10 border border-indigo-500/30 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/30 resize-none text-lg"></textarea>
+                    
+                    <div class="mt-2 flex justify-between text-sm text-gray-400">
+                        <span><span id="charCount">0</span> characters</span>
+                        <span><span id="wordCount">0</span> words</span>
+                    </div>
+                    
+                    <!-- Detect Button -->
+                    <button onclick="detectLanguage()" id="detectBtn" 
+                            class="detect-btn w-full mt-4 py-3 rounded-xl font-bold text-lg shadow-lg">
+                        <i class="fas fa-search-location mr-2"></i>Detect Language
+                    </button>
+                </div>
+
+                <!-- Sample Texts -->
+                <div class="glass rounded-2xl p-6">
+                    <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+                        <i class="fas fa-lightbulb text-yellow-400"></i>
+                        Sample Texts
+                    </h2>
+                    <div id="sampleTexts" class="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto pr-2">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Output Section -->
+            <div class="space-y-6">
+                <!-- Primary Result -->
+                <div class="glass rounded-2xl p-6">
+                    <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                        <i class="fas fa-bullseye text-green-400"></i>
+                        Detection Result
+                    </h2>
+                    
+                    <div id="resultContainer" class="min-h-[200px]">
+                        <div id="resultPlaceholder" class="text-center text-indigo-400 py-12">
+                            <i class="fas fa-globe text-6xl mb-4 block opacity-50"></i>
+                            <p>Detection result will appear here...</p>
+                            <p class="text-sm mt-2">Enter text and click "Detect Language"</p>
+                        </div>
+                        
+                        <div id="primaryResult" class="hidden result-animate">
+                            <div class="text-center mb-6">
+                                <span id="resultFlag" class="flag-large bounce">🌍</span>
+                                <h3 id="resultLanguage" class="text-3xl font-bold mt-4 text-white">Unknown</h3>
+                                <p id="resultNative" class="text-xl text-indigo-300">Unknown</p>
+                                <p id="resultCode" class="text-sm text-gray-400 mt-1">Code: ??</p>
+                            </div>
+                            
+                            <div class="bg-white/5 rounded-xl p-4">
+                                <div class="flex justify-between mb-2">
+                                    <span class="text-gray-300">Confidence</span>
+                                    <span id="resultConfidence" class="font-bold text-indigo-400">0%</span>
+                                </div>
+                                <div class="w-full bg-white/10 rounded-full h-3">
+                                    <div id="confidenceBar" class="confidence-bar" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- All Detections -->
+                <div id="allDetectionsContainer" class="glass rounded-2xl p-6 hidden">
+                    <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+                        <i class="fas fa-list-ol text-purple-400"></i>
+                        All Possibilities
+                    </h2>
+                    <div id="allDetections" class="space-y-3">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Supported Languages -->
+                <div class="glass rounded-2xl p-6">
+                    <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+                        <i class="fas fa-language text-cyan-400"></i>
+                        Supported Languages
+                    </h2>
+                    <div id="languageGrid" class="flex flex-wrap gap-2 max-h-40 overflow-y-auto pr-2">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Batch Detection -->
+        <div class="mt-8 glass rounded-2xl p-6">
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                <i class="fas fa-layer-group text-orange-400"></i>
+                Batch Detection
+                <span class="text-sm font-normal text-gray-400 ml-2">(one text per line)</span>
+            </h2>
+            
+            <textarea id="batchInput" rows="4" 
+                      placeholder="Enter multiple texts, one per line...&#10;Hello, how are you?&#10;Bonjour, comment allez-vous?&#10;Hola, ¿cómo estás?"
+                      class="w-full px-4 py-3 rounded-xl bg-white/10 border border-orange-500/30 focus:border-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-400/30 resize-none"></textarea>
+            
+            <button onclick="detectBatch()" id="batchBtn" 
+                    class="mt-4 px-6 py-2 rounded-xl font-bold bg-gradient-to-r from-orange-500 to-amber-500 hover:shadow-lg hover:shadow-orange-500/30 transition-all">
+                <i class="fas fa-play mr-2"></i>Detect All
+            </button>
+            
+            <div id="batchResults" class="mt-4 hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="batchResultsGrid">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="text-center mt-8 text-indigo-400 text-sm">
+            <p>Day 43 of 100 Days of AI • Language Detection with Zero-Shot Classification</p>
+        </footer>
+    </div>
+
+    <script>
+        // DOM Elements
+        const textInput = document.getElementById('textInput');
+        const detectBtn = document.getElementById('detectBtn');
+        let sampleTextsData = [];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSampleTexts();
+            loadLanguages();
+            checkModelStatus();
+            
+            textInput.addEventListener('input', updateCounts);
+            textInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && e.ctrlKey) detectLanguage();
+            });
+        });
+
+        // Update counts
+        function updateCounts() {
+            const text = textInput.value;
+            document.getElementById('charCount').textContent = text.length;
+            document.getElementById('wordCount').textContent = text.trim() ? text.trim().split(/\s+/).length : 0;
+        }
+
+        // Check model status
+        async function checkModelStatus() {
+            try {
+                const response = await fetch('/model-status');
+                const data = await response.json();
+                
+                const status = document.getElementById('modelStatus');
+                if (data.model_loaded) {
+                    status.innerHTML = '<i class="fas fa-circle text-green-400 mr-2"></i>Model Ready';
+                } else {
+                    status.innerHTML = '<i class="fas fa-circle text-yellow-400 mr-2"></i>Loading on first use';
+                }
+                
+                document.getElementById('langCount').innerHTML = 
+                    `<i class="fas fa-language mr-2 text-purple-400"></i>${data.supported_languages} Languages`;
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // Load sample texts
+        async function loadSampleTexts() {
+            try {
+                const response = await fetch('/sample-texts');
+                const data = await response.json();
+                sampleTextsData = data.samples;
+                
+                const container = document.getElementById('sampleTexts');
+                container.innerHTML = data.samples.map((sample, idx) => `
+                    <button onclick="useSample(${idx})" 
+                            class="sample-btn text-left px-3 py-2 rounded-lg glass border border-white/10 text-sm transition-all">
+                        <span class="block font-bold text-indigo-400">${sample.expected}</span>
+                        <span class="text-xs text-gray-400 line-clamp-1">${sample.text.substring(0, 30)}...</span>
+                    </button>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading samples:', error);
+            }
+        }
+
+        // Load supported languages
+        async function loadLanguages() {
+            try {
+                const response = await fetch('/languages');
+                const data = await response.json();
+                
+                const container = document.getElementById('languageGrid');
+                container.innerHTML = data.languages.map(lang => `
+                    <span class="px-2 py-1 rounded-lg bg-white/5 text-xs flex items-center gap-1">
+                        <span>${lang.flag}</span>
+                        <span>${lang.name}</span>
+                    </span>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading languages:', error);
+            }
+        }
+
+        // Use sample text
+        function useSample(index) {
+            if (sampleTextsData[index]) {
+                textInput.value = sampleTextsData[index].text;
+                updateCounts();
+                showToast(`Loaded ${sampleTextsData[index].expected} sample`, 'success');
+            }
+        }
+
+        // Detect language
+        async function detectLanguage() {
+            const text = textInput.value.trim();
+            
+            if (!text) {
+                showToast('Please enter text to analyze', 'error');
+                textInput.focus();
+                return;
+            }
+
+            // Update UI
+            detectBtn.disabled = true;
+            detectBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Detecting...';
+            
+            const placeholder = document.getElementById('resultPlaceholder');
+            const primaryResult = document.getElementById('primaryResult');
+            
+            placeholder.innerHTML = `
+                <i class="fas fa-globe fa-spin text-6xl mb-4 block text-indigo-400"></i>
+                <p>Analyzing text...</p>
+            `;
+            placeholder.classList.remove('hidden');
+            primaryResult.classList.add('hidden');
+
+            try {
+                const response = await fetch('/detect', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: text, top_k: 5 })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    displayResult(data);
+                    showToast(`Detected: ${data.primary.language}`, 'success');
+                } else {
+                    showToast(data.error || 'Detection failed', 'error');
+                    placeholder.innerHTML = `
+                        <i class="fas fa-exclamation-circle text-6xl mb-4 block text-red-400"></i>
+                        <p>${data.error}</p>
+                    `;
+                }
+            } catch (error) {
+                showToast('Network error. Please try again.', 'error');
+            } finally {
+                detectBtn.disabled = false;
+                detectBtn.innerHTML = '<i class="fas fa-search-location mr-2"></i>Detect Language';
+            }
+        }
+
+        // Display result
+        function displayResult(data) {
+            const placeholder = document.getElementById('resultPlaceholder');
+            const primaryResult = document.getElementById('primaryResult');
+            const primary = data.primary;
+            
+            // Hide placeholder, show result
+            placeholder.classList.add('hidden');
+            primaryResult.classList.remove('hidden');
+            
+            // Update primary result
+            document.getElementById('resultFlag').textContent = primary.flag;
+            document.getElementById('resultLanguage').textContent = primary.language;
+            document.getElementById('resultNative').textContent = primary.native_name;
+            document.getElementById('resultCode').textContent = `Code: ${primary.code}`;
+            document.getElementById('resultConfidence').textContent = `${primary.confidence}%`;
+            document.getElementById('confidenceBar').style.width = `${primary.confidence}%`;
+            
+            // Update all detections
+            const allContainer = document.getElementById('allDetectionsContainer');
+            const allDiv = document.getElementById('allDetections');
+            
+            if (data.all_detections.length > 1) {
+                allContainer.classList.remove('hidden');
+                allDiv.innerHTML = data.all_detections.map((det, idx) => `
+                    <div class="language-card flex items-center justify-between p-3 rounded-xl ${idx === 0 ? 'bg-indigo-500/20 border border-indigo-500/50' : 'bg-white/5'}">
+                        <div class="flex items-center gap-3">
+                            <span class="text-2xl">${det.flag}</span>
+                            <div>
+                                <div class="font-bold">${det.language}</div>
+                                <div class="text-xs text-gray-400">${det.native_name}</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="font-bold ${idx === 0 ? 'text-indigo-400' : 'text-gray-300'}">${det.confidence}%</div>
+                            <div class="w-24 bg-white/10 rounded-full h-1.5 mt-1">
+                                <div class="h-full rounded-full ${idx === 0 ? 'bg-indigo-500' : 'bg-gray-500'}" style="width: ${det.confidence}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                allContainer.classList.add('hidden');
+            }
+        }
+
+        // Batch detection
+        async function detectBatch() {
+            const batchInput = document.getElementById('batchInput');
+            const texts = batchInput.value.split('\n').filter(t => t.trim());
+            
+            if (texts.length === 0) {
+                showToast('Please enter texts to analyze', 'error');
+                return;
+            }
+
+            const batchBtn = document.getElementById('batchBtn');
+            batchBtn.disabled = true;
+            batchBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Detecting...';
+
+            try {
+                const response = await fetch('/detect-batch', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ texts: texts, top_k: 1 })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    displayBatchResults(data.results);
+                    showToast(`Detected ${data.total_texts} texts`, 'success');
+                } else {
+                    showToast(data.error || 'Batch detection failed', 'error');
+                }
+            } catch (error) {
+                showToast('Network error', 'error');
+            } finally {
+                batchBtn.disabled = false;
+                batchBtn.innerHTML = '<i class="fas fa-play mr-2"></i>Detect All';
+            }
+        }
+
+        // Display batch results
+        function displayBatchResults(results) {
+            const container = document.getElementById('batchResults');
+            const grid = document.getElementById('batchResultsGrid');
+            
+            container.classList.remove('hidden');
+            grid.innerHTML = results.map(result => {
+                const det = result.detections[0];
+                return `
+                    <div class="glass rounded-xl p-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="text-2xl">${det ? det.flag : '🏳️'}</span>
+                            <span class="font-bold">${det ? det.language : 'Unknown'}</span>
+                            <span class="text-xs text-gray-400 ml-auto">${det ? det.confidence + '%' : ''}</span>
+                        </div>
+                        <p class="text-sm text-gray-400 line-clamp-2">${result.text}</p>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Toast notification
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            
+            const bgColor = type === 'success' ? 'bg-indigo-500' : 'bg-red-500';
+            const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+            
+            toast.className = `toast ${bgColor} text-white px-4 py-3 rounded-lg shadow-lg flex items-center gap-2`;
+            toast.innerHTML = `<i class="fas ${icon}"></i>${message}`;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideIn 0.3s ease reverse';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

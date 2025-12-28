@@ -1,0 +1,37 @@
+# Virtual environment (project-specific)
+venv/
+.venv/
+env/
+
+# Model files (too large for GitHub)
+models/
+*.h5
+*.pt
+*.pth
+*.bin
+*.safetensors
+*.ckpt
+
+# Hugging Face cache
+.cache/
+~/.cache/huggingface/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Environment variables
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

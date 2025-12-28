@@ -348,11 +348,10 @@ def sample_texts():
 def get_languages():
     """Get all supported languages"""
     languages = []
-    for lang in LANGUAGES:
-        info = LANGUAGE_INFO.get(lang, {"code": "??", "native": lang, "flag": "🏳️"})
+    for code, info in LANGUAGE_INFO.items():
         languages.append({
-            'name': lang,
-            'code': info['code'],
+            'name': info['name'],
+            'code': code,
             'native': info['native'],
             'flag': info['flag']
         })
@@ -365,7 +364,7 @@ def model_status():
     return jsonify({
         'model_loaded': classifier is not None,
         'model_name': MODEL_NAME,
-        'supported_languages': len(LANGUAGES)
+        'supported_languages': len(LANGUAGE_INFO)
     })
 
 
@@ -375,11 +374,6 @@ def model_status():
 
 print("🌍 Language Detector - Day 43")
 print("=" * 35)
-
-try:
-    load_model()
-except Exception as e:
-    print(f"⚠️ Model will be loaded on first request: {e}")
 
 
 if __name__ == '__main__':

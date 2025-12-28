@@ -1,8 +1,3 @@
-"""
-Day 43: Language Detector (Multilingual LLM)
-Detect language using LLM zero-shot classification
-"""
-
 import re
 from flask import Flask, render_template, request, jsonify
 from transformers import pipeline

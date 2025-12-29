@@ -1,0 +1,6 @@
+flask>=3.0.0
+transformers>=4.35.0
+torch>=2.0.0
+sentencepiece>=0.1.99
+rouge-score>=0.1.2
+tf-keras>=2.15.0

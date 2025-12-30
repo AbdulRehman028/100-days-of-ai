@@ -2,6 +2,8 @@
 
 An end-to-end text summarization application using state-of-the-art transformer models (BART and T5) for abstractive summarization with ROUGE score evaluation.
 
+![alt text](image.png)
+
 ## 🌟 Features
 
 - **Multiple Models**: Choose from 4 different summarization models

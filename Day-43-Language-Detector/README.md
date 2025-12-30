@@ -2,6 +2,8 @@
 
 Detect language using LLM zero-shot classification with support for 30+ languages.
 
+![alt text](image.png)
+
 ## 🌟 Features
 
 - **Zero-Shot Detection**: Uses BART-MNLI for multilingual classification

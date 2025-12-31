@@ -472,7 +472,7 @@
 <body>
     <div class="container">
         <header>
-            <div class="logo">🔍</div>
+            <!-- <div class="logo">🔍</div> -->
             <h1>Fake News Detector</h1>
             <p class="subtitle">AI-powered fact-checking • Claim verification • Misinformation detection</p>
         </header>
@@ -717,15 +717,22 @@ Example: &quot;Scientists have discovered that drinking coffee every day can ext
                         <div class="analysis-section">
                             <div class="analysis-title">
                                 <span>🧠</span>
-                                <span>NLI Analysis</span>
+                                <span>Content Analysis</span>
                             </div>
                             <div class="nli-grid">
                                 <div class="nli-item">
-                                    <div class="nli-label">Factual Content</div>
+                                    <div class="nli-label">Factual & Informative</div>
                                     <div class="nli-bar">
                                         <div class="nli-bar-fill" style="width: ${analysis.nli.factual_score * 100}%; background: var(--true)"></div>
                                     </div>
                                     <div class="nli-value" style="color: var(--true)">${(analysis.nli.factual_score * 100).toFixed(1)}%</div>
+                                </div>
+                                <div class="nli-item">
+                                    <div class="nli-label">Legitimate Journalism</div>
+                                    <div class="nli-bar">
+                                        <div class="nli-bar-fill" style="width: ${(analysis.nli.journalism_score || 0) * 100}%; background: var(--mostly-true)"></div>
+                                    </div>
+                                    <div class="nli-value" style="color: var(--mostly-true)">${((analysis.nli.journalism_score || 0) * 100).toFixed(1)}%</div>
                                 </div>
                                 <div class="nli-item">
                                     <div class="nli-label">Misleading Elements</div>
@@ -735,18 +742,25 @@ Example: &quot;Scientists have discovered that drinking coffee every day can ext
                                     <div class="nli-value" style="color: var(--false)">${(analysis.nli.misleading_score * 100).toFixed(1)}%</div>
                                 </div>
                                 <div class="nli-item">
-                                    <div class="nli-label">Opinion/Unverifiable</div>
+                                    <div class="nli-label">Sensationalized</div>
+                                    <div class="nli-bar">
+                                        <div class="nli-bar-fill" style="width: ${analysis.nli.sensational_score * 100}%; background: var(--mixed)"></div>
+                                    </div>
+                                    <div class="nli-value" style="color: var(--mixed)">${(analysis.nli.sensational_score * 100).toFixed(1)}%</div>
+                                </div>
+                                <div class="nli-item">
+                                    <div class="nli-label">Opinion/Editorial</div>
                                     <div class="nli-bar">
                                         <div class="nli-bar-fill" style="width: ${analysis.nli.opinion_score * 100}%; background: var(--unverifiable)"></div>
                                     </div>
                                     <div class="nli-value">${(analysis.nli.opinion_score * 100).toFixed(1)}%</div>
                                 </div>
                                 <div class="nli-item">
-                                    <div class="nli-label">Sensationalized</div>
+                                    <div class="nli-label">Promotional Content</div>
                                     <div class="nli-bar">
-                                        <div class="nli-bar-fill" style="width: ${analysis.nli.sensational_score * 100}%; background: var(--mixed)"></div>
+                                        <div class="nli-bar-fill" style="width: ${(analysis.nli.promotional_score || 0) * 100}%; background: var(--mostly-false)"></div>
                                     </div>
-                                    <div class="nli-value" style="color: var(--mixed)">${(analysis.nli.sensational_score * 100).toFixed(1)}%</div>
+                                    <div class="nli-value" style="color: var(--mostly-false)">${((analysis.nli.promotional_score || 0) * 100).toFixed(1)}%</div>
                                 </div>
                             </div>
                         </div>
@@ -757,7 +771,7 @@ Example: &quot;Scientists have discovered that drinking coffee every day can ext
                         <div class="analysis-section">
                             <div class="analysis-title">
                                 <span>😊</span>
-                                <span>Emotional Bias</span>
+                                <span>Emotional Tone</span>
                             </div>
                             <div class="nli-item">
                                 <div class="nli-label">Detected Sentiment: <strong>${analysis.sentiment.sentiment}</strong></div>
@@ -765,6 +779,32 @@ Example: &quot;Scientists have discovered that drinking coffee every day can ext
                                     <div class="nli-bar-fill" style="width: ${analysis.sentiment.confidence * 100}%; background: var(--secondary)"></div>
                                 </div>
                                 <div class="nli-value">${(analysis.sentiment.confidence * 100).toFixed(1)}% confidence</div>
+                            </div>
+                        </div>
+                    ` : ''}
+                    
+                    <!-- Credibility Analysis -->
+                    ${analysis.credibility ? `
+                        <div class="analysis-section">
+                            <div class="analysis-title">
+                                <span>📝</span>
+                                <span>Writing Quality Assessment</span>
+                            </div>
+                            <div class="nli-grid">
+                                <div class="nli-item">
+                                    <div class="nli-label">Professional Style</div>
+                                    <div class="nli-bar">
+                                        <div class="nli-bar-fill" style="width: ${analysis.credibility.professional_style * 100}%; background: var(--true)"></div>
+                                    </div>
+                                    <div class="nli-value" style="color: var(--true)">${(analysis.credibility.professional_style * 100).toFixed(1)}%</div>
+                                </div>
+                                <div class="nli-item">
+                                    <div class="nli-label">Verifiable Facts</div>
+                                    <div class="nli-bar">
+                                        <div class="nli-bar-fill" style="width: ${analysis.credibility.verifiable_facts * 100}%; background: var(--mostly-true)"></div>
+                                    </div>
+                                    <div class="nli-value" style="color: var(--mostly-true)">${(analysis.credibility.verifiable_facts * 100).toFixed(1)}%</div>
+                                </div>
                             </div>
                         </div>
                     ` : ''}

@@ -23,11 +23,11 @@ MODELS = {
         "display_name": "BART MNLI",
         "description": "Natural Language Inference for claim verification"
     },
-    # Fake news detection model
-    "fake_news": {
-        "name": "hamzab/roberta-fake-news-classification",
-        "display_name": "RoBERTa Fake News",
-        "description": "Fine-tuned for fake news classification"
+    # Text quality/credibility analysis (using NLI for reliability assessment)
+    "credibility": {
+        "name": "facebook/bart-large-mnli",
+        "display_name": "Credibility Analyzer",
+        "description": "Assess text credibility and reliability"
     },
     # Sentiment/Bias analysis
     "sentiment": {
@@ -115,13 +115,13 @@ RED_FLAGS = [
 
 # Global pipelines
 nli_pipeline = None
-fake_news_pipeline = None
+credibility_pipeline = None
 sentiment_pipeline = None
 
 
 def load_models():
     """Load all analysis models"""
-    global nli_pipeline, fake_news_pipeline, sentiment_pipeline
+    global nli_pipeline, credibility_pipeline, sentiment_pipeline
     
     print("📦 Loading NLI model for claim verification...")
     nli_pipeline = pipeline(
@@ -131,17 +131,9 @@ def load_models():
     )
     print("✅ NLI model loaded!")
     
-    print("📦 Loading Fake News detection model...")
-    try:
-        fake_news_pipeline = pipeline(
-            "text-classification",
-            model=MODELS["fake_news"]["name"],
-            device=-1
-        )
-        print("✅ Fake News model loaded!")
-    except Exception as e:
-        print(f"⚠️ Fake news model not available: {e}")
-        fake_news_pipeline = None
+    # Credibility uses the same NLI model
+    credibility_pipeline = nli_pipeline
+    print("✅ Credibility analyzer ready!")
     
     print("📦 Loading Sentiment analysis model...")
     try:
@@ -200,70 +192,96 @@ def analyze_claim_with_nli(claim, evidence=None):
     if nli_pipeline is None:
         return None
     
-    # If no evidence provided, use general fact-checking labels
-    if not evidence:
-        labels = [
-            "This is a factual and accurate statement",
-            "This is misleading or contains false information",
-            "This is an opinion or cannot be verified",
-            "This contains exaggerated or sensationalized claims"
-        ]
+    # Truncate long text to avoid model issues
+    claim_text = claim[:1024] if len(claim) > 1024 else claim
+    
+    # Use more nuanced labels for better classification
+    labels = [
+        "This is factual, informative, and well-sourced content",
+        "This appears to be legitimate journalism or reporting",
+        "This contains misleading, false, or unverified claims",
+        "This is sensationalized or clickbait content",
+        "This is opinion, editorial, or commentary",
+        "This is promotional or marketing content"
+    ]
+    
+    try:
+        result = nli_pipeline(claim_text, labels, multi_label=True)
         
-        result = nli_pipeline(claim, labels, multi_label=True)
+        # Map results to meaningful scores
+        scores_dict = dict(zip(result["labels"], result["scores"]))
+        
+        factual_score = scores_dict.get("This is factual, informative, and well-sourced content", 0)
+        journalism_score = scores_dict.get("This appears to be legitimate journalism or reporting", 0)
+        misleading_score = scores_dict.get("This contains misleading, false, or unverified claims", 0)
+        sensational_score = scores_dict.get("This is sensationalized or clickbait content", 0)
+        opinion_score = scores_dict.get("This is opinion, editorial, or commentary", 0)
+        promotional_score = scores_dict.get("This is promotional or marketing content", 0)
+        
+        # Calculate combined credibility
+        credibility_positive = (factual_score + journalism_score) / 2
+        credibility_negative = (misleading_score + sensational_score) / 2
         
         return {
-            "factual_score": result["scores"][0],
-            "misleading_score": result["scores"][1],
-            "opinion_score": result["scores"][2],
-            "sensational_score": result["scores"][3],
+            "factual_score": factual_score,
+            "journalism_score": journalism_score,
+            "misleading_score": misleading_score,
+            "sensational_score": sensational_score,
+            "opinion_score": opinion_score,
+            "promotional_score": promotional_score,
+            "credibility_positive": credibility_positive,
+            "credibility_negative": credibility_negative,
             "labels": result["labels"],
             "scores": result["scores"]
         }
-    else:
-        # Check claim against provided evidence
-        labels = ["entailment", "contradiction", "neutral"]
-        hypothesis = f"Based on the evidence: {evidence}"
-        
-        result = nli_pipeline(
-            claim,
-            labels,
-            hypothesis_template="{}. " + hypothesis
-        )
-        
-        return {
-            "supports": result["scores"][0],
-            "contradicts": result["scores"][1],
-            "neutral": result["scores"][2]
-        }
+    except Exception as e:
+        print(f"NLI analysis error: {e}")
+        return None
 
 
-def analyze_fake_news(text):
-    """Direct fake news classification"""
-    global fake_news_pipeline
+def analyze_text_credibility(text):
+    """Analyze text credibility using writing quality indicators"""
+    global credibility_pipeline
     
-    if fake_news_pipeline is None:
+    if credibility_pipeline is None:
         return None
     
+    # Truncate for model
+    text_sample = text[:512] if len(text) > 512 else text
+    
+    # Check for credibility indicators
+    credibility_labels = [
+        "professional, academic, or journalistic writing style",
+        "informal, emotional, or biased writing style",
+        "contains verifiable facts and data",
+        "makes unsubstantiated claims"
+    ]
+    
     try:
-        result = fake_news_pipeline(text[:512])  # Truncate for model
+        result = credibility_pipeline(text_sample, credibility_labels, multi_label=True)
+        scores_dict = dict(zip(result["labels"], result["scores"]))
         
-        # Handle different model output formats
-        if isinstance(result, list):
-            result = result[0]
+        professional = scores_dict.get("professional, academic, or journalistic writing style", 0)
+        informal = scores_dict.get("informal, emotional, or biased writing style", 0)
+        verifiable = scores_dict.get("contains verifiable facts and data", 0)
+        unsubstantiated = scores_dict.get("makes unsubstantiated claims", 0)
         
-        label = result.get("label", "").upper()
-        score = result.get("score", 0)
+        # Calculate overall credibility
+        positive_indicators = (professional + verifiable) / 2
+        negative_indicators = (informal + unsubstantiated) / 2
         
-        # Normalize labels
-        if "FAKE" in label or "FALSE" in label or label == "LABEL_0":
-            return {"classification": "FAKE", "confidence": score}
-        elif "REAL" in label or "TRUE" in label or label == "LABEL_1":
-            return {"classification": "REAL", "confidence": score}
-        else:
-            return {"classification": label, "confidence": score}
-            
+        return {
+            "professional_style": professional,
+            "informal_style": informal,
+            "verifiable_facts": verifiable,
+            "unsubstantiated_claims": unsubstantiated,
+            "classification": "CREDIBLE" if positive_indicators > negative_indicators else "QUESTIONABLE",
+            "confidence": abs(positive_indicators - negative_indicators),
+            "positive_score": positive_indicators,
+            "negative_score": negative_indicators
+        }
     except Exception as e:
-        print(f"Fake news analysis error: {e}")
+        print(f"Credibility analysis error: {e}")
         return None
 
 
@@ -289,7 +307,7 @@ def analyze_sentiment_bias(text):
         return None
 
 
-def calculate_verdict(nli_result, fake_news_result, red_flags, known_facts):
+def calculate_verdict(nli_result, credibility_result, red_flags, known_facts, sentiment_result):
     """Calculate final verdict based on all analyses"""
     
     # Initialize scores
@@ -297,59 +315,95 @@ def calculate_verdict(nli_result, fake_news_result, red_flags, known_facts):
     confidence = 0.0
     reasons = []
     
-    # Factor 1: NLI Analysis (40% weight)
+    # Factor 1: NLI Analysis (Primary - 50% weight)
     if nli_result:
         factual = nli_result.get("factual_score", 0)
+        journalism = nli_result.get("journalism_score", 0)
         misleading = nli_result.get("misleading_score", 0)
         sensational = nli_result.get("sensational_score", 0)
+        opinion = nli_result.get("opinion_score", 0)
         
-        nli_contribution = (factual * 0.5) - (misleading * 0.3) - (sensational * 0.2)
-        credibility_score += nli_contribution * 0.4
-        confidence += 0.3
+        # Positive contributions
+        positive_score = (factual + journalism) / 2
+        # Negative contributions  
+        negative_score = (misleading + sensational) / 2
         
-        if factual > 0.5:
-            reasons.append(f"NLI analysis suggests factual content ({factual:.0%})")
+        # Calculate net contribution (can range from -0.5 to +0.5)
+        nli_contribution = (positive_score - negative_score) * 0.5
+        credibility_score += nli_contribution
+        confidence += 0.4
+        
+        if factual > 0.3:
+            reasons.append(f"Content appears factual and informative ({factual:.0%})")
+        if journalism > 0.3:
+            reasons.append(f"Writing style resembles legitimate journalism ({journalism:.0%})")
         if misleading > 0.4:
-            reasons.append(f"NLI detects potentially misleading elements ({misleading:.0%})")
+            reasons.append(f"⚠️ May contain misleading elements ({misleading:.0%})")
         if sensational > 0.4:
-            reasons.append(f"NLI detects sensationalized language ({sensational:.0%})")
+            reasons.append(f"⚠️ Contains sensationalized language ({sensational:.0%})")
+        if opinion > 0.5:
+            reasons.append(f"Contains opinion or editorial content ({opinion:.0%})")
     
-    # Factor 2: Fake News Model (30% weight)
-    if fake_news_result:
-        if fake_news_result["classification"] == "REAL":
-            credibility_score += 0.3 * fake_news_result["confidence"]
-            reasons.append(f"Fake news detector: REAL ({fake_news_result['confidence']:.0%})")
-        elif fake_news_result["classification"] == "FAKE":
-            credibility_score -= 0.3 * fake_news_result["confidence"]
-            reasons.append(f"Fake news detector: FAKE ({fake_news_result['confidence']:.0%})")
+    # Factor 2: Credibility Analysis (25% weight)
+    if credibility_result:
+        if credibility_result["classification"] == "CREDIBLE":
+            credibility_score += 0.15 * credibility_result["confidence"]
+            if credibility_result["professional_style"] > 0.3:
+                reasons.append(f"Professional writing style detected ({credibility_result['professional_style']:.0%})")
+        else:
+            credibility_score -= 0.15 * credibility_result["confidence"]
+            if credibility_result["unsubstantiated_claims"] > 0.3:
+                reasons.append(f"⚠️ May contain unsubstantiated claims ({credibility_result['unsubstantiated_claims']:.0%})")
         confidence += 0.25
     
-    # Factor 3: Red Flags (20% weight)
+    # Factor 3: Red Flags (15% weight) - Only penalize if found
     if red_flags["count"] > 0:
-        credibility_score -= red_flags["suspicion_score"] * 0.2
-        reasons.append(f"Found {red_flags['count']} red flag(s): {', '.join(red_flags['flags'][:3])}")
-        confidence += 0.2
-    
-    # Factor 4: Known Facts Match (10% weight)
-    if known_facts:
-        # Having relevant established facts to compare against
-        reasons.append(f"Related to known topic: {known_facts[0]['topic']}")
+        # Reduce credibility based on number and severity of red flags
+        penalty = min(red_flags["suspicion_score"] * 0.15, 0.15)
+        credibility_score -= penalty
+        flag_list = ', '.join(red_flags['flags'][:3])
+        reasons.append(f"⚠️ Red flags detected: {flag_list}")
         confidence += 0.15
+    else:
+        # No red flags is a small positive indicator
+        credibility_score += 0.05
+        reasons.append("No obvious red flags detected")
+        confidence += 0.1
+    
+    # Factor 4: Sentiment Analysis (10% weight)
+    if sentiment_result:
+        sentiment = sentiment_result.get("sentiment", "").lower()
+        sent_confidence = sentiment_result.get("confidence", 0)
+        
+        # Neutral sentiment is generally better for factual content
+        if sentiment == "neutral":
+            credibility_score += 0.05
+            reasons.append(f"Neutral tone detected ({sent_confidence:.0%})")
+        elif sentiment == "negative" and sent_confidence > 0.8:
+            # Very negative might indicate fear-mongering
+            credibility_score -= 0.03
+            reasons.append(f"Strong negative tone ({sent_confidence:.0%})")
+        confidence += 0.1
+    
+    # Factor 5: Known Facts Match (bonus)
+    if known_facts:
+        reasons.append(f"Related to established topic: {known_facts[0]['topic']}")
+        confidence += 0.05
     
     # Normalize credibility score to 0-1
     credibility_score = max(0, min(1, credibility_score))
     confidence = min(confidence, 1.0)
     
-    # Determine verdict
-    if confidence < 0.3:
+    # Determine verdict based on credibility score
+    if confidence < 0.25:
         verdict_key = "UNVERIFIABLE"
-    elif credibility_score >= 0.7:
+    elif credibility_score >= 0.65:
         verdict_key = "TRUE"
     elif credibility_score >= 0.55:
         verdict_key = "MOSTLY_TRUE"
     elif credibility_score >= 0.45:
         verdict_key = "MIXED"
-    elif credibility_score >= 0.3:
+    elif credibility_score >= 0.35:
         verdict_key = "MOSTLY_FALSE"
     else:
         verdict_key = "FALSE"
@@ -382,18 +436,18 @@ def fact_check_claim(claim, context=None):
     red_flags = analyze_red_flags(claim)
     known_facts = check_against_known_facts(claim)
     nli_result = analyze_claim_with_nli(claim)
-    fake_news_result = analyze_fake_news(claim)
+    credibility_result = analyze_text_credibility(claim)
     sentiment_result = analyze_sentiment_bias(claim)
     
-    # Calculate verdict
-    verdict_result = calculate_verdict(nli_result, fake_news_result, red_flags, known_facts)
+    # Calculate verdict with all analysis results
+    verdict_result = calculate_verdict(nli_result, credibility_result, red_flags, known_facts, sentiment_result)
     
     return {
         "claim": claim[:500] + "..." if len(claim) > 500 else claim,
         "verdict": verdict_result,
         "analysis": {
             "nli": nli_result,
-            "fake_news": fake_news_result,
+            "credibility": credibility_result,
             "sentiment": sentiment_result,
             "red_flags": red_flags,
             "known_facts": known_facts
@@ -481,7 +535,7 @@ def model_status():
     """Check model status"""
     return jsonify({
         'nli_loaded': nli_pipeline is not None,
-        'fake_news_loaded': fake_news_pipeline is not None,
+        'credibility_loaded': credibility_pipeline is not None,
         'sentiment_loaded': sentiment_pipeline is not None
     })
 

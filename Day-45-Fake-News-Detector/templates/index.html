@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fake News Detector - Day 45</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8b5cf6;
+            --primary-dark: #7c3aed;
+            --secondary: #06b6d4;
+            --true: #22c55e;
+            --mostly-true: #84cc16;
+            --mixed: #eab308;
+            --mostly-false: #f97316;
+            --false: #ef4444;
+            --unverifiable: #6b7280;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --bg-input: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border: #475569;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .logo {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+        
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+        
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .card-icon {
+            font-size: 1.5rem;
+        }
+        
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            background: var(--bg-input);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.95rem;
+            resize: vertical;
+            transition: all 0.3s ease;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+        }
+        
+        .input-claim {
+            min-height: 200px;
+        }
+        
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            width: 100%;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3);
+        }
+        
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* Verdict Display */
+        .verdict-container {
+            text-align: center;
+            padding: 2rem;
+            background: var(--bg-input);
+            border-radius: 16px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .verdict-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        
+        .verdict-label {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .verdict-description {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+        
+        .verdict-scores {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .score-card {
+            background: var(--bg-card);
+            padding: 1rem;
+            border-radius: 12px;
+        }
+        
+        .score-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .score-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Analysis Sections */
+        .analysis-section {
+            margin-top: 1.5rem;
+        }
+        
+        .analysis-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--secondary);
+        }
+        
+        .reasons-list {
+            list-style: none;
+        }
+        
+        .reasons-list li {
+            padding: 0.75rem 1rem;
+            background: var(--bg-input);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.9rem;
+        }
+        
+        .reasons-list li::before {
+            content: "📌";
+        }
+        
+        /* Red Flags */
+        .red-flags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .red-flag {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--false);
+            padding: 0.4rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        
+        .red-flag::before {
+            content: "🚩";
+        }
+        
+        /* NLI Scores */
+        .nli-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+        
+        .nli-item {
+            background: var(--bg-input);
+            padding: 0.75rem;
+            border-radius: 8px;
+        }
+        
+        .nli-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.25rem;
+        }
+        
+        .nli-bar {
+            height: 6px;
+            background: var(--bg-card);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 0.25rem;
+        }
+        
+        .nli-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+        
+        .nli-value {
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        /* Sample Claims */
+        .samples-section {
+            margin-top: 2rem;
+        }
+        
+        .samples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+        
+        .sample-card {
+            background: var(--bg-input);
+            padding: 1.25rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .sample-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+        
+        .sample-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        
+        .sample-title {
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .sample-category {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            background: var(--bg-card);
+            border-radius: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .sample-preview {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        /* Verdict Legend */
+        .legend-section {
+            margin-top: 2rem;
+        }
+        
+        .legend-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 0.75rem;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: var(--bg-input);
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .legend-icon {
+            font-size: 1.25rem;
+        }
+        
+        /* Text Stats */
+        .text-stats {
+            display: flex;
+            gap: 1.5rem;
+            padding: 0.75rem 0;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Placeholder */
+        .placeholder {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+        
+        .placeholder-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        
+        /* Loading Spinner */
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid transparent;
+            border-top-color: currentColor;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+        
+        /* Animations */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-in {
+            animation: slideIn 0.4s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">🔍</div>
+            <h1>Fake News Detector</h1>
+            <p class="subtitle">AI-powered fact-checking • Claim verification • Misinformation detection</p>
+        </header>
+        
+        <div class="main-grid">
+            <!-- Input Panel -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon">📝</span>
+                    <span class="card-title">Enter Claim or News</span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="claimInput">News Claim / Article</label>
+                    <textarea id="claimInput" class="input-claim" placeholder="Paste a news claim, headline, or article text to fact-check...
+
+Example: &quot;Scientists have discovered that drinking coffee every day can extend your lifespan by up to 10 years.&quot;"></textarea>
+                    <div class="text-stats">
+                        <span>📊 Words: <strong id="wordCount">0</strong></span>
+                        <span>📏 Characters: <strong id="charCount">0</strong></span>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary" id="checkBtn" onclick="checkClaim()">
+                    <span>🔍</span>
+                    <span>Analyze Claim</span>
+                </button>
+            </div>
+            
+            <!-- Results Panel -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon">📊</span>
+                    <span class="card-title">Analysis Results</span>
+                </div>
+                
+                <div id="resultsContainer">
+                    <div class="placeholder">
+                        <div class="placeholder-icon">🔍</div>
+                        <p>Enter a claim and click "Analyze" to see the fact-check results</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sample Claims -->
+        <div class="card samples-section">
+            <div class="card-header">
+                <span class="card-icon">📚</span>
+                <span class="card-title">Sample Claims to Test</span>
+            </div>
+            <div class="samples-grid" id="samplesGrid">
+                <!-- Samples loaded dynamically -->
+            </div>
+        </div>
+        
+        <!-- Verdict Legend -->
+        <div class="card legend-section">
+            <div class="card-header">
+                <span class="card-icon">📋</span>
+                <span class="card-title">Verdict Guide</span>
+            </div>
+            <div class="legend-grid">
+                <div class="legend-item">
+                    <span class="legend-icon">✅</span>
+                    <span><strong>True</strong> - Factually accurate</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-icon">🟢</span>
+                    <span><strong>Mostly True</strong> - Largely accurate</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-icon">🟡</span>
+                    <span><strong>Mixed</strong> - True and false elements</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-icon">🟠</span>
+                    <span><strong>Mostly False</strong> - Largely inaccurate</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-icon">❌</span>
+                    <span><strong>False</strong> - Factually incorrect</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-icon">❓</span>
+                    <span><strong>Unverifiable</strong> - Cannot determine</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>Day 45 of 100 Days of AI • Built with 
+            <a href="https://huggingface.co/" target="_blank">Hugging Face Transformers</a>
+        </p>
+        <p style="margin-top: 0.5rem; font-size: 0.8rem;">
+            ⚠️ This is an AI-based tool and may not be 100% accurate. Always verify important claims from multiple sources.
+        </p>
+    </footer>
+    
+    <script>
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSamples();
+            updateTextStats();
+            
+            document.getElementById('claimInput').addEventListener('input', updateTextStats);
+        });
+        
+        function updateTextStats() {
+            const text = document.getElementById('claimInput').value;
+            const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+            document.getElementById('wordCount').textContent = words;
+            document.getElementById('charCount').textContent = text.length;
+        }
+        
+        async function loadSamples() {
+            try {
+                const response = await fetch('/sample-claims');
+                const data = await response.json();
+                
+                const grid = document.getElementById('samplesGrid');
+                grid.innerHTML = data.samples.map((sample, idx) => `
+                    <div class="sample-card" onclick="loadSample(${idx})">
+                        <div class="sample-header">
+                            <span class="sample-title">📄 ${sample.title}</span>
+                            <span class="sample-category">${sample.category}</span>
+                        </div>
+                        <div class="sample-preview">${sample.claim.substring(0, 120)}...</div>
+                    </div>
+                `).join('');
+                
+                window.sampleClaims = data.samples;
+            } catch (error) {
+                console.error('Failed to load samples:', error);
+            }
+        }
+        
+        function loadSample(idx) {
+            const sample = window.sampleClaims[idx];
+            document.getElementById('claimInput').value = sample.claim;
+            updateTextStats();
+            document.getElementById('claimInput').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        async function checkClaim() {
+            const claim = document.getElementById('claimInput').value.trim();
+            
+            if (!claim) {
+                alert('Please enter a claim to analyze');
+                return;
+            }
+            
+            const btn = document.getElementById('checkBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span><span>Analyzing...</span>';
+            
+            try {
+                const response = await fetch('/check', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ claim: claim })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayResults(data);
+                } else {
+                    document.getElementById('resultsContainer').innerHTML = `
+                        <div class="placeholder">
+                            <div class="placeholder-icon">❌</div>
+                            <p>${data.error}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('resultsContainer').innerHTML = `
+                    <div class="placeholder">
+                        <div class="placeholder-icon">❌</div>
+                        <p>Error: ${error.message}</p>
+                    </div>
+                `;
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span>🔍</span><span>Analyze Claim</span>';
+            }
+        }
+        
+        function displayResults(data) {
+            const verdict = data.verdict;
+            const analysis = data.analysis;
+            
+            let html = `
+                <div class="animate-in">
+                    <!-- Verdict -->
+                    <div class="verdict-container" style="border: 2px solid ${verdict.verdict_info.color}">
+                        <div class="verdict-icon">${verdict.verdict_info.icon}</div>
+                        <div class="verdict-label" style="color: ${verdict.verdict_info.color}">${verdict.verdict_info.label}</div>
+                        <div class="verdict-description">${verdict.verdict_info.description}</div>
+                        
+                        <div class="verdict-scores">
+                            <div class="score-card">
+                                <div class="score-value">${verdict.credibility_score}%</div>
+                                <div class="score-label">Credibility Score</div>
+                            </div>
+                            <div class="score-card">
+                                <div class="score-value">${verdict.confidence}%</div>
+                                <div class="score-label">Confidence</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Reasons -->
+                    ${verdict.reasons.length > 0 ? `
+                        <div class="analysis-section">
+                            <div class="analysis-title">
+                                <span>📌</span>
+                                <span>Analysis Findings</span>
+                            </div>
+                            <ul class="reasons-list">
+                                ${verdict.reasons.map(r => `<li>${r}</li>`).join('')}
+                            </ul>
+                        </div>
+                    ` : ''}
+                    
+                    <!-- Red Flags -->
+                    ${analysis.red_flags.count > 0 ? `
+                        <div class="analysis-section">
+                            <div class="analysis-title">
+                                <span>🚩</span>
+                                <span>Red Flags Detected (${analysis.red_flags.count})</span>
+                            </div>
+                            <div class="red-flags">
+                                ${analysis.red_flags.flags.map(f => `<span class="red-flag">${f}</span>`).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                    
+                    <!-- NLI Analysis -->
+                    ${analysis.nli ? `
+                        <div class="analysis-section">
+                            <div class="analysis-title">
+                                <span>🧠</span>
+                                <span>NLI Analysis</span>
+                            </div>
+                            <div class="nli-grid">
+                                <div class="nli-item">
+                                    <div class="nli-label">Factual Content</div>
+                                    <div class="nli-bar">
+                                        <div class="nli-bar-fill" style="width: ${analysis.nli.factual_score * 100}%; background: var(--true)"></div>
+                                    </div>
+                                    <div class="nli-value" style="color: var(--true)">${(analysis.nli.factual_score * 100).toFixed(1)}%</div>
+                                </div>
+                                <div class="nli-item">
+                                    <div class="nli-label">Misleading Elements</div>
+                                    <div class="nli-bar">
+                                        <div class="nli-bar-fill" style="width: ${analysis.nli.misleading_score * 100}%; background: var(--false)"></div>
+                                    </div>
+                                    <div class="nli-value" style="color: var(--false)">${(analysis.nli.misleading_score * 100).toFixed(1)}%</div>
+                                </div>
+                                <div class="nli-item">
+                                    <div class="nli-label">Opinion/Unverifiable</div>
+                                    <div class="nli-bar">
+                                        <div class="nli-bar-fill" style="width: ${analysis.nli.opinion_score * 100}%; background: var(--unverifiable)"></div>
+                                    </div>
+                                    <div class="nli-value">${(analysis.nli.opinion_score * 100).toFixed(1)}%</div>
+                                </div>
+                                <div class="nli-item">
+                                    <div class="nli-label">Sensationalized</div>
+                                    <div class="nli-bar">
+                                        <div class="nli-bar-fill" style="width: ${analysis.nli.sensational_score * 100}%; background: var(--mixed)"></div>
+                                    </div>
+                                    <div class="nli-value" style="color: var(--mixed)">${(analysis.nli.sensational_score * 100).toFixed(1)}%</div>
+                                </div>
+                            </div>
+                        </div>
+                    ` : ''}
+                    
+                    <!-- Sentiment -->
+                    ${analysis.sentiment ? `
+                        <div class="analysis-section">
+                            <div class="analysis-title">
+                                <span>😊</span>
+                                <span>Emotional Bias</span>
+                            </div>
+                            <div class="nli-item">
+                                <div class="nli-label">Detected Sentiment: <strong>${analysis.sentiment.sentiment}</strong></div>
+                                <div class="nli-bar">
+                                    <div class="nli-bar-fill" style="width: ${analysis.sentiment.confidence * 100}%; background: var(--secondary)"></div>
+                                </div>
+                                <div class="nli-value">${(analysis.sentiment.confidence * 100).toFixed(1)}% confidence</div>
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            document.getElementById('resultsContainer').innerHTML = html;
+        }
+    </script>
+</body>
+</html>

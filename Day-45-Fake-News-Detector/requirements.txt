@@ -1,0 +1,4 @@
+flask>=3.0.0
+transformers>=4.35.0
+torch>=2.0.0
+tf-keras>=2.15.0

@@ -10,6 +10,10 @@ This project demonstrates the fundamentals of chatbot development using:
 - **Response Generation**: Selecting appropriate responses based on matched patterns
 - **Dynamic Responses**: Real-time data for time, date, and math calculations
 
+| | |
+|---|---|
+| ![Image 1](image.png) | ![Image 2](image-1.png) |
+
 ## ✨ Features
 
 ### Supported Intents

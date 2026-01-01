@@ -363,6 +363,313 @@ INTENTS = {
         ]
     },
     
+    # ===============================
+    # GENERAL KNOWLEDGE - CAPITALS
+    # ===============================
+    
+    "capital_pakistan": {
+        "patterns": [
+            r"\bcapital\s*(of\s*)?(pakistan|pak)\b",
+            r"\bpakistan('?s)?\s*capital\b",
+            r"\bwhat\s*is\s*(the\s*)?capital\s*(of\s*)?(pakistan|pak)\b"
+        ],
+        "responses": [
+            "🇵🇰 The capital of Pakistan is **Islamabad**! It became the capital in 1967, replacing Karachi.",
+            "Islamabad is the capital of Pakistan! 🇵🇰 It's a beautiful planned city in the Pothohar Plateau."
+        ]
+    },
+    
+    "capital_india": {
+        "patterns": [
+            r"\bcapital\s*(of\s*)?india\b",
+            r"\bindia('?s)?\s*capital\b",
+            r"\bwhat\s*is\s*(the\s*)?capital\s*(of\s*)?india\b"
+        ],
+        "responses": [
+            "🇮🇳 The capital of India is **New Delhi**!",
+            "New Delhi is the capital of India! 🇮🇳"
+        ]
+    },
+    
+    "capital_usa": {
+        "patterns": [
+            r"\bcapital\s*(of\s*)?(usa|america|united\s*states|us)\b",
+            r"\b(usa|america|united\s*states)('?s)?\s*capital\b",
+            r"\bwhat\s*is\s*(the\s*)?capital\s*(of\s*)?(usa|america|united\s*states|us)\b"
+        ],
+        "responses": [
+            "🇺🇸 The capital of the United States is **Washington, D.C.**!",
+            "Washington, D.C. is the capital of the USA! 🇺🇸 (Not New York, as many think!)"
+        ]
+    },
+    
+    "capital_uk": {
+        "patterns": [
+            r"\bcapital\s*(of\s*)?(uk|england|britain|united\s*kingdom)\b",
+            r"\b(uk|england|britain)('?s)?\s*capital\b",
+            r"\bwhat\s*is\s*(the\s*)?capital\s*(of\s*)?(uk|england|britain|united\s*kingdom)\b"
+        ],
+        "responses": [
+            "🇬🇧 The capital of the United Kingdom is **London**!",
+            "London is the capital of the UK! 🇬🇧"
+        ]
+    },
+    
+    "capital_china": {
+        "patterns": [
+            r"\bcapital\s*(of\s*)?china\b",
+            r"\bchina('?s)?\s*capital\b",
+            r"\bwhat\s*is\s*(the\s*)?capital\s*(of\s*)?china\b"
+        ],
+        "responses": [
+            "🇨🇳 The capital of China is **Beijing**!",
+            "Beijing is the capital of China! 🇨🇳"
+        ]
+    },
+    
+    "capital_japan": {
+        "patterns": [
+            r"\bcapital\s*(of\s*)?japan\b",
+            r"\bjapan('?s)?\s*capital\b",
+            r"\bwhat\s*is\s*(the\s*)?capital\s*(of\s*)?japan\b"
+        ],
+        "responses": [
+            "🇯🇵 The capital of Japan is **Tokyo**!",
+            "Tokyo is the capital of Japan! 🇯🇵"
+        ]
+    },
+    
+    "capital_france": {
+        "patterns": [
+            r"\bcapital\s*(of\s*)?france\b",
+            r"\bfrance('?s)?\s*capital\b",
+            r"\bwhat\s*is\s*(the\s*)?capital\s*(of\s*)?france\b"
+        ],
+        "responses": [
+            "🇫🇷 The capital of France is **Paris**!",
+            "Paris is the capital of France! 🇫🇷 The city of love!"
+        ]
+    },
+    
+    "capital_germany": {
+        "patterns": [
+            r"\bcapital\s*(of\s*)?germany\b",
+            r"\bgermany('?s)?\s*capital\b",
+            r"\bwhat\s*is\s*(the\s*)?capital\s*(of\s*)?germany\b"
+        ],
+        "responses": [
+            "🇩🇪 The capital of Germany is **Berlin**!",
+            "Berlin is the capital of Germany! 🇩🇪"
+        ]
+    },
+    
+    "capital_russia": {
+        "patterns": [
+            r"\bcapital\s*(of\s*)?russia\b",
+            r"\brussia('?s)?\s*capital\b",
+            r"\bwhat\s*is\s*(the\s*)?capital\s*(of\s*)?russia\b"
+        ],
+        "responses": [
+            "🇷🇺 The capital of Russia is **Moscow**!",
+            "Moscow is the capital of Russia! 🇷🇺"
+        ]
+    },
+    
+    "capital_australia": {
+        "patterns": [
+            r"\bcapital\s*(of\s*)?australia\b",
+            r"\baustralia('?s)?\s*capital\b",
+            r"\bwhat\s*is\s*(the\s*)?capital\s*(of\s*)?australia\b"
+        ],
+        "responses": [
+            "🇦🇺 The capital of Australia is **Canberra**! (Not Sydney, as many think!)",
+            "Canberra is the capital of Australia! 🇦🇺"
+        ]
+    },
+    
+    "capital_canada": {
+        "patterns": [
+            r"\bcapital\s*(of\s*)?canada\b",
+            r"\bcanada('?s)?\s*capital\b",
+            r"\bwhat\s*is\s*(the\s*)?capital\s*(of\s*)?canada\b"
+        ],
+        "responses": [
+            "🇨🇦 The capital of Canada is **Ottawa**! (Not Toronto!)",
+            "Ottawa is the capital of Canada! 🇨🇦"
+        ]
+    },
+    
+    "capital_italy": {
+        "patterns": [
+            r"\bcapital\s*(of\s*)?italy\b",
+            r"\bitaly('?s)?\s*capital\b",
+            r"\bwhat\s*is\s*(the\s*)?capital\s*(of\s*)?italy\b"
+        ],
+        "responses": [
+            "🇮🇹 The capital of Italy is **Rome**!",
+            "Rome is the capital of Italy! 🇮🇹 The Eternal City!"
+        ]
+    },
+    
+    "capital_spain": {
+        "patterns": [
+            r"\bcapital\s*(of\s*)?spain\b",
+            r"\bspain('?s)?\s*capital\b",
+            r"\bwhat\s*is\s*(the\s*)?capital\s*(of\s*)?spain\b"
+        ],
+        "responses": [
+            "🇪🇸 The capital of Spain is **Madrid**!",
+            "Madrid is the capital of Spain! 🇪🇸"
+        ]
+    },
+    
+    "capital_brazil": {
+        "patterns": [
+            r"\bcapital\s*(of\s*)?brazil\b",
+            r"\bbrazil('?s)?\s*capital\b",
+            r"\bwhat\s*is\s*(the\s*)?capital\s*(of\s*)?brazil\b"
+        ],
+        "responses": [
+            "🇧🇷 The capital of Brazil is **Brasília**! (Not Rio or São Paulo!)",
+            "Brasília is the capital of Brazil! 🇧🇷"
+        ]
+    },
+    
+    "capital_uae": {
+        "patterns": [
+            r"\bcapital\s*(of\s*)?(uae|dubai|emirates|united\s*arab\s*emirates)\b",
+            r"\b(uae|emirates)('?s)?\s*capital\b",
+            r"\bwhat\s*is\s*(the\s*)?capital\s*(of\s*)?(uae|emirates)\b"
+        ],
+        "responses": [
+            "🇦🇪 The capital of UAE is **Abu Dhabi**! (Not Dubai!)",
+            "Abu Dhabi is the capital of the United Arab Emirates! 🇦🇪"
+        ]
+    },
+    
+    "capital_saudi": {
+        "patterns": [
+            r"\bcapital\s*(of\s*)?(saudi\s*arabia|saudi|ksa)\b",
+            r"\b(saudi\s*arabia|saudi)('?s)?\s*capital\b",
+            r"\bwhat\s*is\s*(the\s*)?capital\s*(of\s*)?(saudi\s*arabia|saudi)\b"
+        ],
+        "responses": [
+            "🇸🇦 The capital of Saudi Arabia is **Riyadh**!",
+            "Riyadh is the capital of Saudi Arabia! 🇸🇦"
+        ]
+    },
+    
+    "capital_turkey": {
+        "patterns": [
+            r"\bcapital\s*(of\s*)?(turkey|türkiye)\b",
+            r"\b(turkey|türkiye)('?s)?\s*capital\b",
+            r"\bwhat\s*is\s*(the\s*)?capital\s*(of\s*)?(turkey|türkiye)\b"
+        ],
+        "responses": [
+            "🇹🇷 The capital of Turkey is **Ankara**! (Not Istanbul!)",
+            "Ankara is the capital of Turkey! 🇹🇷"
+        ]
+    },
+    
+    "capital_egypt": {
+        "patterns": [
+            r"\bcapital\s*(of\s*)?egypt\b",
+            r"\begypt('?s)?\s*capital\b",
+            r"\bwhat\s*is\s*(the\s*)?capital\s*(of\s*)?egypt\b"
+        ],
+        "responses": [
+            "🇪🇬 The capital of Egypt is **Cairo**!",
+            "Cairo is the capital of Egypt! 🇪🇬"
+        ]
+    },
+    
+    "capital_south_korea": {
+        "patterns": [
+            r"\bcapital\s*(of\s*)?(south\s*korea|korea)\b",
+            r"\b(south\s*)?korea('?s)?\s*capital\b",
+            r"\bwhat\s*is\s*(the\s*)?capital\s*(of\s*)?(south\s*)?korea\b"
+        ],
+        "responses": [
+            "🇰🇷 The capital of South Korea is **Seoul**!",
+            "Seoul is the capital of South Korea! 🇰🇷"
+        ]
+    },
+    
+    # ===============================
+    # GENERAL KNOWLEDGE - OTHER
+    # ===============================
+    
+    "largest_country": {
+        "patterns": [
+            r"\blargest\s*country\b",
+            r"\bbiggest\s*country\b",
+            r"\bwhich\s*(is\s*)?(the\s*)?largest\s*country\b"
+        ],
+        "responses": [
+            "🌍 Russia is the largest country in the world by area, covering over 17 million square kilometers!",
+            "The largest country is Russia! 🇷🇺 It spans 11 time zones!"
+        ]
+    },
+    
+    "smallest_country": {
+        "patterns": [
+            r"\bsmallest\s*country\b",
+            r"\bwhich\s*(is\s*)?(the\s*)?smallest\s*country\b"
+        ],
+        "responses": [
+            "🇻🇦 Vatican City is the smallest country in the world, at only 0.44 square kilometers!",
+            "The smallest country is Vatican City! 🇻🇦"
+        ]
+    },
+    
+    "largest_ocean": {
+        "patterns": [
+            r"\blargest\s*ocean\b",
+            r"\bbiggest\s*ocean\b",
+            r"\bwhich\s*(is\s*)?(the\s*)?largest\s*ocean\b"
+        ],
+        "responses": [
+            "🌊 The Pacific Ocean is the largest ocean, covering about 63 million square miles!",
+            "The largest ocean is the Pacific Ocean! 🌊"
+        ]
+    },
+    
+    "longest_river": {
+        "patterns": [
+            r"\blongest\s*river\b",
+            r"\bwhich\s*(is\s*)?(the\s*)?longest\s*river\b"
+        ],
+        "responses": [
+            "🏞️ The Nile River is traditionally considered the longest river at about 6,650 km! (Though some argue the Amazon is longer)",
+            "The longest river is the Nile! 🏞️"
+        ]
+    },
+    
+    "highest_mountain": {
+        "patterns": [
+            r"\bhighest\s*mountain\b",
+            r"\btallest\s*mountain\b",
+            r"\bwhich\s*(is\s*)?(the\s*)?highest\s*mountain\b",
+            r"\bmount\s*everest\b"
+        ],
+        "responses": [
+            "🏔️ Mount Everest is the highest mountain at 8,849 meters (29,032 ft)!",
+            "The highest mountain is Mount Everest! 🏔️ Located in the Himalayas between Nepal and Tibet."
+        ]
+    },
+    
+    "population_world": {
+        "patterns": [
+            r"\bworld\s*population\b",
+            r"\bhow\s*many\s*people\s*(are\s*)?(in|on)\s*(the\s*)?world\b",
+            r"\bglobal\s*population\b"
+        ],
+        "responses": [
+            "🌍 The world population is approximately 8 billion people!",
+            "There are about 8 billion people on Earth! 🌍"
+        ]
+    },
+    
     "help": {
         "patterns": [
             r"^help$",
@@ -371,7 +678,7 @@ INTENTS = {
             r"\bwhat\s*can\s*i\s*ask\b"
         ],
         "responses": [
-            "📋 **Here's what I can help with:**\n\n• **Greetings** - Say hi!\n• **Time/Date** - Ask for current time or date\n• **Math** - Basic calculations (e.g., '5 + 3')\n• **Jokes** - 'Tell me a joke'\n• **Fun Facts** - 'Tell me a fact'\n• **Questions** - Ask about AI, Python, etc.\n• **Chat** - Just have a conversation!\n\nJust type naturally and I'll do my best to help! 😊"
+            "📋 **Here's what I can help with:**\n\n• **Greetings** - Say hi!\n• **Time/Date** - Ask for current time or date\n• **Math** - Basic calculations (e.g., '5 + 3')\n• **Jokes** - 'Tell me a joke'\n• **Fun Facts** - 'Tell me a fact'\n• **Capitals** - 'What is the capital of Pakistan?'\n• **Geography** - Largest country, highest mountain, etc.\n• **Questions** - Ask about AI, Python, etc.\n\nJust type naturally and I'll do my best to help! 😊"
         ]
     }
 }

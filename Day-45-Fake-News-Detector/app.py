@@ -195,14 +195,15 @@ def analyze_claim_with_nli(claim, evidence=None):
     # Truncate long text to avoid model issues
     claim_text = claim[:1024] if len(claim) > 1024 else claim
     
-    # Use more nuanced labels for better classification
+    # Use style-focused labels to avoid confusing topic with quality
+    # These labels focus on HOW the content is written, not WHAT it's about
     labels = [
-        "This is factual, informative, and well-sourced content",
-        "This appears to be legitimate journalism or reporting",
-        "This contains misleading, false, or unverified claims",
-        "This is sensationalized or clickbait content",
-        "This is opinion, editorial, or commentary",
-        "This is promotional or marketing content"
+        "This is a well-written, informative article with clear explanations",
+        "This is professionally written with proper structure and sources",
+        "This uses emotional manipulation or fear-mongering tactics",
+        "This makes extraordinary claims without credible evidence",
+        "This is balanced reporting that presents multiple perspectives",
+        "This is clickbait designed to generate outrage or shock"
     ]
     
     try:
@@ -211,24 +212,27 @@ def analyze_claim_with_nli(claim, evidence=None):
         # Map results to meaningful scores
         scores_dict = dict(zip(result["labels"], result["scores"]))
         
-        factual_score = scores_dict.get("This is factual, informative, and well-sourced content", 0)
-        journalism_score = scores_dict.get("This appears to be legitimate journalism or reporting", 0)
-        misleading_score = scores_dict.get("This contains misleading, false, or unverified claims", 0)
-        sensational_score = scores_dict.get("This is sensationalized or clickbait content", 0)
-        opinion_score = scores_dict.get("This is opinion, editorial, or commentary", 0)
-        promotional_score = scores_dict.get("This is promotional or marketing content", 0)
+        informative_score = scores_dict.get("This is a well-written, informative article with clear explanations", 0)
+        professional_score = scores_dict.get("This is professionally written with proper structure and sources", 0)
+        manipulation_score = scores_dict.get("This uses emotional manipulation or fear-mongering tactics", 0)
+        extraordinary_score = scores_dict.get("This makes extraordinary claims without credible evidence", 0)
+        balanced_score = scores_dict.get("This is balanced reporting that presents multiple perspectives", 0)
+        clickbait_score = scores_dict.get("This is clickbait designed to generate outrage or shock", 0)
         
-        # Calculate combined credibility
-        credibility_positive = (factual_score + journalism_score) / 2
-        credibility_negative = (misleading_score + sensational_score) / 2
+        # Calculate combined credibility - positive indicators
+        credibility_positive = (informative_score + professional_score + balanced_score) / 3
+        # Negative indicators
+        credibility_negative = (manipulation_score + extraordinary_score + clickbait_score) / 3
         
         return {
-            "factual_score": factual_score,
-            "journalism_score": journalism_score,
-            "misleading_score": misleading_score,
-            "sensational_score": sensational_score,
-            "opinion_score": opinion_score,
-            "promotional_score": promotional_score,
+            "factual_score": informative_score,
+            "journalism_score": professional_score,
+            "balanced_score": balanced_score,
+            "misleading_score": manipulation_score,
+            "sensational_score": clickbait_score,
+            "extraordinary_score": extraordinary_score,
+            "opinion_score": 0,  # Not used in new approach
+            "promotional_score": 0,  # Not used in new approach
             "credibility_positive": credibility_positive,
             "credibility_negative": credibility_negative,
             "labels": result["labels"],
@@ -317,57 +321,64 @@ def calculate_verdict(nli_result, credibility_result, red_flags, known_facts, se
     
     # Factor 1: NLI Analysis (Primary - 50% weight)
     if nli_result:
-        factual = nli_result.get("factual_score", 0)
-        journalism = nli_result.get("journalism_score", 0)
-        misleading = nli_result.get("misleading_score", 0)
-        sensational = nli_result.get("sensational_score", 0)
-        opinion = nli_result.get("opinion_score", 0)
+        informative = nli_result.get("factual_score", 0)
+        professional = nli_result.get("journalism_score", 0)
+        balanced = nli_result.get("balanced_score", 0)
+        manipulation = nli_result.get("misleading_score", 0)
+        clickbait = nli_result.get("sensational_score", 0)
+        extraordinary = nli_result.get("extraordinary_score", 0)
         
-        # Positive contributions
-        positive_score = (factual + journalism) / 2
-        # Negative contributions  
-        negative_score = (misleading + sensational) / 2
+        # Positive contributions (good indicators)
+        positive_score = (informative + professional + balanced) / 3
+        # Negative contributions (bad indicators)
+        negative_score = (manipulation + clickbait + extraordinary) / 3
         
-        # Calculate net contribution (can range from -0.5 to +0.5)
-        nli_contribution = (positive_score - negative_score) * 0.5
+        # Calculate net contribution (range -0.25 to +0.25)
+        nli_contribution = (positive_score * 0.5) - (negative_score * 0.5)
         credibility_score += nli_contribution
         confidence += 0.4
         
-        if factual > 0.3:
-            reasons.append(f"Content appears factual and informative ({factual:.0%})")
-        if journalism > 0.3:
-            reasons.append(f"Writing style resembles legitimate journalism ({journalism:.0%})")
-        if misleading > 0.4:
-            reasons.append(f"⚠️ May contain misleading elements ({misleading:.0%})")
-        if sensational > 0.4:
-            reasons.append(f"⚠️ Contains sensationalized language ({sensational:.0%})")
-        if opinion > 0.5:
-            reasons.append(f"Contains opinion or editorial content ({opinion:.0%})")
+        # Add reasons based on strongest signals
+        if informative > 0.25:
+            reasons.append(f"Well-written and informative content ({informative:.0%})")
+        if professional > 0.25:
+            reasons.append(f"Professional writing structure ({professional:.0%})")
+        if balanced > 0.25:
+            reasons.append(f"Balanced presentation of information ({balanced:.0%})")
+        if manipulation > 0.35:
+            reasons.append(f"⚠️ May use emotional manipulation ({manipulation:.0%})")
+        if clickbait > 0.35:
+            reasons.append(f"⚠️ Contains clickbait elements ({clickbait:.0%})")
+        if extraordinary > 0.35:
+            reasons.append(f"⚠️ Makes extraordinary claims ({extraordinary:.0%})")
     
     # Factor 2: Credibility Analysis (25% weight)
     if credibility_result:
-        if credibility_result["classification"] == "CREDIBLE":
-            credibility_score += 0.15 * credibility_result["confidence"]
-            if credibility_result["professional_style"] > 0.3:
-                reasons.append(f"Professional writing style detected ({credibility_result['professional_style']:.0%})")
-        else:
-            credibility_score -= 0.15 * credibility_result["confidence"]
-            if credibility_result["unsubstantiated_claims"] > 0.3:
-                reasons.append(f"⚠️ May contain unsubstantiated claims ({credibility_result['unsubstantiated_claims']:.0%})")
-        confidence += 0.25
+        prof_style = credibility_result.get("professional_style", 0)
+        verifiable = credibility_result.get("verifiable_facts", 0)
+        
+        # Professional style is a strong positive indicator
+        if prof_style > 0.5:
+            credibility_score += 0.1
+            reasons.append(f"Professional writing style ({prof_style:.0%})")
+        
+        if verifiable > 0.3:
+            credibility_score += 0.05
+            reasons.append(f"Contains verifiable information ({verifiable:.0%})")
+        
+        confidence += 0.2
     
     # Factor 3: Red Flags (15% weight) - Only penalize if found
     if red_flags["count"] > 0:
-        # Reduce credibility based on number and severity of red flags
-        penalty = min(red_flags["suspicion_score"] * 0.15, 0.15)
+        # Light penalty for red flags, but don't overweight
+        penalty = min(red_flags["suspicion_score"] * 0.1, 0.1)
         credibility_score -= penalty
         flag_list = ', '.join(red_flags['flags'][:3])
-        reasons.append(f"⚠️ Red flags detected: {flag_list}")
+        reasons.append(f"⚠️ Style concerns: {flag_list}")
         confidence += 0.15
     else:
-        # No red flags is a small positive indicator
         credibility_score += 0.05
-        reasons.append("No obvious red flags detected")
+        reasons.append("No concerning language patterns detected")
         confidence += 0.1
     
     # Factor 4: Sentiment Analysis (10% weight)
@@ -375,19 +386,21 @@ def calculate_verdict(nli_result, credibility_result, red_flags, known_facts, se
         sentiment = sentiment_result.get("sentiment", "").lower()
         sent_confidence = sentiment_result.get("confidence", 0)
         
-        # Neutral sentiment is generally better for factual content
+        # Neutral is ideal for factual content
         if sentiment == "neutral":
             credibility_score += 0.05
-            reasons.append(f"Neutral tone detected ({sent_confidence:.0%})")
-        elif sentiment == "negative" and sent_confidence > 0.8:
-            # Very negative might indicate fear-mongering
+            reasons.append(f"Neutral, objective tone ({sent_confidence:.0%})")
+        elif sentiment == "positive":
+            # Slight concern for overly positive (could be promotional)
+            reasons.append(f"Positive tone detected ({sent_confidence:.0%})")
+        elif sentiment == "negative" and sent_confidence > 0.85:
             credibility_score -= 0.03
             reasons.append(f"Strong negative tone ({sent_confidence:.0%})")
         confidence += 0.1
     
     # Factor 5: Known Facts Match (bonus)
     if known_facts:
-        reasons.append(f"Related to established topic: {known_facts[0]['topic']}")
+        reasons.append(f"Relates to known topic: {known_facts[0]['topic']}")
         confidence += 0.05
     
     # Normalize credibility score to 0-1
@@ -397,9 +410,9 @@ def calculate_verdict(nli_result, credibility_result, red_flags, known_facts, se
     # Determine verdict based on credibility score
     if confidence < 0.25:
         verdict_key = "UNVERIFIABLE"
-    elif credibility_score >= 0.65:
+    elif credibility_score >= 0.60:
         verdict_key = "TRUE"
-    elif credibility_score >= 0.55:
+    elif credibility_score >= 0.52:
         verdict_key = "MOSTLY_TRUE"
     elif credibility_score >= 0.45:
         verdict_key = "MIXED"

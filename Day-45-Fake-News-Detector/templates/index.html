@@ -721,46 +721,46 @@ Example: &quot;Scientists have discovered that drinking coffee every day can ext
                             </div>
                             <div class="nli-grid">
                                 <div class="nli-item">
-                                    <div class="nli-label">Factual & Informative</div>
+                                    <div class="nli-label">Well-Written & Informative</div>
                                     <div class="nli-bar">
                                         <div class="nli-bar-fill" style="width: ${analysis.nli.factual_score * 100}%; background: var(--true)"></div>
                                     </div>
                                     <div class="nli-value" style="color: var(--true)">${(analysis.nli.factual_score * 100).toFixed(1)}%</div>
                                 </div>
                                 <div class="nli-item">
-                                    <div class="nli-label">Legitimate Journalism</div>
+                                    <div class="nli-label">Professional Structure</div>
                                     <div class="nli-bar">
                                         <div class="nli-bar-fill" style="width: ${(analysis.nli.journalism_score || 0) * 100}%; background: var(--mostly-true)"></div>
                                     </div>
                                     <div class="nli-value" style="color: var(--mostly-true)">${((analysis.nli.journalism_score || 0) * 100).toFixed(1)}%</div>
                                 </div>
                                 <div class="nli-item">
-                                    <div class="nli-label">Misleading Elements</div>
+                                    <div class="nli-label">Balanced Reporting</div>
+                                    <div class="nli-bar">
+                                        <div class="nli-bar-fill" style="width: ${(analysis.nli.balanced_score || 0) * 100}%; background: var(--secondary)"></div>
+                                    </div>
+                                    <div class="nli-value" style="color: var(--secondary)">${((analysis.nli.balanced_score || 0) * 100).toFixed(1)}%</div>
+                                </div>
+                                <div class="nli-item">
+                                    <div class="nli-label">Emotional Manipulation</div>
                                     <div class="nli-bar">
                                         <div class="nli-bar-fill" style="width: ${analysis.nli.misleading_score * 100}%; background: var(--false)"></div>
                                     </div>
                                     <div class="nli-value" style="color: var(--false)">${(analysis.nli.misleading_score * 100).toFixed(1)}%</div>
                                 </div>
                                 <div class="nli-item">
-                                    <div class="nli-label">Sensationalized</div>
+                                    <div class="nli-label">Clickbait Elements</div>
                                     <div class="nli-bar">
-                                        <div class="nli-bar-fill" style="width: ${analysis.nli.sensational_score * 100}%; background: var(--mixed)"></div>
+                                        <div class="nli-bar-fill" style="width: ${analysis.nli.sensational_score * 100}%; background: var(--mostly-false)"></div>
                                     </div>
-                                    <div class="nli-value" style="color: var(--mixed)">${(analysis.nli.sensational_score * 100).toFixed(1)}%</div>
+                                    <div class="nli-value" style="color: var(--mostly-false)">${(analysis.nli.sensational_score * 100).toFixed(1)}%</div>
                                 </div>
                                 <div class="nli-item">
-                                    <div class="nli-label">Opinion/Editorial</div>
+                                    <div class="nli-label">Extraordinary Claims</div>
                                     <div class="nli-bar">
-                                        <div class="nli-bar-fill" style="width: ${analysis.nli.opinion_score * 100}%; background: var(--unverifiable)"></div>
+                                        <div class="nli-bar-fill" style="width: ${(analysis.nli.extraordinary_score || 0) * 100}%; background: var(--mixed)"></div>
                                     </div>
-                                    <div class="nli-value">${(analysis.nli.opinion_score * 100).toFixed(1)}%</div>
-                                </div>
-                                <div class="nli-item">
-                                    <div class="nli-label">Promotional Content</div>
-                                    <div class="nli-bar">
-                                        <div class="nli-bar-fill" style="width: ${(analysis.nli.promotional_score || 0) * 100}%; background: var(--mostly-false)"></div>
-                                    </div>
-                                    <div class="nli-value" style="color: var(--mostly-false)">${((analysis.nli.promotional_score || 0) * 100).toFixed(1)}%</div>
+                                    <div class="nli-value" style="color: var(--mixed)">${((analysis.nli.extraordinary_score || 0) * 100).toFixed(1)}%</div>
                                 </div>
                             </div>
                         </div>

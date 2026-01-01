@@ -1,0 +1,3 @@
+# Day 46: Rule-Based Chatbot
+flask==3.0.0
+Werkzeug==3.0.1

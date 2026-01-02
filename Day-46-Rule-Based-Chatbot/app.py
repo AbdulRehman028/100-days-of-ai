@@ -355,9 +355,7 @@ INTENTS = {
         ]
     },
     
-    # ===============================
     # GENERAL KNOWLEDGE - CAPITALS
-    # ===============================
     
     "capital_pakistan": {
         "patterns": [
@@ -587,9 +585,7 @@ INTENTS = {
         ]
     },
     
-    # ===============================
     # GENERAL KNOWLEDGE - OTHER
-    # ===============================
     
     "largest_country": {
         "patterns": [
@@ -686,9 +682,7 @@ DEFAULT_RESPONSES = [
 ]
 
 
-# ===============================
 # CHATBOT LOGIC
-# ===============================
 
 def extract_numbers(text, pattern):
     """Extract numbers from text based on pattern"""
@@ -787,9 +781,7 @@ def get_conversation_context():
     }
 
 
-# ===============================
 # FLASK ROUTES
-# ===============================
 
 @app.route('/')
 def index():
@@ -847,9 +839,7 @@ def get_intents():
     return jsonify({'intents': intent_list})
 
 
-# ===============================
 # MAIN
-# ===============================
 
 if __name__ == '__main__':
     context = get_conversation_context()

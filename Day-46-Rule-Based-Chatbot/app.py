@@ -1,9 +1,3 @@
-"""
-Day 46: Rule-Based Chatbot (As Baseline)
-A simple rule-based bot for Q&A using pattern matching and predefined responses.
-This serves as a baseline before implementing more advanced NLP/AI chatbots.
-"""
-
 from flask import Flask, render_template, request, jsonify
 import re
 import random
@@ -11,9 +5,7 @@ from datetime import datetime
 
 app = Flask(__name__)
 
-# ===============================
 # CHATBOT KNOWLEDGE BASE
-# ===============================
 
 # Intent definitions with patterns and responses
 INTENTS = {

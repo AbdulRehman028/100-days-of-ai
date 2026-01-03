@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ Chatbot with Embeddings - Day 47</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8b5cf6;
+            --primary-dark: #7c3aed;
+            --primary-light: #a78bfa;
+            --secondary: #06b6d4;
+            --accent: #10b981;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --bg-input: #334155;
+            --bg-message-user: #7c3aed;
+            --bg-message-bot: #374151;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border: #475569;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 1rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        
+        /* Header */
+        header {
+            text-align: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 1rem;
+        }
+        
+        .logo {
+            font-size: 2.5rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.25rem;
+        }
+        
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+        
+        .tech-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--bg-input);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            color: var(--secondary);
+            margin-top: 0.5rem;
+        }
+        
+        /* Main Layout */
+        .main-layout {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 1rem;
+            min-height: 0;
+        }
+        
+        @media (max-width: 900px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                display: none;
+            }
+        }
+        
+        /* Chat Container */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            min-height: 0;
+        }
+        
+        /* Messages Area */
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .messages::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .messages::-webkit-scrollbar-track {
+            background: var(--bg-input);
+        }
+        
+        .messages::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+        
+        /* Message Bubbles */
+        .message {
+            display: flex;
+            gap: 0.75rem;
+            max-width: 85%;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .message.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+        
+        .message.bot {
+            align-self: flex-start;
+        }
+        
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+        
+        .message.user .avatar {
+            background: var(--primary);
+        }
+        
+        .message.bot .avatar {
+            background: var(--accent);
+        }
+        
+        .message-content {
+            padding: 0.75rem 1rem;
+            border-radius: 16px;
+            line-height: 1.5;
+            font-size: 0.9rem;
+        }
+        
+        .message.user .message-content {
+            background: var(--bg-message-user);
+            border-bottom-right-radius: 4px;
+        }
+        
+        .message.bot .message-content {
+            background: var(--bg-message-bot);
+            border-bottom-left-radius: 4px;
+        }
+        
+        /* Confidence Badge */
+        .confidence-badge {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            background: var(--bg-input);
+            border-radius: 10px;
+            font-size: 0.7rem;
+            margin-top: 0.5rem;
+            color: var(--text-secondary);
+        }
+        
+        .confidence-badge.high {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--accent);
+        }
+        
+        .confidence-badge.medium {
+            background: rgba(234, 179, 8, 0.2);
+            color: #eab308;
+        }
+        
+        .confidence-badge.low {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+        
+        /* Matched Question */
+        .matched-question {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid var(--border);
+        }
+        
+        .matched-question strong {
+            color: var(--secondary);
+        }
+        
+        /* Suggestions */
+        .suggestions {
+            margin-top: 0.75rem;
+        }
+        
+        .suggestions-title {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .suggestion-chip {
+            display: inline-block;
+            padding: 0.35rem 0.75rem;
+            background: var(--bg-input);
+            border-radius: 15px;
+            font-size: 0.75rem;
+            margin: 0.25rem 0.25rem 0 0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+        
+        .suggestion-chip:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* Typing Indicator */
+        .typing-indicator {
+            display: none;
+            align-self: flex-start;
+            padding: 0.75rem 1rem;
+            background: var(--bg-message-bot);
+            border-radius: 16px;
+            margin-left: 40px;
+        }
+        
+        .typing-indicator.show {
+            display: flex;
+            gap: 4px;
+        }
+        
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--text-secondary);
+            border-radius: 50%;
+            animation: typingPulse 1.4s infinite;
+        }
+        
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        
+        @keyframes typingPulse {
+            0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+            30% { transform: translateY(-4px); opacity: 1; }
+        }
+        
+        /* Input Area */
+        .input-area {
+            padding: 1rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 0.75rem;
+            background: var(--bg-input);
+        }
+        
+        #messageInput {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: 25px;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        #messageInput:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        #sendBtn {
+            padding: 0.75rem 1.25rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        #sendBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(139, 92, 246, 0.4);
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .sidebar-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            padding: 1rem;
+        }
+        
+        .sidebar-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+        
+        .stat-item {
+            background: var(--bg-input);
+            padding: 0.5rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Quick Questions */
+        .quick-questions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+        
+        .quick-question {
+            padding: 0.5rem 0.75rem;
+            background: var(--bg-input);
+            border-radius: 8px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+        
+        .quick-question:hover {
+            border-color: var(--primary);
+            background: rgba(139, 92, 246, 0.1);
+        }
+        
+        /* Categories */
+        .category-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .category-tag {
+            padding: 0.35rem 0.75rem;
+            background: var(--bg-input);
+            border-radius: 15px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .category-tag:hover {
+            background: var(--secondary);
+            color: white;
+        }
+        
+        /* Welcome Message */
+        .welcome-message {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: var(--text-secondary);
+        }
+        
+        .welcome-message h2 {
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+        
+        .welcome-message p {
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+        }
+        
+        .welcome-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+        
+        .welcome-feature {
+            padding: 0.5rem 1rem;
+            background: var(--bg-input);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .welcome-feature:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 0.75rem;
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">🧠</div>
+            <h1>FAQ Chatbot with Embeddings</h1>
+            <p class="subtitle">Semantic search powered by AI embeddings</p>
+            <span class="tech-badge">🤗 Sentence Transformers • all-MiniLM-L6-v2</span>
+        </header>
+        
+        <div class="main-layout">
+            <!-- Chat Container -->
+            <div class="chat-container">
+                <div class="messages" id="messages">
+                    <div class="welcome-message" id="welcomeMessage">
+                        <h2>👋 Welcome to the FAQ Chatbot!</h2>
+                        <p>I use AI embeddings to understand your questions semantically.<br>
+                        Ask me anything about AI, programming, or this chatbot!</p>
+                        <div class="welcome-features">
+                            <span class="welcome-feature" onclick="sendQuestion('What is artificial intelligence?')">🤖 What is AI?</span>
+                            <span class="welcome-feature" onclick="sendQuestion('How does this chatbot work?')">⚙️ How it works</span>
+                            <span class="welcome-feature" onclick="sendQuestion('What are embeddings?')">📊 Embeddings</span>
+                            <span class="welcome-feature" onclick="sendQuestion('Tell me a joke about AI')">😄 Tell a joke</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="typing-indicator" id="typingIndicator">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+                
+                <div class="input-area">
+                    <input type="text" id="messageInput" placeholder="Ask me a question..." autocomplete="off">
+                    <button id="sendBtn" onclick="sendMessage()">Send ➤</button>
+                </div>
+            </div>
+            
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <!-- Stats -->
+                <div class="sidebar-card">
+                    <div class="sidebar-title">📊 Knowledge Base</div>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value" id="faqCount">--</div>
+                            <div class="stat-label">FAQs</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="categoryCount">--</div>
+                            <div class="stat-label">Categories</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">384</div>
+                            <div class="stat-label">Dimensions</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">50%</div>
+                            <div class="stat-label">Threshold</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Categories -->
+                <div class="sidebar-card">
+                    <div class="sidebar-title">📁 Categories</div>
+                    <div class="category-list" id="categoryList">
+                        <!-- Loaded dynamically -->
+                    </div>
+                </div>
+                
+                <!-- Quick Questions -->
+                <div class="sidebar-card">
+                    <div class="sidebar-title">💡 Try These</div>
+                    <div class="quick-questions">
+                        <div class="quick-question" onclick="sendQuestion('What is machine learning?')">What is machine learning?</div>
+                        <div class="quick-question" onclick="sendQuestion('How do I learn Python?')">How do I learn Python?</div>
+                        <div class="quick-question" onclick="sendQuestion('Difference between AI and ML')">AI vs ML difference</div>
+                        <div class="quick-question" onclick="sendQuestion('What is NLP?')">What is NLP?</div>
+                        <div class="quick-question" onclick="sendQuestion('Career in AI')">Career in AI</div>
+                        <div class="quick-question" onclick="sendQuestion('Fun fact about computers')">Fun fact</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            Day 47 of 100 Days of AI • FAQ Chatbot with Semantic Embeddings
+        </footer>
+    </div>
+    
+    <script>
+        const messagesContainer = document.getElementById('messages');
+        const messageInput = document.getElementById('messageInput');
+        const typingIndicator = document.getElementById('typingIndicator');
+        const welcomeMessage = document.getElementById('welcomeMessage');
+        
+        let conversationStarted = false;
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadStats();
+            messageInput.focus();
+        });
+        
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+        
+        function sendQuestion(text) {
+            messageInput.value = text;
+            sendMessage();
+        }
+        
+        async function loadStats() {
+            try {
+                const response = await fetch('/stats');
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('faqCount').textContent = data.stats.total_faqs;
+                    document.getElementById('categoryCount').textContent = Object.keys(data.stats.categories).length;
+                    
+                    // Load categories
+                    const categoryList = document.getElementById('categoryList');
+                    categoryList.innerHTML = Object.entries(data.stats.categories)
+                        .map(([cat, count]) => `<span class="category-tag" onclick="filterCategory('${cat}')">${cat} (${count})</span>`)
+                        .join('');
+                }
+            } catch (error) {
+                console.error('Failed to load stats:', error);
+            }
+        }
+        
+        function filterCategory(category) {
+            messageInput.value = `Tell me about ${category}`;
+            messageInput.focus();
+        }
+        
+        async function sendMessage() {
+            const message = messageInput.value.trim();
+            if (!message) return;
+            
+            if (!conversationStarted) {
+                welcomeMessage.style.display = 'none';
+                conversationStarted = true;
+            }
+            
+            messageInput.value = '';
+            addMessage(message, 'user');
+            
+            typingIndicator.classList.add('show');
+            scrollToBottom();
+            
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: message })
+                });
+                
+                const data = await response.json();
+                
+                await new Promise(resolve => setTimeout(resolve, 400 + Math.random() * 400));
+                typingIndicator.classList.remove('show');
+                
+                if (data.success) {
+                    addBotMessage(data);
+                } else {
+                    addMessage('Sorry, something went wrong. Please try again!', 'bot');
+                }
+            } catch (error) {
+                typingIndicator.classList.remove('show');
+                addMessage('Connection error. Please try again.', 'bot');
+            }
+        }
+        
+        function addMessage(text, type) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            
+            const avatar = type === 'user' ? '👤' : '🧠';
+            
+            messageDiv.innerHTML = `
+                <div class="avatar">${avatar}</div>
+                <div class="message-content">${text}</div>
+            `;
+            
+            messagesContainer.appendChild(messageDiv);
+            scrollToBottom();
+        }
+        
+        function addBotMessage(data) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message bot';
+            
+            // Determine confidence level
+            let confidenceClass = 'low';
+            let confidenceText = 'Low confidence';
+            if (data.confidence >= 0.7) {
+                confidenceClass = 'high';
+                confidenceText = 'High confidence';
+            } else if (data.confidence >= 0.5) {
+                confidenceClass = 'medium';
+                confidenceText = 'Medium confidence';
+            }
+            
+            let html = `
+                <div class="avatar">🧠</div>
+                <div>
+                    <div class="message-content">
+                        ${data.answer}
+                        <div class="confidence-badge ${confidenceClass}">
+                            ${confidenceText}: ${(data.confidence * 100).toFixed(1)}%
+                        </div>
+            `;
+            
+            // Add matched question if available
+            if (data.matched_question) {
+                html += `
+                    <div class="matched-question">
+                        <strong>Matched:</strong> ${data.matched_question}
+                        ${data.category ? `<br><strong>Category:</strong> ${data.category}` : ''}
+                    </div>
+                `;
+            }
+            
+            // Add suggestions if available
+            if (data.suggestions && data.suggestions.length > 0) {
+                html += `
+                    <div class="suggestions">
+                        <div class="suggestions-title">Related questions:</div>
+                        ${data.suggestions.map(s => `<span class="suggestion-chip" onclick="sendQuestion('${s.replace(/'/g, "\\'")}')">${s}</span>`).join('')}
+                    </div>
+                `;
+            }
+            
+            html += `</div></div>`;
+            
+            messageDiv.innerHTML = html;
+            messagesContainer.appendChild(messageDiv);
+            scrollToBottom();
+        }
+        
+        function scrollToBottom() {
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+    </script>
+</body>
+</html>

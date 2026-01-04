@@ -15,6 +15,8 @@ Unlike traditional keyword-based chatbots, this FAQ chatbot uses **semantic embe
 - **Cosine Similarity**: Measures how similar two questions are in meaning space
 - **Confidence Scores**: Shows how confident the bot is in its answers
 
+![alt text](image.png) ![alt text](image-1.png)
+
 ## 🚀 Features
 
 - 🧠 **Sentence Transformers** - State-of-the-art embedding model (all-MiniLM-L6-v2)

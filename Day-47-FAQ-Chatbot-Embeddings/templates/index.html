@@ -3,25 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FAQ Chatbot with Embeddings - Day 47</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>FAQ Chatbot - Day 47</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary: #8b5cf6;
-            --primary-dark: #7c3aed;
-            --primary-light: #a78bfa;
-            --secondary: #06b6d4;
-            --accent: #10b981;
-            --bg-dark: #0f172a;
-            --bg-card: #1e293b;
-            --bg-input: #334155;
-            --bg-message-user: #7c3aed;
-            --bg-message-bot: #374151;
-            --text-primary: #f1f5f9;
-            --text-secondary: #94a3b8;
-            --border: #475569;
-        }
-        
         * {
             margin: 0;
             padding: 0;
@@ -29,146 +13,350 @@
         }
         
         body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg-dark);
-            color: var(--text-primary);
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #09090b;
+            color: #fafafa;
             min-height: 100vh;
+        }
+        
+        /* App Layout */
+        .app {
+            display: flex;
+            height: 100vh;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 1rem;
+            gap: 1rem;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 300px;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            flex-shrink: 0;
+        }
+        
+        .card {
+            background: #18181b;
+            border: 1px solid #27272a;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        
+        /* Brand */
+        .brand {
+            padding: 1.5rem;
+        }
+        
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.875rem;
+        }
+        
+        .brand-icon {
+            width: 44px;
+            height: 44px;
+            background: #3b82f6;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .brand-text h1 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+        
+        .brand-text span {
+            font-size: 0.8rem;
+            color: #71717a;
+        }
+        
+        /* Stats */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1px;
+            background: #27272a;
+        }
+        
+        .stat {
+            background: #18181b;
+            padding: 1rem;
+            text-align: center;
+        }
+        
+        .stat-num {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #3b82f6;
+            letter-spacing: -0.02em;
+        }
+        
+        .stat-label {
+            font-size: 0.7rem;
+            color: #71717a;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 0.25rem;
+        }
+        
+        /* Questions */
+        .questions-card {
+            flex: 1;
             display: flex;
             flex-direction: column;
         }
         
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 1rem;
+        .card-header {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid #27272a;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #71717a;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .questions-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0.5rem;
+        }
+        
+        .question-item {
+            padding: 0.875rem 1rem;
+            border-radius: 10px;
+            font-size: 0.875rem;
+            color: #a1a1aa;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .question-item:hover {
+            background: #27272a;
+            color: #fafafa;
+        }
+        
+        /* Tags */
+        .tags-section {
+            padding: 1.25rem;
+            border-top: 1px solid #27272a;
+        }
+        
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .tag {
+            padding: 0.5rem 0.875rem;
+            background: #27272a;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            color: #cfcfd4;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .tag:hover {
+            background: #3b82f6;
+            color: #fff;
+        }
+        
+        /* Main Chat */
+        .main {
             flex: 1;
             display: flex;
             flex-direction: column;
-            height: 100vh;
+            background: #18181b;
+            border: 1px solid #27272a;
+            border-radius: 16px;
+            min-width: 0;
         }
         
         /* Header */
-        header {
-            text-align: center;
-            padding: 1rem 0;
-            border-bottom: 1px solid var(--border);
-            margin-bottom: 1rem;
-        }
-        
-        .logo {
-            font-size: 2.5rem;
-            margin-bottom: 0.25rem;
-        }
-        
-        h1 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 0.25rem;
-        }
-        
-        .subtitle {
-            color: var(--text-secondary);
-            font-size: 0.85rem;
-        }
-        
-        .tech-badge {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            background: var(--bg-input);
-            border-radius: 20px;
-            font-size: 0.75rem;
-            color: var(--secondary);
-            margin-top: 0.5rem;
-        }
-        
-        /* Main Layout */
-        .main-layout {
-            flex: 1;
-            display: grid;
-            grid-template-columns: 1fr 300px;
-            gap: 1rem;
-            min-height: 0;
-        }
-        
-        @media (max-width: 900px) {
-            .main-layout {
-                grid-template-columns: 1fr;
-            }
-            .sidebar {
-                display: none;
-            }
-        }
-        
-        /* Chat Container */
-        .chat-container {
+        .header {
             display: flex;
-            flex-direction: column;
-            background: var(--bg-card);
-            border-radius: 16px;
-            border: 1px solid var(--border);
-            overflow: hidden;
-            min-height: 0;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #27272a;
         }
         
-        /* Messages Area */
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .online-dot {
+            width: 8px;
+            height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #22c55e;
+        }
+        
+        .header-info h2 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+        
+        .header-info p {
+            font-size: 0.75rem;
+            color: #71717a;
+        }
+        
+        .header-btns {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .icon-btn {
+            width: 36px;
+            height: 36px;
+            background: #27272a;
+            border: none;
+            border-radius: 10px;
+            color: #71717a;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        
+        .icon-btn:hover {
+            background: #3f3f46;
+            color: #fafafa;
+        }
+        
+        /* Messages */
         .messages {
             flex: 1;
             overflow-y: auto;
-            padding: 1.25rem;
+            padding: 1.5rem;
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 1.5rem;
         }
         
         .messages::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        .messages::-webkit-scrollbar-track {
-            background: var(--bg-input);
+            width: 4px;
         }
         
         .messages::-webkit-scrollbar-thumb {
-            background: var(--border);
-            border-radius: 3px;
+            background: #3f3f46;
+            border-radius: 2px;
         }
         
-        /* Message Bubbles */
-        .message {
+        /* Welcome */
+        .welcome {
+            flex: 1;
             display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .welcome-emoji {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .welcome h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.5rem;
+        }
+        
+        .welcome p {
+            color: #71717a;
+            font-size: 0.95rem;
+            max-width: 360px;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+        
+        .starters {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
             gap: 0.75rem;
-            max-width: 85%;
-            animation: slideIn 0.3s ease;
+            width: 100%;
+            max-width: 440px;
         }
         
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .starter {
+            padding: 1.25rem;
+            background: #27272a;
+            border: 1px solid #3f3f46;
+            border-radius: 14px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s;
         }
         
-        .message.user {
+        .starter:hover {
+            border-color: #3b82f6;
+            background: #1e3a5f20;
+        }
+        
+        .starter-icon {
+            font-size: 1.25rem;
+            margin-bottom: 0.625rem;
+        }
+        
+        .starter h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            letter-spacing: -0.01em;
+        }
+        
+        .starter p {
+            font-size: 0.75rem;
+            color: #71717a;
+            margin: 0;
+        }
+        
+        /* Message */
+        .msg {
+            display: flex;
+            gap: 0.875rem;
+            max-width: 80%;
+            animation: slideUp 0.25s ease;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .msg.user {
             align-self: flex-end;
             flex-direction: row-reverse;
         }
         
-        .message.bot {
+        .msg.bot {
             align-self: flex-start;
         }
         
-        .avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
+        .msg-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -176,562 +364,409 @@
             flex-shrink: 0;
         }
         
-        .message.user .avatar {
-            background: var(--primary);
+        .msg.user .msg-avatar {
+            background: #27272a;
         }
         
-        .message.bot .avatar {
-            background: var(--accent);
+        .msg.bot .msg-avatar {
+            background: #3b82f6;
         }
         
-        .message-content {
-            padding: 0.75rem 1rem;
-            border-radius: 16px;
-            line-height: 1.5;
+        .msg-content {
+            display: flex;
+            flex-direction: column;
+            gap: 0.625rem;
+        }
+        
+        .msg-bubble {
+            padding: 1rem 1.125rem;
+            border-radius: 14px;
             font-size: 0.9rem;
+            line-height: 1.6;
         }
         
-        .message.user .message-content {
-            background: var(--bg-message-user);
+        .msg.user .msg-bubble {
+            background: #3b82f6;
             border-bottom-right-radius: 4px;
         }
         
-        .message.bot .message-content {
-            background: var(--bg-message-bot);
+        .msg.bot .msg-bubble {
+            background: #27272a;
             border-bottom-left-radius: 4px;
         }
         
-        /* Confidence Badge */
-        .confidence-badge {
-            display: inline-block;
-            padding: 0.2rem 0.5rem;
-            background: var(--bg-input);
-            border-radius: 10px;
-            font-size: 0.7rem;
-            margin-top: 0.5rem;
-            color: var(--text-secondary);
-        }
-        
-        .confidence-badge.high {
-            background: rgba(16, 185, 129, 0.2);
-            color: var(--accent);
-        }
-        
-        .confidence-badge.medium {
-            background: rgba(234, 179, 8, 0.2);
-            color: #eab308;
-        }
-        
-        .confidence-badge.low {
-            background: rgba(239, 68, 68, 0.2);
-            color: #ef4444;
-        }
-        
-        /* Matched Question */
-        .matched-question {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            margin-top: 0.5rem;
-            padding-top: 0.5rem;
-            border-top: 1px solid var(--border);
-        }
-        
-        .matched-question strong {
-            color: var(--secondary);
-        }
-        
-        /* Suggestions */
-        .suggestions {
-            margin-top: 0.75rem;
-        }
-        
-        .suggestions-title {
-            font-size: 0.7rem;
-            color: var(--text-secondary);
-            margin-bottom: 0.5rem;
-        }
-        
-        .suggestion-chip {
-            display: inline-block;
-            padding: 0.35rem 0.75rem;
-            background: var(--bg-input);
-            border-radius: 15px;
-            font-size: 0.75rem;
-            margin: 0.25rem 0.25rem 0 0;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border: 1px solid transparent;
-        }
-        
-        .suggestion-chip:hover {
-            background: var(--primary);
-            color: white;
-        }
-        
-        /* Typing Indicator */
-        .typing-indicator {
-            display: none;
-            align-self: flex-start;
-            padding: 0.75rem 1rem;
-            background: var(--bg-message-bot);
-            border-radius: 16px;
-            margin-left: 40px;
-        }
-        
-        .typing-indicator.show {
-            display: flex;
-            gap: 4px;
-        }
-        
-        .typing-dot {
-            width: 6px;
-            height: 6px;
-            background: var(--text-secondary);
-            border-radius: 50%;
-            animation: typingPulse 1.4s infinite;
-        }
-        
-        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
-        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
-        
-        @keyframes typingPulse {
-            0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
-            30% { transform: translateY(-4px); opacity: 1; }
-        }
-        
-        /* Input Area */
-        .input-area {
-            padding: 1rem;
-            border-top: 1px solid var(--border);
-            display: flex;
-            gap: 0.75rem;
-            background: var(--bg-input);
-        }
-        
-        #messageInput {
-            flex: 1;
-            padding: 0.75rem 1rem;
-            border: 2px solid var(--border);
-            border-radius: 25px;
-            background: var(--bg-card);
-            color: var(--text-primary);
-            font-family: inherit;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-        }
-        
-        #messageInput:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-        
-        #sendBtn {
-            padding: 0.75rem 1.25rem;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            font-family: inherit;
-            font-size: 0.9rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        
-        #sendBtn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(139, 92, 246, 0.4);
-        }
-        
-        /* Sidebar */
-        .sidebar {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-        
-        .sidebar-card {
-            background: var(--bg-card);
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            padding: 1rem;
-        }
-        
-        .sidebar-title {
-            font-size: 0.9rem;
-            font-weight: 600;
-            margin-bottom: 0.75rem;
+        /* Meta */
+        .msg-meta {
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            flex-wrap: wrap;
         }
         
-        /* Stats */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.5rem;
-        }
-        
-        .stat-item {
-            background: var(--bg-input);
-            padding: 0.5rem;
-            border-radius: 8px;
-            text-align: center;
-        }
-        
-        .stat-value {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--primary);
-        }
-        
-        .stat-label {
+        .badge {
+            padding: 0.35rem 0.625rem;
+            border-radius: 6px;
             font-size: 0.7rem;
-            color: var(--text-secondary);
+            font-weight: 500;
         }
         
-        /* Quick Questions */
-        .quick-questions {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            max-height: 250px;
-            overflow-y: auto;
+        .badge-high {
+            background: #14532d;
+            color: #4ade80;
         }
         
-        .quick-question {
-            padding: 0.5rem 0.75rem;
-            background: var(--bg-input);
+        .badge-medium {
+            background: #422006;
+            color: #fbbf24;
+        }
+        
+        .badge-low {
+            background: #450a0a;
+            color: #f87171;
+        }
+        
+        .badge-cat {
+            background: #1e3a5f;
+            color: #60a5fa;
+        }
+        
+        .msg-matched {
+            font-size: 0.75rem;
+            color: #71717a;
+            padding: 0.625rem 0.875rem;
+            background: #09090b;
             border-radius: 8px;
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border: 1px solid transparent;
+            border-left: 2px solid #3b82f6;
         }
         
-        .quick-question:hover {
-            border-color: var(--primary);
-            background: rgba(139, 92, 246, 0.1);
-        }
-        
-        /* Categories */
-        .category-list {
+        .msg-related {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.5rem;
+            gap: 0.375rem;
         }
         
-        .category-tag {
-            padding: 0.35rem 0.75rem;
-            background: var(--bg-input);
-            border-radius: 15px;
+        .related-btn {
+            padding: 0.4rem 0.7rem;
+            background: #09090b;
+            border-radius: 6px;
             font-size: 0.75rem;
+            color: #a1a1aa;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.2s;
         }
         
-        .category-tag:hover {
-            background: var(--secondary);
-            color: white;
+        .related-btn:hover {
+            background: #3b82f6;
+            color: #fff;
         }
         
-        /* Welcome Message */
-        .welcome-message {
-            text-align: center;
-            padding: 2rem 1rem;
-            color: var(--text-secondary);
+        /* Typing */
+        .typing {
+            display: none;
+            align-self: flex-start;
+            padding: 1rem;
+            background: #27272a;
+            border-radius: 14px;
+            margin-left: 42px;
+            gap: 5px;
         }
         
-        .welcome-message h2 {
-            color: var(--text-primary);
-            margin-bottom: 0.5rem;
-            font-size: 1.1rem;
-        }
-        
-        .welcome-message p {
-            font-size: 0.85rem;
-            margin-bottom: 1rem;
-        }
-        
-        .welcome-features {
+        .typing.show {
             display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            justify-content: center;
-            margin-top: 1rem;
         }
         
-        .welcome-feature {
-            padding: 0.5rem 1rem;
-            background: var(--bg-input);
-            border-radius: 20px;
-            font-size: 0.8rem;
+        .typing span {
+            width: 6px;
+            height: 6px;
+            background: #71717a;
+            border-radius: 50%;
+            animation: pulse 1.4s infinite;
+        }
+        
+        .typing span:nth-child(2) { animation-delay: 0.15s; }
+        .typing span:nth-child(3) { animation-delay: 0.3s; }
+        
+        @keyframes pulse {
+            0%, 60%, 100% { transform: scale(1); opacity: 0.4; }
+            30% { transform: scale(1.2); opacity: 1; }
+        }
+        
+        /* Input */
+        .input-section {
+            padding: 1rem 1.5rem 1.25rem;
+            border-top: 1px solid #27272a;
+        }
+        
+        .input-wrap {
+            display: flex;
+            gap: 0.75rem;
+            background: #27272a;
+            border: 1px solid #3f3f46;
+            border-radius: 14px;
+            padding: 0.5rem;
+            transition: all 0.2s;
+        }
+        
+        .input-wrap:focus-within {
+            border-color: #3b82f6;
+        }
+        
+        #input {
+            flex: 1;
+            padding: 0.625rem 0.875rem;
+            background: none;
+            border: none;
+            font-family: inherit;
+            font-size: 0.9rem;
+            color: #fafafa;
+        }
+
+        .pa{
+            color: #e3e3e8;
+        }
+        
+        #input:focus {
+            outline: none;
+        }
+        
+        #input::placeholder {
+            color: #52525b;
+        }
+        
+        #sendBtn {
+            padding: 0.625rem 1.25rem;
+            background: #3b82f6;
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            font-family: inherit;
+            font-size: 0.875rem;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.2s;
         }
         
-        .welcome-feature:hover {
-            background: var(--primary);
-            color: white;
+        #sendBtn:hover {
+            background: #2563eb;
         }
         
-        /* Footer */
-        footer {
+        .input-hint {
             text-align: center;
-            padding: 0.75rem;
-            color: var(--text-secondary);
-            font-size: 0.75rem;
+            font-size: 0.7rem;
+            color: #e3e3e8;
+            margin-top: 0.625rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 900px) {
+            .sidebar { display: none; }
+            .app { padding: 0.5rem; }
+        }
+        
+        @media (max-width: 600px) {
+            .starters { grid-template-columns: 1fr; }
+            .msg { max-width: 90%; }
+            .header { padding: 0.875rem 1rem; }
+            .messages { padding: 1rem; }
+            .input-section { padding: 0.875rem 1rem 1rem; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="logo">🧠</div>
-            <h1>FAQ Chatbot with Embeddings</h1>
-            <p class="subtitle">Semantic search powered by AI embeddings</p>
-            <span class="tech-badge">🤗 Sentence Transformers • all-MiniLM-L6-v2</span>
-        </header>
-        
-        <div class="main-layout">
-            <!-- Chat Container -->
-            <div class="chat-container">
-                <div class="messages" id="messages">
-                    <div class="welcome-message" id="welcomeMessage">
-                        <h2>👋 Welcome to the FAQ Chatbot!</h2>
-                        <p>I use AI embeddings to understand your questions semantically.<br>
-                        Ask me anything about AI, programming, or this chatbot!</p>
-                        <div class="welcome-features">
-                            <span class="welcome-feature" onclick="sendQuestion('What is artificial intelligence?')">🤖 What is AI?</span>
-                            <span class="welcome-feature" onclick="sendQuestion('How does this chatbot work?')">⚙️ How it works</span>
-                            <span class="welcome-feature" onclick="sendQuestion('What are embeddings?')">📊 Embeddings</span>
-                            <span class="welcome-feature" onclick="sendQuestion('Tell me a joke about AI')">😄 Tell a joke</span>
-                        </div>
+    <div class="app">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="card brand">
+                <div class="brand-logo">
+                    <div class="brand-icon">🧠</div>
+                    <div class="brand-text">
+                        <h1>FAQ Chatbot</h1>
+                        <span class="pa">Semantic Embeddings</span>
                     </div>
-                </div>
-                
-                <div class="typing-indicator" id="typingIndicator">
-                    <div class="typing-dot"></div>
-                    <div class="typing-dot"></div>
-                    <div class="typing-dot"></div>
-                </div>
-                
-                <div class="input-area">
-                    <input type="text" id="messageInput" placeholder="Ask me a question..." autocomplete="off">
-                    <button id="sendBtn" onclick="sendMessage()">Send ➤</button>
                 </div>
             </div>
             
-            <!-- Sidebar -->
-            <div class="sidebar">
-                <!-- Stats -->
-                <div class="sidebar-card">
-                    <div class="sidebar-title">📊 Knowledge Base</div>
-                    <div class="stats-grid">
-                        <div class="stat-item">
-                            <div class="stat-value" id="faqCount">--</div>
-                            <div class="stat-label">FAQs</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value" id="categoryCount">--</div>
-                            <div class="stat-label">Categories</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value">384</div>
-                            <div class="stat-label">Dimensions</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value">50%</div>
-                            <div class="stat-label">Threshold</div>
-                        </div>
+            <!-- <div class="card">
+                <div class="stats">
+                    <div class="stat">
+                        <div class="stat-num" id="faqCount">--</div>
+                        <div class="stat-label">FAQs</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-num" id="catCount">--</div>
+                        <div class="stat-label">Categories</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-num">384</div>
+                        <div class="stat-label">Dimensions</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-num">50%</div>
+                        <div class="stat-label">Threshold</div>
                     </div>
                 </div>
-                
-                <!-- Categories -->
-                <div class="sidebar-card">
-                    <div class="sidebar-title">📁 Categories</div>
-                    <div class="category-list" id="categoryList">
-                        <!-- Loaded dynamically -->
-                    </div>
+            </div> -->
+            
+            <div class="card questions-card">
+                <div class="card-header">Try asking</div>
+                <div class="questions-list">
+                    <div class="question-item" onclick="ask('What is machine learning?')">What is machine learning?</div>
+                    <div class="question-item" onclick="ask('How do I learn Python?')">How do I learn Python?</div>
+                    <div class="question-item" onclick="ask('What is the difference between AI and ML?')">AI vs ML difference</div>
+                    <div class="question-item" onclick="ask('What is NLP?')">What is NLP?</div>
+                    <div class="question-item" onclick="ask('How to start a career in AI?')">Career in AI</div>
+                    <div class="question-item" onclick="ask('What is deep learning?')">What is deep learning?</div>
                 </div>
-                
-                <!-- Quick Questions -->
-                <div class="sidebar-card">
-                    <div class="sidebar-title">💡 Try These</div>
-                    <div class="quick-questions">
-                        <div class="quick-question" onclick="sendQuestion('What is machine learning?')">What is machine learning?</div>
-                        <div class="quick-question" onclick="sendQuestion('How do I learn Python?')">How do I learn Python?</div>
-                        <div class="quick-question" onclick="sendQuestion('Difference between AI and ML')">AI vs ML difference</div>
-                        <div class="quick-question" onclick="sendQuestion('What is NLP?')">What is NLP?</div>
-                        <div class="quick-question" onclick="sendQuestion('Career in AI')">Career in AI</div>
-                        <div class="quick-question" onclick="sendQuestion('Fun fact about computers')">Fun fact</div>
+                <div class="tags-section">
+                    <div class="tags" id="tags"></div>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- Main -->
+        <main class="main">
+            
+            <div class="messages" id="messages">
+                <div class="welcome" id="welcome">
+                    <div class="welcome-emoji">💬</div>
+                    <h2>How can I help?</h2>
+                    <p>I understand meaning, not just keywords. Ask about AI, programming, or tech.</p>
+                    <div class="starters">
+                        <div class="starter" onclick="ask('What is artificial intelligence?')">
+                            <div class="starter-icon">🤖</div>
+                            <h4>What is AI?</h4>
+                            <p>Learn the basics</p>
+                        </div>
+                        <div class="starter" onclick="ask('How does this chatbot work?')">
+                            <div class="starter-icon">⚙️</div>
+                            <h4>How it works</h4>
+                            <p>Embeddings explained</p>
+                        </div>
+                        <div class="starter" onclick="ask('Best language to learn programming')">
+                            <div class="starter-icon">💻</div>
+                            <h4>Start coding</h4>
+                            <p>Programming tips</p>
+                        </div>
+                        <div class="starter" onclick="ask('Tell me something fun')">
+                            <div class="starter-icon">✨</div>
+                            <h4>Fun facts</h4>
+                            <p>AI trivia</p>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        
-        <footer>
-            Day 47 of 100 Days of AI • FAQ Chatbot with Semantic Embeddings
-        </footer>
+            
+            <div class="typing" id="typing">
+                <span></span><span></span><span></span>
+            </div>
+            
+            <div class="input-section">
+                <div class="input-wrap">
+                    <input type="text" id="input" placeholder="Ask a question..." autocomplete="off">
+                    <button id="sendBtn" onclick="send()">Send</button>
+                </div>
+                <div class="input-hint">Press Enter to send • Day 47 of 100 Days of AI</div>
+            </div>
+        </main>
     </div>
     
     <script>
-        const messagesContainer = document.getElementById('messages');
-        const messageInput = document.getElementById('messageInput');
-        const typingIndicator = document.getElementById('typingIndicator');
-        const welcomeMessage = document.getElementById('welcomeMessage');
+        const msgs = document.getElementById('messages');
+        const input = document.getElementById('input');
+        const typing = document.getElementById('typing');
+        const welcome = document.getElementById('welcome');
+        let started = false;
         
-        let conversationStarted = false;
+        document.addEventListener('DOMContentLoaded', () => { loadStats(); input.focus(); });
+        input.addEventListener('keypress', e => { if (e.key === 'Enter') send(); });
         
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            loadStats();
-            messageInput.focus();
-        });
+        function ask(t) { input.value = t; send(); }
         
-        messageInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') sendMessage();
-        });
-        
-        function sendQuestion(text) {
-            messageInput.value = text;
-            sendMessage();
+        function clear() {
+            started = false;
+            msgs.innerHTML = '';
+            msgs.appendChild(welcome);
+            welcome.style.display = 'flex';
         }
         
         async function loadStats() {
             try {
-                const response = await fetch('/stats');
-                const data = await response.json();
-                
-                if (data.success) {
-                    document.getElementById('faqCount').textContent = data.stats.total_faqs;
-                    document.getElementById('categoryCount').textContent = Object.keys(data.stats.categories).length;
-                    
-                    // Load categories
-                    const categoryList = document.getElementById('categoryList');
-                    categoryList.innerHTML = Object.entries(data.stats.categories)
-                        .map(([cat, count]) => `<span class="category-tag" onclick="filterCategory('${cat}')">${cat} (${count})</span>`)
-                        .join('');
+                const r = await fetch('/stats');
+                const d = await r.json();
+                if (d.success) {
+                    document.getElementById('faqCount').textContent = d.stats.total_faqs;
+                    document.getElementById('catCount').textContent = Object.keys(d.stats.categories).length;
+                    document.getElementById('tags').innerHTML = Object.keys(d.stats.categories)
+                        .map(c => `<span class="tag" onclick="ask('Tell me about ${c}')">${c}</span>`).join('');
                 }
-            } catch (error) {
-                console.error('Failed to load stats:', error);
-            }
+            } catch(e) {}
         }
         
-        function filterCategory(category) {
-            messageInput.value = `Tell me about ${category}`;
-            messageInput.focus();
-        }
-        
-        async function sendMessage() {
-            const message = messageInput.value.trim();
-            if (!message) return;
-            
-            if (!conversationStarted) {
-                welcomeMessage.style.display = 'none';
-                conversationStarted = true;
-            }
-            
-            messageInput.value = '';
-            addMessage(message, 'user');
-            
-            typingIndicator.classList.add('show');
-            scrollToBottom();
+        async function send() {
+            const t = input.value.trim();
+            if (!t) return;
+            if (!started) { welcome.style.display = 'none'; started = true; }
+            input.value = '';
+            addMsg(t, 'user');
+            typing.classList.add('show');
+            scroll();
             
             try {
-                const response = await fetch('/chat', {
+                const r = await fetch('/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: message })
+                    body: JSON.stringify({ message: t })
                 });
-                
-                const data = await response.json();
-                
-                await new Promise(resolve => setTimeout(resolve, 400 + Math.random() * 400));
-                typingIndicator.classList.remove('show');
-                
-                if (data.success) {
-                    addBotMessage(data);
-                } else {
-                    addMessage('Sorry, something went wrong. Please try again!', 'bot');
-                }
-            } catch (error) {
-                typingIndicator.classList.remove('show');
-                addMessage('Connection error. Please try again.', 'bot');
+                const d = await r.json();
+                await new Promise(r => setTimeout(r, 350));
+                typing.classList.remove('show');
+                d.success ? addBotMsg(d) : addMsg('Something went wrong.', 'bot');
+            } catch(e) {
+                typing.classList.remove('show');
+                addMsg('Connection error.', 'bot');
             }
         }
         
-        function addMessage(text, type) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${type}`;
+        function addMsg(t, type) {
+            const el = document.createElement('div');
+            el.className = `msg ${type}`;
+            el.innerHTML = `
+                <div class="msg-avatar">${type === 'user' ? '👤' : '🧠'}</div>
+                <div class="msg-content"><div class="msg-bubble">${t}</div></div>
+            `;
+            msgs.appendChild(el);
+            scroll();
+        }
+        
+        function addBotMsg(d) {
+            const el = document.createElement('div');
+            el.className = 'msg bot';
             
-            const avatar = type === 'user' ? '👤' : '🧠';
+            let bc = 'badge-low', bt = 'Low';
+            if (d.confidence >= 0.7) { bc = 'badge-high'; bt = 'High'; }
+            else if (d.confidence >= 0.5) { bc = 'badge-medium'; bt = 'Medium'; }
             
-            messageDiv.innerHTML = `
-                <div class="avatar">${avatar}</div>
-                <div class="message-content">${text}</div>
+            let h = `
+                <div class="msg-avatar">🧠</div>
+                <div class="msg-content">
+                    <div class="msg-bubble">${d.answer}</div>
+                    <div class="msg-meta">
+                        <span class="badge ${bc}">${bt} ${(d.confidence*100).toFixed(0)}%</span>
+                        ${d.category ? `<span class="badge badge-cat">${d.category}</span>` : ''}
+                    </div>
             `;
             
-            messagesContainer.appendChild(messageDiv);
-            scrollToBottom();
+            if (d.matched_question) h += `<div class="msg-matched">Matched: ${d.matched_question}</div>`;
+            if (d.suggestions?.length) h += `<div class="msg-related">${d.suggestions.map(s => 
+                `<span class="related-btn" onclick="ask('${s.replace(/'/g,"\\'")}')">${s}</span>`).join('')}</div>`;
+            
+            h += '</div>';
+            el.innerHTML = h;
+            msgs.appendChild(el);
+            scroll();
         }
         
-        function addBotMessage(data) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'message bot';
-            
-            // Determine confidence level
-            let confidenceClass = 'low';
-            let confidenceText = 'Low confidence';
-            if (data.confidence >= 0.7) {
-                confidenceClass = 'high';
-                confidenceText = 'High confidence';
-            } else if (data.confidence >= 0.5) {
-                confidenceClass = 'medium';
-                confidenceText = 'Medium confidence';
-            }
-            
-            let html = `
-                <div class="avatar">🧠</div>
-                <div>
-                    <div class="message-content">
-                        ${data.answer}
-                        <div class="confidence-badge ${confidenceClass}">
-                            ${confidenceText}: ${(data.confidence * 100).toFixed(1)}%
-                        </div>
-            `;
-            
-            // Add matched question if available
-            if (data.matched_question) {
-                html += `
-                    <div class="matched-question">
-                        <strong>Matched:</strong> ${data.matched_question}
-                        ${data.category ? `<br><strong>Category:</strong> ${data.category}` : ''}
-                    </div>
-                `;
-            }
-            
-            // Add suggestions if available
-            if (data.suggestions && data.suggestions.length > 0) {
-                html += `
-                    <div class="suggestions">
-                        <div class="suggestions-title">Related questions:</div>
-                        ${data.suggestions.map(s => `<span class="suggestion-chip" onclick="sendQuestion('${s.replace(/'/g, "\\'")}')">${s}</span>`).join('')}
-                    </div>
-                `;
-            }
-            
-            html += `</div></div>`;
-            
-            messageDiv.innerHTML = html;
-            messagesContainer.appendChild(messageDiv);
-            scrollToBottom();
-        }
-        
-        function scrollToBottom() {
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
+        function scroll() { msgs.scrollTop = msgs.scrollHeight; }
     </script>
 </body>
 </html>

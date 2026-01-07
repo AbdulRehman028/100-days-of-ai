@@ -227,5 +227,3 @@ chatbot = ConversationalChatbot("microsoft/DialoGPT-large")
 This project is part of the 100 Days of AI challenge.
 
 ---
-
-**Day 48 of 100** - Building AI, one day at a time! 🚀

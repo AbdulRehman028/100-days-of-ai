@@ -18,9 +18,7 @@ from datetime import datetime
 app = Flask(__name__)
 app.secret_key = 'day48-chatbot-llm-rnn-secret-key'
 
-# ============================================
 # Chatbot Engine using DialoGPT
-# ============================================
 
 class ConversationalChatbot:
     """
@@ -177,9 +175,7 @@ class ConversationalChatbot:
 # Initialize chatbot
 chatbot = ConversationalChatbot(model_name="microsoft/DialoGPT-medium")
 
-# ============================================
 # Flask Routes
-# ============================================
 
 @app.route('/')
 def index():
@@ -248,9 +244,7 @@ def stats():
         'stats': chatbot.get_stats()
     })
 
-# ============================================
 # Main Entry Point
-# ============================================
 
 if __name__ == '__main__':
     print("=" * 50)

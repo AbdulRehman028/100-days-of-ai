@@ -69,6 +69,49 @@ class ConversationalChatbot:
             }
         return self.conversations[session_id]
     
+    def check_intent(self, user_input):
+        """
+        Check for common intents that need predefined responses.
+        DialoGPT doesn't know about itself, so we handle these specially.
+        """
+        text = user_input.lower().strip()
+        
+        # Greeting patterns
+        greetings = ['hello', 'hi', 'hey', 'greetings', 'good morning', 'good afternoon', 'good evening']
+        if any(text.startswith(g) or text == g for g in greetings):
+            return "greeting"
+        
+        # Capability questions
+        capability_keywords = ['what can you do', 'what do you do', 'your capabilities', 
+                              'help me with', 'what are you', 'who are you', 
+                              'your purpose', 'your function', 'how can you help']
+        if any(kw in text for kw in capability_keywords):
+            return "capabilities"
+        
+        # Name questions
+        name_keywords = ['your name', 'who are you', 'what are you called']
+        if any(kw in text for kw in name_keywords):
+            return "name"
+        
+        # How are you
+        if 'how are you' in text or "how're you" in text:
+            return "how_are_you"
+        
+        return None
+    
+    def get_intent_response(self, intent):
+        """Get predefined response for detected intent."""
+        responses = {
+            'greeting': "Hello! 👋 I'm an AI chatbot powered by DialoGPT. I can have conversations on various topics, answer questions, discuss ideas, or just chat! Feel free to ask me anything.",
+            
+            'capabilities': "I'm a conversational AI that can:\n\n• 💬 Have natural conversations on any topic\n• 🤔 Answer questions and share knowledge\n• 💡 Discuss ideas and brainstorm\n• 📖 Tell stories and be creative\n• 🎭 Engage in roleplay scenarios\n\nI'm powered by DialoGPT, trained on millions of conversations. What would you like to talk about?",
+            
+            'name': "I'm DialoGPT Chatbot! 🤖 I'm powered by Microsoft's DialoGPT model, which is trained on 147 million Reddit conversations. I'm here to chat with you about anything!",
+            
+            'how_are_you': "I'm doing great, thank you for asking! 😊 As an AI, I'm always ready and eager to chat. How can I help you today?"
+        }
+        return responses.get(intent, None)
+    
     def generate_response(self, user_input, session_id):
         """
         Generate a response using DialoGPT.
@@ -80,6 +123,23 @@ class ConversationalChatbot:
             return "Model not loaded. Please wait...", 0
         
         conv = self.get_or_create_session(session_id)
+        
+        # Check for common intents first
+        intent = self.check_intent(user_input)
+        if intent:
+            response = self.get_intent_response(intent)
+            # Store in history
+            conv['messages'].append({
+                'role': 'user',
+                'content': user_input,
+                'timestamp': datetime.now().isoformat()
+            })
+            conv['messages'].append({
+                'role': 'assistant',
+                'content': response,
+                'timestamp': datetime.now().isoformat()
+            })
+            return response, 0.95
         
         # Encode the user input
         new_input_ids = self.tokenizer.encode(

@@ -1,23 +1,14 @@
-"""
-Day 49: LangChain Q&A Chatbot
-=============================
-A Q&A chatbot built with LangChain using HuggingFace InferenceClient.
-Uses Hugging Face's Inference API for powerful language understanding.
-
-LangChain Components:
-- Custom LLM wrapper with HF InferenceClient
-- PromptTemplate: Structured prompts for chat
-- LCEL: Chain for connecting components
-"""
-
 from flask import Flask, render_template, request, jsonify, session
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
-from langchain_core.language_models.llms import LLM
+from langchain_core.language_models.chat_models import BaseChatModel
+from langchain_core.messages import BaseMessage, AIMessage, HumanMessage
+from langchain_core.outputs import ChatResult, ChatGeneration
 from huggingface_hub import InferenceClient
 from datetime import datetime
 from dotenv import load_dotenv
 from typing import Any, List, Optional
+from pydantic import Field
 import uuid
 import os
 
@@ -27,51 +18,77 @@ load_dotenv()
 app = Flask(__name__)
 app.secret_key = 'day49-langchain-qa-chatbot-secret-key'
 
-# ============================================
-# Custom LangChain LLM with HuggingFace
-# ============================================
+# Custom LangChain ChatModel with HuggingFace
 
-class HuggingFaceLLM(LLM):
-    """Custom LangChain LLM wrapper for HuggingFace InferenceClient."""
+class HuggingFaceChatModel(BaseChatModel):
+    """Custom LangChain ChatModel wrapper for HuggingFace InferenceClient."""
     
-    client: Any = None
-    model_name: str = "HuggingFaceH4/zephyr-7b-beta"
+    client: Any = Field(default=None, exclude=True)
+    model_name: str = Field(default="HuggingFaceH4/zephyr-7b-beta")
     
-    def __init__(self, token: str, model_name: str = "HuggingFaceH4/zephyr-7b-beta"):
-        super().__init__()
-        self.model_name = model_name
-        self.client = InferenceClient(model=model_name, token=token)
+    def __init__(self, token: str, model_name: str = "HuggingFaceH4/zephyr-7b-beta", **kwargs):
+        super().__init__(**kwargs)
+        object.__setattr__(self, 'model_name', model_name)
+        object.__setattr__(self, 'client', InferenceClient(model=model_name, token=token))
     
     @property
     def _llm_type(self) -> str:
-        return "huggingface_inference"
+        return "huggingface_chat"
     
-    def _call(self, prompt: str, stop: Optional[List[str]] = None, **kwargs) -> str:
-        """Call the HuggingFace Inference API using chat completion."""
-        messages = [{"role": "user", "content": prompt}]
+    def _generate(
+        self,
+        messages: List[BaseMessage],
+        stop: Optional[List[str]] = None,
+        **kwargs
+    ) -> ChatResult:
+        """Generate a chat response using HuggingFace Inference API."""
+        # Convert LangChain messages to HF format
+        hf_messages = []
+        for msg in messages:
+            if isinstance(msg, HumanMessage):
+                hf_messages.append({"role": "user", "content": msg.content})
+            elif isinstance(msg, AIMessage):
+                hf_messages.append({"role": "assistant", "content": msg.content})
+            else:
+                # System or other messages
+                hf_messages.append({"role": "user", "content": msg.content})
+        
+        # Call HuggingFace API
         response = self.client.chat_completion(
-            messages=messages,
+            messages=hf_messages,
             max_tokens=512,
             temperature=0.7,
+            stop=["Question:", "Human:", "\n\nQuestion", "\n\nHuman"],
         )
-        return response.choices[0].message.content
+        
+        content = response.choices[0].message.content
+        
+        # Clean up response - remove any continuation patterns
+        stop_patterns = ["Question:", "Human:", "\n\nQ:", "Answer:"]
+        for pattern in stop_patterns:
+            if pattern in content:
+                content = content.split(pattern)[0]
+        
+        content = content.strip()
+        
+        return ChatResult(
+            generations=[ChatGeneration(message=AIMessage(content=content))]
+        )
 
-# ============================================
 # LangChain Q&A Chatbot Engine
-# ============================================
 
 class LangChainQAChatbot:
     """
-    Q&A Chatbot using LangChain with HuggingFaceHub.
+    Q&A Chatbot using LangChain with HuggingFace ChatModel.
     
     Architecture:
-    User Input → PromptTemplate → HuggingFaceHub LLM → StrOutputParser → Response
+    User Input → PromptTemplate → HuggingFace ChatModel → StrOutputParser → Response
     
     Uses LCEL (LangChain Expression Language) for clean chain composition.
     """
     
     def __init__(self):
-        self.llm = None
+        self.chat_model = None
         self.chain = None
         self.conversations = {}
         self.model_name = "HuggingFaceH4/zephyr-7b-beta"
@@ -83,7 +100,7 @@ class LangChainQAChatbot:
         
         Chain Architecture:
         1. PromptTemplate - Formats the question with context
-        2. HuggingFaceHub - The LLM via HF Inference API
+        2. HuggingFaceChatModel - The ChatModel via HF Inference API
         3. StrOutputParser - Extracts string response
         """
         try:
@@ -98,8 +115,8 @@ class LangChainQAChatbot:
             
             print(f"🔗 Initializing LangChain with model: {self.model_name}")
             
-            # Step 1: Create custom LLM with HuggingFace InferenceClient
-            self.llm = HuggingFaceLLM(token=token, model_name=self.model_name)
+            # Step 1: Create custom ChatModel with HuggingFace InferenceClient
+            self.chat_model = HuggingFaceChatModel(token=token, model_name=self.model_name)
             
             # Step 2: Create the prompt template
             self.prompt = PromptTemplate(
@@ -115,8 +132,8 @@ Answer:""",
             )
             
             # Step 3: Build the chain using LCEL (LangChain Expression Language)
-            # prompt | llm | parser
-            self.chain = self.prompt | self.llm | StrOutputParser()
+            # prompt | chat_model | parser
+            self.chain = self.prompt | self.chat_model | StrOutputParser()
             
             # Test the chain
             print("🧪 Testing chain...")
@@ -238,7 +255,7 @@ Answer:""",
         return {
             'model': self.model_name,
             'framework': 'LangChain',
-            'model_type': 'Text2Text (Flan-T5)',
+            'model_type': 'ChatModel (Zephyr-7B)',
             'active_sessions': len(self.conversations),
             'total_messages': sum(
                 len(conv['messages']) 
@@ -255,9 +272,7 @@ if os.getenv("HUGGINGFACEHUB_API_TOKEN"):
     print("🔑 Found token in .env, auto-initializing...")
     chatbot.initialize()
 
-# ============================================
 # Flask Routes
-# ============================================
 
 @app.route('/')
 def index():

@@ -1,19 +1,25 @@
 # Day 49: LangChain Q&A Chatbot 🔗
 
-A powerful Q&A chatbot built with LangChain using ChatModel architecture and Hugging Face's Mistral-7B-Instruct!
+A powerful Q&A chatbot built with LangChain and Hugging Face's Zephyr-7B-Beta featuring a ChatGPT-style interface!
 
 ![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
 ![LangChain](https://img.shields.io/badge/🦜🔗-LangChain-green.svg)
 ![Hugging Face](https://img.shields.io/badge/🤗-Hugging%20Face-yellow.svg)
+![Zephyr](https://img.shields.io/badge/🌀-Zephyr--7B-purple.svg)
+
+![alt text](image.png)
+
+![alt text](image-1.png)
 
 ## 🎯 What This Project Does
 
-This project implements a **Q&A chatbot** using LangChain's ChatModel interface:
+This project implements a **Q&A chatbot** using LangChain with a custom LLM wrapper:
 
 - **LangChain**: Framework for building LLM applications
-- **ChatModel**: Proper chat interface with system/human/AI messages
-- **Mistral-7B-Instruct**: Powerful instruction-tuned LLM
+- **Custom LLM Wrapper**: HuggingFace InferenceClient integration
+- **Zephyr-7B-Beta**: Powerful instruction-tuned chat model
 - **LCEL**: LangChain Expression Language for clean chains
+- **ChatGPT-style UI**: Modern dark theme interface
 
 ## 🔗 LangChain Chain Architecture
 
@@ -22,12 +28,13 @@ User Input
     │
     ▼
 ┌─────────────────────────┐
-│   ChatPromptTemplate    │  ← System prompt + History + User message
+│     PromptTemplate      │  ← System prompt + Conversation history
 └─────────────────────────┘
     │
     ▼
 ┌─────────────────────────┐
-│    ChatHuggingFace      │  ← Mistral-7B-Instruct via API
+│   HuggingFaceLLM        │  ← Custom wrapper using InferenceClient
+│   (chat_completion)     │  ← Zephyr-7B-Beta model
 └─────────────────────────┘
     │
     ▼
@@ -42,11 +49,11 @@ Response
 ## 🚀 Features
 
 - 🔗 **LangChain Integration** - Modern LCEL chain composition
-- 💬 **ChatModel Interface** - Proper chat message handling
-- 🧠 **Mistral-7B-Instruct** - Powerful instruction-following LLM
+- 🌀 **Zephyr-7B-Beta** - High-quality instruction-tuned responses
+- 💬 **ChatGPT-style UI** - Dark theme, suggestion cards, typing indicator
 - 📜 **Conversation Memory** - Maintains context across messages
-- 🎨 **Modern Dark UI** - Beautiful, responsive chat interface
-- 🔑 **Token-based Auth** - Secure HuggingFace API integration
+- 🎨 **Responsive Design** - Works on desktop and mobile
+- 🔑 **Auto-initialization** - Token loaded from .env file
 
 ## 📦 Installation
 
@@ -87,18 +94,18 @@ Response
    http://localhost:5000
    ```
 
-## 🔑 Getting Your HuggingFace Token
+## 🔑 Setting Up Your HuggingFace Token
 
 1. Go to [huggingface.co/settings/tokens](https://huggingface.co/settings/tokens)
 2. Click "New token"
 3. Give it a name and select "Read" access
 4. Copy the token
-5. Paste it in the web interface
+5. Create a `.env` file in the project root:
+   ```
+   HUGGINGFACEHUB_API_TOKEN=your_token_here
+   ```
 
-**Or set as environment variable:**
-```bash
-export HF_TOKEN=your_token_here
-```
+The app auto-loads the token on startup - no manual initialization needed!
 
 ## 🏗️ Project Structure
 
@@ -108,32 +115,38 @@ Day-49-LangChain-QA-Chatbot/
 ├── requirements.txt      # Python dependencies
 ├── README.md            # Documentation
 ├── .gitignore           # Git ignore file
+├── .env                 # HuggingFace API token (create this)
 └── templates/
-    └── index.html       # Modern chat UI
+    └── index.html       # ChatGPT-style dark UI
 ```
 
 ## 🧠 Key LangChain Concepts
 
-### 1. ChatPromptTemplate
+### 1. Custom LLM Wrapper
 ```python
-prompt = ChatPromptTemplate.from_messages([
-    ("system", "You are a helpful assistant..."),
-    MessagesPlaceholder(variable_name="history"),
-    ("human", "{input}")
-])
+class HuggingFaceLLM(LLM):
+    def _call(self, prompt: str, **kwargs) -> str:
+        response = self.client.chat_completion(
+            messages=[{"role": "user", "content": prompt}],
+            model=self.model_name,
+            max_tokens=512
+        )
+        return response.choices[0].message.content
 ```
 
-### 2. ChatHuggingFace (ChatModel)
+### 2. PromptTemplate with History
 ```python
-chat_model = ChatHuggingFace(
-    llm=HuggingFaceEndpoint(...),
-    verbose=True
+prompt = PromptTemplate(
+    input_variables=["history", "input"],
+    template="""You are a helpful AI assistant...\n
+    Conversation history:\n{history}\n
+    Human: {input}\nAssistant:"""
 )
 ```
 
 ### 3. LCEL Chain Composition
 ```python
-chain = prompt | chat_model | StrOutputParser()
+chain = prompt | llm | StrOutputParser()
 response = chain.invoke({"input": question, "history": history})
 ```
 
@@ -141,8 +154,7 @@ response = chain.invoke({"input": question, "history": history})
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/` | GET | Chat interface |
-| `/initialize` | POST | Initialize with HF token |
+| `/` | GET | ChatGPT-style chat interface |
 | `/ask` | POST | Send question, get answer |
 | `/clear` | POST | Clear conversation history |
 | `/history` | GET | Get conversation history |
@@ -190,33 +202,46 @@ By building this project, you'll learn:
 
 ### Change the Model
 ```python
-self.model_name = "meta-llama/Llama-2-7b-chat-hf"
+# In HuggingFaceLLM class
+model_name: str = "mistralai/Mistral-7B-Instruct-v0.2"
 # or
-self.model_name = "google/flan-t5-xxl"
+model_name: str = "meta-llama/Llama-2-7b-chat-hf"
 ```
 
 ### Adjust Generation Parameters
 ```python
-self.llm = HuggingFaceEndpoint(
-    max_new_tokens=1024,    # Longer responses
-    temperature=0.9,        # More creative
-    top_p=0.85,            # Nucleus sampling
+response = self.client.chat_completion(
+    messages=messages,
+    model=self.model_name,
+    max_tokens=1024,      # Longer responses
+    temperature=0.9,      # More creative
 )
 ```
 
 ### Custom System Prompt
 ```python
-self.prompt = ChatPromptTemplate.from_messages([
-    ("system", "You are a Python expert. Only answer coding questions."),
-    ...
-])
+self.prompt = PromptTemplate(
+    template="""You are a Python expert. Only answer coding questions.
+    {history}
+    Human: {input}
+    Assistant:"""
+)
 ```
+
+## 🎨 UI Features
+
+- **Dark Theme** - ChatGPT-inspired colors (#343541, #202123)
+- **Welcome Screen** - Suggestion cards for quick start
+- **Typing Indicator** - Bouncing dots while waiting
+- **Responsive** - Sidebar hides on mobile
+- **Auto-resize Input** - Textarea grows with content
+- **Toast Notifications** - Error feedback
 
 ## 📚 Resources
 
 - [LangChain Docs](https://python.langchain.com/docs/)
 - [Hugging Face Hub](https://huggingface.co/docs/hub/)
-- [Mistral AI](https://mistral.ai/)
+- [Zephyr-7B Model](https://huggingface.co/HuggingFaceH4/zephyr-7b-beta)
 - [LCEL Guide](https://python.langchain.com/docs/expression_language/)
 
 ## 📝 License

@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LangChain Q&A Chatbot | Day 49</title>
+    <title>LangChain Q&A Chatbot</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -14,180 +14,88 @@
         }
 
         :root {
-            --bg-primary: #0a0a0f;
-            --bg-secondary: #12121a;
-            --bg-tertiary: #1a1a25;
-            --bg-card: #16161f;
-            --text-primary: #f8f9fa;
-            --text-secondary: #a0a3b1;
-            --text-muted: #6b6f7e;
-            --accent: #6366f1;
-            --accent-hover: #818cf8;
-            --accent-glow: rgba(99, 102, 241, 0.15);
-            --success: #10b981;
-            --error: #ef4444;
-            --warning: #f59e0b;
-            --border: #2a2a3a;
-            --user-bg: #6366f1;
-            --bot-bg: #1e1e2d;
+            --bg-main: #343541;
+            --bg-sidebar: #202123;
+            --bg-chat: #343541;
+            --bg-user: #343541;
+            --bg-bot: #444654;
+            --bg-input: #40414f;
+            --text-primary: #ececf1;
+            --text-secondary: #c5c5d2;
+            --text-muted: #8e8ea0;
+            --border: #4d4d4f;
+            --accent: #10a37f;
+            --accent-hover: #1a7f64;
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg-primary);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-main);
             color: var(--text-primary);
-            min-height: 100vh;
-            line-height: 1.6;
+            height: 100vh;
+            overflow: hidden;
         }
 
-        /* Layout */
         .app-container {
-            display: grid;
-            grid-template-columns: 300px 1fr;
-            min-height: 100vh;
-            max-width: 1600px;
-            margin: 0 auto;
-        }
-
-        @media (max-width: 900px) {
-            .app-container {
-                grid-template-columns: 1fr;
-            }
-            .sidebar {
-                display: none;
-            }
-            .sidebar.mobile-open {
-                display: block;
-                position: fixed;
-                left: 0;
-                top: 0;
-                bottom: 0;
-                z-index: 100;
-                width: 300px;
-            }
+            display: flex;
+            height: 100vh;
         }
 
         /* Sidebar */
         .sidebar {
-            background: var(--bg-secondary);
-            border-right: 1px solid var(--border);
-            padding: 24px;
+            width: 260px;
+            background: var(--bg-sidebar);
             display: flex;
             flex-direction: column;
-            gap: 24px;
+            padding: 8px;
         }
 
-        .logo {
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+        }
+
+        .new-chat-btn {
             display: flex;
             align-items: center;
             gap: 12px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .logo-icon {
-            width: 44px;
-            height: 44px;
-            background: var(--accent);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-        }
-
-        .logo-text h1 {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .logo-text span {
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-
-        /* Token Setup */
-        .setup-section {
-            background: var(--bg-card);
-            border-radius: 12px;
-            padding: 16px;
-            border: 1px solid var(--border);
-        }
-
-        .setup-section h3 {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-secondary);
-            margin-bottom: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .token-input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .token-input {
-            width: 100%;
-            padding: 10px 12px;
-            background: var(--bg-tertiary);
+            padding: 12px;
             border: 1px solid var(--border);
             border-radius: 8px;
+            background: transparent;
             color: var(--text-primary);
-            font-size: 13px;
-            font-family: 'Courier New', monospace;
-        }
-
-        .token-input:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px var(--accent-glow);
-        }
-
-        .token-btn {
-            width: 100%;
-            padding: 10px;
-            background: var(--accent);
-            border: none;
-            border-radius: 8px;
-            color: white;
-            font-size: 13px;
-            font-weight: 500;
+            font-size: 14px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: background 0.2s;
         }
 
-        .token-btn:hover {
-            background: var(--accent-hover);
+        .new-chat-btn:hover {
+            background: rgba(255,255,255,0.1);
         }
 
-        .token-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
+        .sidebar-info {
+            margin-top: auto;
+            padding: 12px;
+            border-top: 1px solid var(--border);
         }
 
-        .status-badge {
+        .model-badge {
             display: flex;
             align-items: center;
             gap: 8px;
-            padding: 8px 12px;
-            background: var(--bg-tertiary);
+            padding: 10px 12px;
+            background: rgba(16, 163, 127, 0.1);
             border-radius: 8px;
-            font-size: 12px;
+            font-size: 13px;
+            color: var(--accent);
         }
 
-        .status-dot {
+        .model-badge .dot {
             width: 8px;
             height: 8px;
+            background: var(--accent);
             border-radius: 50%;
-            background: var(--error);
-        }
-
-        .status-dot.ready {
-            background: var(--success);
             animation: pulse 2s infinite;
         }
 
@@ -196,176 +104,135 @@
             50% { opacity: 0.5; }
         }
 
-        /* Info Cards */
-        .info-section {
+        /* Main Content */
+        .main-content {
             flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 16px;
-        }
-
-        .info-card {
-            background: var(--bg-card);
-            border-radius: 12px;
-            padding: 14px;
-            border: 1px solid var(--border);
-        }
-
-        .info-card h4 {
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
-        }
-
-        .info-card p {
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-
-        .info-card .value {
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .chain-flow {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .chain-step {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 11px;
-            color: var(--text-secondary);
-        }
-
-        .chain-step .icon {
-            width: 20px;
-            height: 20px;
-            background: var(--accent-glow);
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-        }
-
-        .chain-arrow {
-            color: var(--accent);
-            font-size: 10px;
-            margin-left: 12px;
-        }
-
-        /* Main Chat Area */
-        .main-content {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
+            position: relative;
         }
 
         /* Header */
-        .chat-header {
-            padding: 16px 24px;
-            background: var(--bg-secondary);
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 16px;
             border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            background: var(--bg-main);
         }
 
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .mobile-menu-btn {
-            display: none;
-            padding: 8px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: var(--text-primary);
-            cursor: pointer;
-        }
-
-        @media (max-width: 900px) {
-            .mobile-menu-btn {
-                display: flex;
-            }
-        }
-
-        .header-title h2 {
+        .header h1 {
             font-size: 16px;
             font-weight: 600;
         }
 
-        .header-title span {
-            font-size: 12px;
-            color: var(--text-muted);
+        /* Chat Container */
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            scroll-behavior: smooth;
         }
 
-        .header-actions {
+        .chat-messages {
+            max-width: 768px;
+            margin: 0 auto;
+            padding: 24px 16px 150px;
+        }
+
+        /* Welcome Screen */
+        .welcome-screen {
             display: flex;
-            gap: 8px;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 60vh;
+            text-align: center;
+            padding: 40px 20px;
         }
 
-        .header-btn {
-            padding: 8px 14px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: var(--text-secondary);
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 0.2s;
+        .welcome-logo {
+            width: 72px;
+            height: 72px;
+            background: var(--accent);
+            border-radius: 50%;
             display: flex;
             align-items: center;
-            gap: 6px;
+            justify-content: center;
+            font-size: 36px;
+            margin-bottom: 24px;
         }
 
-        .header-btn:hover {
-            background: var(--bg-tertiary);
+        .welcome-screen h2 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .welcome-screen p {
+            color: var(--text-muted);
+            font-size: 15px;
+            margin-bottom: 32px;
+        }
+
+        .suggestions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        @media (max-width: 600px) {
+            .suggestions {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .suggestion-card {
+            padding: 16px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .suggestion-card:hover {
+            background: var(--bg-bot);
+            border-color: var(--text-muted);
+        }
+
+        .suggestion-card h4 {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 4px;
             color: var(--text-primary);
         }
 
-        /* Chat Messages */
-        .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 24px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
+        .suggestion-card p {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin: 0;
         }
 
+        /* Messages */
         .message {
             display: flex;
-            gap: 14px;
-            max-width: 800px;
-            animation: fadeIn 0.3s ease;
+            gap: 16px;
+            padding: 24px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .message.user {
-            align-self: flex-end;
-            flex-direction: row-reverse;
+        .message:last-child {
+            border-bottom: none;
         }
 
         .message-avatar {
             width: 36px;
             height: 36px;
-            border-radius: 10px;
+            border-radius: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -373,181 +240,31 @@
             flex-shrink: 0;
         }
 
+        .message.user .message-avatar {
+            background: #5436da;
+        }
+
         .message.bot .message-avatar {
             background: var(--accent);
         }
 
-        .message.user .message-avatar {
-            background: var(--bg-tertiary);
-        }
-
         .message-content {
-            background: var(--bot-bg);
-            padding: 14px 18px;
-            border-radius: 16px;
-            border-bottom-left-radius: 4px;
-        }
-
-        .message.user .message-content {
-            background: var(--user-bg);
-            border-radius: 16px;
-            border-bottom-right-radius: 4px;
+            flex: 1;
+            line-height: 1.7;
+            font-size: 15px;
+            color: var(--text-primary);
         }
 
         .message-content p {
-            font-size: 14px;
-            line-height: 1.7;
             white-space: pre-wrap;
+            word-wrap: break-word;
         }
 
-        .message-time {
-            font-size: 11px;
-            color: var(--text-muted);
-            margin-top: 6px;
-        }
-
-        .message.user .message-time {
-            text-align: right;
-        }
-
-        /* Welcome Screen */
-        .welcome-screen {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 40px;
-            text-align: center;
-        }
-
-        .welcome-icon {
-            width: 80px;
-            height: 80px;
-            background: var(--accent-glow);
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
-            margin-bottom: 24px;
-        }
-
-        .welcome-screen h2 {
-            font-size: 24px;
-            font-weight: 600;
-            margin-bottom: 12px;
-        }
-
-        .welcome-screen p {
-            color: var(--text-secondary);
-            max-width: 500px;
-            margin-bottom: 32px;
-        }
-
-        .quick-questions {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 12px;
-            width: 100%;
-            max-width: 700px;
-        }
-
-        .quick-question {
-            padding: 14px 18px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            color: var(--text-secondary);
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-align: left;
-        }
-
-        .quick-question:hover {
-            background: var(--bg-tertiary);
-            border-color: var(--accent);
-            color: var(--text-primary);
-        }
-
-        .quick-question span {
-            margin-right: 8px;
-        }
-
-        /* Input Area */
-        .chat-input-container {
-            padding: 20px 24px;
-            background: var(--bg-secondary);
-            border-top: 1px solid var(--border);
-        }
-
-        .input-wrapper {
-            display: flex;
-            gap: 12px;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .chat-input {
-            flex: 1;
-            padding: 14px 18px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            color: var(--text-primary);
-            font-size: 14px;
-            font-family: inherit;
-            resize: none;
-            min-height: 50px;
-            max-height: 150px;
-        }
-
-        .chat-input:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px var(--accent-glow);
-        }
-
-        .chat-input::placeholder {
-            color: var(--text-muted);
-        }
-
-        .send-btn {
-            width: 50px;
-            height: 50px;
-            background: var(--accent);
-            border: none;
-            border-radius: 14px;
-            color: white;
-            font-size: 18px;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .send-btn:hover {
-            background: var(--accent-hover);
-            transform: scale(1.05);
-        }
-
-        .send-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        /* Loading */
+        /* Typing Indicator */
         .typing-indicator {
             display: flex;
             gap: 4px;
-            padding: 14px 18px;
-            background: var(--bot-bg);
-            border-radius: 16px;
-            border-bottom-left-radius: 4px;
-            width: fit-content;
+            padding: 8px 0;
         }
 
         .typing-indicator span {
@@ -555,29 +272,133 @@
             height: 8px;
             background: var(--text-muted);
             border-radius: 50%;
-            animation: typing 1.4s infinite;
+            animation: bounce 1.4s infinite ease-in-out;
         }
 
+        .typing-indicator span:nth-child(1) { animation-delay: 0s; }
         .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
         .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
 
-        @keyframes typing {
-            0%, 60%, 100% { transform: translateY(0); }
-            30% { transform: translateY(-8px); }
+        @keyframes bounce {
+            0%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-8px); }
         }
 
-        /* Toast Notifications */
+        /* Input Area */
+        .input-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 16px;
+            background: linear-gradient(transparent, var(--bg-main) 50%);
+        }
+
+        .input-wrapper {
+            max-width: 768px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .input-box {
+            display: flex;
+            align-items: flex-end;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 12px 16px;
+            transition: border-color 0.2s;
+        }
+
+        .input-box:focus-within {
+            border-color: var(--text-muted);
+        }
+
+        .input-box textarea {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 15px;
+            font-family: inherit;
+            resize: none;
+            max-height: 200px;
+            line-height: 1.5;
+        }
+
+        .input-box textarea::placeholder {
+            color: var(--text-muted);
+        }
+
+        .input-box textarea:focus {
+            outline: none;
+        }
+
+        .send-btn {
+            width: 36px;
+            height: 36px;
+            background: var(--accent);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            margin-left: 8px;
+        }
+
+        .send-btn:hover {
+            background: var(--accent-hover);
+        }
+
+        .send-btn:disabled {
+            background: var(--text-muted);
+            cursor: not-allowed;
+        }
+
+        .send-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .input-footer {
+            text-align: center;
+            padding: 12px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+
+        /* Toast */
         .toast {
             position: fixed;
             bottom: 100px;
             left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: var(--bg-card);
+            transform: translateX(-50%) translateY(20px);
+            background: var(--bg-input);
             border: 1px solid var(--border);
-            padding: 12px 20px;
-            border-radius: 12px;
-            color: var(--text-primary);
-            font-size: 13px;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
             opacity: 0;
             transition: all 0.3s;
             z-index: 1000;
@@ -587,192 +408,96 @@
             opacity: 1;
             transform: translateX(-50%) translateY(0);
         }
-
-        .toast.error {
-            border-color: var(--error);
-            background: rgba(239, 68, 68, 0.1);
-        }
-
-        .toast.success {
-            border-color: var(--success);
-            background: rgba(16, 185, 129, 0.1);
-        }
-
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--border);
-            border-radius: 3px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--text-muted);
-        }
-
-        /* Mobile Overlay */
-        .mobile-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 99;
-        }
-
-        .mobile-overlay.show {
-            display: block;
-        }
     </style>
 </head>
 <body>
     <div class="app-container">
         <!-- Sidebar -->
-        <aside class="sidebar" id="sidebar">
-            <div class="logo">
-                <div class="logo-icon">🔗</div>
-                <div class="logo-text">
-                    <h1>LangChain Q&A</h1>
-                    <span>Day 49 • AI Assistant</span>
-                </div>
-            </div>
+        <aside class="sidebar">
+            <button class="new-chat-btn" onclick="clearChat()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                New chat
+            </button>
 
-            <!-- Token Setup -->
-            <div class="setup-section">
-                <h3>🔑 API Setup</h3>
-                <div class="token-input-group">
-                    <input type="password" class="token-input" id="tokenInput" 
-                           placeholder="Enter HuggingFace Token">
-                    <button class="token-btn" id="initBtn" onclick="initializeChatbot()">
-                        Initialize Chatbot
-                    </button>
-                </div>
-                <div class="status-badge" style="margin-top: 12px;">
-                    <div class="status-dot" id="statusDot"></div>
-                    <span id="statusText">Not initialized</span>
-                </div>
-            </div>
-
-            <!-- Chain Flow -->
-            <div class="info-card">
-                <h4>⛓️ LangChain Flow</h4>
-                <div class="chain-flow">
-                    <div class="chain-step">
-                        <span class="icon">📝</span>
-                        <span>ChatPromptTemplate</span>
-                    </div>
-                    <div class="chain-arrow">↓</div>
-                    <div class="chain-step">
-                        <span class="icon">🤖</span>
-                        <span>ChatHuggingFace</span>
-                    </div>
-                    <div class="chain-arrow">↓</div>
-                    <div class="chain-step">
-                        <span class="icon">📤</span>
-                        <span>StrOutputParser</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Model Info -->
-            <div class="info-section">
-                <div class="info-card">
-                    <h4>Model</h4>
-                    <p class="value">Mistral-7B-Instruct</p>
-                    <p style="margin-top: 4px;">Instruction-tuned LLM</p>
-                </div>
-
-                <div class="info-card">
-                    <h4>Messages</h4>
-                    <p class="value" id="messageCount">0</p>
-                </div>
-
-                <div class="info-card">
-                    <h4>How to get token</h4>
-                    <p style="font-size: 12px;">
-                        1. Go to <a href="https://huggingface.co/settings/tokens" target="_blank" 
-                           style="color: var(--accent);">huggingface.co/settings/tokens</a><br>
-                        2. Create new token (Read)<br>
-                        3. Paste above
-                    </p>
+            <div class="sidebar-info">
+                <div class="model-badge">
+                    <span class="dot"></span>
+                    Zephyr-7B via LangChain
                 </div>
             </div>
         </aside>
 
         <!-- Main Content -->
         <main class="main-content">
-            <!-- Header -->
-            <header class="chat-header">
-                <div class="header-left">
-                    <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
-                    <div class="header-title">
-                        <h2>Q&A Chat</h2>
-                        <span>Ask me anything!</span>
-                    </div>
-                </div>
-                <div class="header-actions">
-                    <button class="header-btn" onclick="clearChat()">
-                        🗑️ Clear
-                    </button>
-                </div>
+            <header class="header">
+                <h1>LangChain Q&A</h1>
             </header>
 
-            <!-- Chat Area -->
-            <div class="chat-messages" id="chatMessages">
-                <!-- Welcome Screen -->
-                <div class="welcome-screen" id="welcomeScreen">
-                    <div class="welcome-icon">🔗</div>
-                    <h2>LangChain Q&A Chatbot</h2>
-                    <p>I'm powered by LangChain and Mistral-7B. Ask me anything and I'll provide helpful, detailed answers!</p>
-                    
-                    <div class="quick-questions">
-                        <button class="quick-question" onclick="askQuestion('What is machine learning?')">
-                            <span>🤖</span> What is machine learning?
-                        </button>
-                        <button class="quick-question" onclick="askQuestion('Explain LangChain in simple terms')">
-                            <span>🔗</span> Explain LangChain simply
-                        </button>
-                        <button class="quick-question" onclick="askQuestion('How do neural networks work?')">
-                            <span>🧠</span> How do neural networks work?
-                        </button>
-                        <button class="quick-question" onclick="askQuestion('Write a Python function to check if a number is prime')">
-                            <span>💻</span> Python prime checker
-                        </button>
+            <div class="chat-container" id="chatContainer">
+                <div class="chat-messages" id="chatMessages">
+                    <!-- Welcome Screen -->
+                    <div class="welcome-screen" id="welcomeScreen">
+                        <div class="welcome-logo">🔗</div>
+                        <h2>How can I help you today?</h2>
+                        <p>I'm powered by LangChain & Zephyr-7B</p>
+                        
+                        <div class="suggestions">
+                            <div class="suggestion-card" onclick="askQuestion('Explain machine learning in simple terms')">
+                                <h4>Explain machine learning</h4>
+                                <p>in simple terms</p>
+                            </div>
+                            <div class="suggestion-card" onclick="askQuestion('How do neural networks work?')">
+                                <h4>How do neural networks</h4>
+                                <p>work?</p>
+                            </div>
+                            <div class="suggestion-card" onclick="askQuestion('Write a Python function to check if a number is prime')">
+                                <h4>Write a Python function</h4>
+                                <p>to check if a number is prime</p>
+                            </div>
+                            <div class="suggestion-card" onclick="askQuestion('What is LangChain and why is it useful?')">
+                                <h4>What is LangChain</h4>
+                                <p>and why is it useful?</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- Input Area -->
-            <div class="chat-input-container">
+            <div class="input-container">
                 <div class="input-wrapper">
-                    <textarea class="chat-input" id="chatInput" 
-                              placeholder="Ask a question..." 
-                              rows="1"
-                              onkeydown="handleKeyDown(event)"></textarea>
-                    <button class="send-btn" id="sendBtn" onclick="sendMessage()">
-                        ➤
-                    </button>
+                    <div class="input-box">
+                        <textarea 
+                            id="chatInput" 
+                            placeholder="Message LangChain Q&A..."
+                            rows="1"
+                            onkeydown="handleKeyDown(event)"
+                            oninput="autoResize(this)"
+                        ></textarea>
+                        <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="22" y1="2" x2="11" y2="13"></line>
+                                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="input-footer">
+                        LangChain Q&A can make mistakes. Consider checking important information.
+                    </div>
                 </div>
             </div>
         </main>
     </div>
 
-    <!-- Toast -->
     <div class="toast" id="toast"></div>
-
-    <!-- Mobile Overlay -->
-    <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
 
     <script>
         let isReady = false;
         let messageCount = 0;
 
-        // Check status on load
         window.onload = function() {
             checkStatus();
             document.getElementById('chatInput').focus();
@@ -783,59 +508,8 @@
                 const response = await fetch('/status');
                 const data = await response.json();
                 isReady = data.ready;
-                updateStatusUI();
             } catch (error) {
                 console.error('Error checking status:', error);
-            }
-        }
-
-        function updateStatusUI() {
-            const dot = document.getElementById('statusDot');
-            const text = document.getElementById('statusText');
-            
-            if (isReady) {
-                dot.classList.add('ready');
-                text.textContent = 'Ready to chat!';
-            } else {
-                dot.classList.remove('ready');
-                text.textContent = 'Not initialized';
-            }
-        }
-
-        async function initializeChatbot() {
-            const token = document.getElementById('tokenInput').value.trim();
-            
-            if (!token) {
-                showToast('Please enter your HuggingFace token', 'error');
-                return;
-            }
-
-            const btn = document.getElementById('initBtn');
-            btn.disabled = true;
-            btn.textContent = 'Initializing...';
-
-            try {
-                const response = await fetch('/initialize', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ token })
-                });
-
-                const data = await response.json();
-                
-                if (data.success) {
-                    isReady = true;
-                    updateStatusUI();
-                    showToast('Chatbot initialized successfully!', 'success');
-                    document.getElementById('tokenInput').value = '';
-                } else {
-                    showToast(data.message || 'Failed to initialize', 'error');
-                }
-            } catch (error) {
-                showToast('Error connecting to server', 'error');
-            } finally {
-                btn.disabled = false;
-                btn.textContent = 'Initialize Chatbot';
             }
         }
 
@@ -851,7 +525,7 @@
             if (!question) return;
 
             if (!isReady) {
-                showToast('Please initialize the chatbot first', 'error');
+                showToast('Chatbot is loading, please wait...');
                 return;
             }
 
@@ -890,7 +564,6 @@
 
         function addMessage(content, role) {
             const container = document.getElementById('chatMessages');
-            const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${role}`;
@@ -900,15 +573,12 @@
                 </div>
                 <div class="message-content">
                     <p>${escapeHtml(content)}</p>
-                    <div class="message-time">${now}</div>
                 </div>
             `;
 
             container.appendChild(messageDiv);
-            container.scrollTop = container.scrollHeight;
-            
+            scrollToBottom();
             messageCount++;
-            document.getElementById('messageCount').textContent = messageCount;
         }
 
         function showTyping() {
@@ -920,15 +590,17 @@
             typingDiv.id = id;
             typingDiv.innerHTML = `
                 <div class="message-avatar">🔗</div>
-                <div class="typing-indicator">
-                    <span></span>
-                    <span></span>
-                    <span></span>
+                <div class="message-content">
+                    <div class="typing-indicator">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
                 </div>
             `;
             
             container.appendChild(typingDiv);
-            container.scrollTop = container.scrollHeight;
+            scrollToBottom();
             
             return id;
         }
@@ -945,6 +617,11 @@
             }
         }
 
+        function autoResize(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = Math.min(textarea.scrollHeight, 200) + 'px';
+        }
+
         async function clearChat() {
             try {
                 await fetch('/clear', { method: 'POST' });
@@ -952,46 +629,46 @@
                 const container = document.getElementById('chatMessages');
                 container.innerHTML = `
                     <div class="welcome-screen" id="welcomeScreen">
-                        <div class="welcome-icon">🔗</div>
-                        <h2>LangChain Q&A Chatbot</h2>
-                        <p>I'm powered by LangChain and Mistral-7B. Ask me anything and I'll provide helpful, detailed answers!</p>
+                        <div class="welcome-logo">🔗</div>
+                        <h2>How can I help you today?</h2>
+                        <p>I'm powered by LangChain & Zephyr-7B</p>
                         
-                        <div class="quick-questions">
-                            <button class="quick-question" onclick="askQuestion('What is machine learning?')">
-                                <span>🤖</span> What is machine learning?
-                            </button>
-                            <button class="quick-question" onclick="askQuestion('Explain LangChain in simple terms')">
-                                <span>🔗</span> Explain LangChain simply
-                            </button>
-                            <button class="quick-question" onclick="askQuestion('How do neural networks work?')">
-                                <span>🧠</span> How do neural networks work?
-                            </button>
-                            <button class="quick-question" onclick="askQuestion('Write a Python function to check if a number is prime')">
-                                <span>💻</span> Python prime checker
-                            </button>
+                        <div class="suggestions">
+                            <div class="suggestion-card" onclick="askQuestion('Explain machine learning in simple terms')">
+                                <h4>Explain machine learning</h4>
+                                <p>in simple terms</p>
+                            </div>
+                            <div class="suggestion-card" onclick="askQuestion('How do neural networks work?')">
+                                <h4>How do neural networks</h4>
+                                <p>work?</p>
+                            </div>
+                            <div class="suggestion-card" onclick="askQuestion('Write a Python function to check if a number is prime')">
+                                <h4>Write a Python function</h4>
+                                <p>to check if a number is prime</p>
+                            </div>
+                            <div class="suggestion-card" onclick="askQuestion('What is LangChain and why is it useful?')">
+                                <h4>What is LangChain</h4>
+                                <p>and why is it useful?</p>
+                            </div>
                         </div>
                     </div>
                 `;
                 
                 messageCount = 0;
-                document.getElementById('messageCount').textContent = '0';
-                showToast('Chat cleared', 'success');
             } catch (error) {
-                showToast('Failed to clear chat', 'error');
+                showToast('Failed to clear chat');
             }
         }
 
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('mobileOverlay');
-            sidebar.classList.toggle('mobile-open');
-            overlay.classList.toggle('show');
+        function scrollToBottom() {
+            const container = document.getElementById('chatContainer');
+            container.scrollTop = container.scrollHeight;
         }
 
-        function showToast(message, type = '') {
+        function showToast(message) {
             const toast = document.getElementById('toast');
             toast.textContent = message;
-            toast.className = `toast ${type} show`;
+            toast.classList.add('show');
             
             setTimeout(() => {
                 toast.classList.remove('show');
@@ -1003,12 +680,6 @@
             div.textContent = text;
             return div.innerHTML;
         }
-
-        // Auto-resize textarea
-        document.getElementById('chatInput').addEventListener('input', function() {
-            this.style.height = 'auto';
-            this.style.height = Math.min(this.scrollHeight, 150) + 'px';
-        });
     </script>
 </body>
 </html>

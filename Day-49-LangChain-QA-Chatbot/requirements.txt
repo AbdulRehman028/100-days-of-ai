@@ -1,0 +1,17 @@
+# Day 49: LangChain Q&A Chatbot
+# ==============================
+
+# Core Framework
+flask>=2.3.0
+
+# LangChain
+langchain>=0.1.0
+langchain-core>=0.1.0
+langchain-huggingface>=0.0.3
+
+# Hugging Face
+huggingface-hub>=0.20.0
+transformers>=4.30.0
+
+# Utilities
+python-dotenv>=1.0.0

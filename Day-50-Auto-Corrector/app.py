@@ -1,15 +1,3 @@
-"""
-Day 50: Auto-Corrector (LLM-Powered)
-====================================
-An intelligent text correction tool using Hugging Face Transformers.
-Corrects spelling, grammar, and punctuation errors in real-time.
-
-Tech Stack:
-- Python + Flask
-- Hugging Face Transformers
-- T5 Grammar Correction Model
-"""
-
 from flask import Flask, render_template, request, jsonify
 from transformers import pipeline, AutoTokenizer, AutoModelForSeq2SeqLM
 from datetime import datetime

@@ -7,9 +7,7 @@ import os
 app = Flask(__name__)
 app.secret_key = 'day50-auto-corrector-secret-key'
 
-# ============================================
 # Grammar Correction Engine
-# ============================================
 
 class AutoCorrector:
     """

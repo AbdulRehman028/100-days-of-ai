@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto-Corrector | Day 50</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0f0f23;
+            --bg-secondary: #1a1a2e;
+            --bg-card: #16213e;
+            --bg-input: #1f2937;
+            --accent: #00d4ff;
+            --accent-hover: #00b8e6;
+            --accent-glow: rgba(0, 212, 255, 0.3);
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border: #334155;
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #00d4ff 0%, #00ff88 100%);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .logo h1 {
+            font-size: 20px;
+            font-weight: 700;
+            background: var(--gradient-2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo span {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--bg-card);
+            border-radius: 20px;
+            font-size: 13px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--warning);
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.ready {
+            background: var(--success);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Main Content */
+        .main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 32px 24px;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .hero h2 {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            background: var(--gradient-2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            color: var(--text-secondary);
+            font-size: 16px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Editor Container */
+        .editor-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        @media (max-width: 900px) {
+            .editor-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .editor-panel {
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .panel-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .panel-title .icon {
+            font-size: 18px;
+        }
+
+        .panel-badge {
+            padding: 4px 10px;
+            background: var(--bg-input);
+            border-radius: 12px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .panel-badge.changes {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .editor-area {
+            padding: 20px;
+            min-height: 300px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 260px;
+            background: var(--bg-input);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            color: var(--text-primary);
+            font-size: 15px;
+            font-family: inherit;
+            line-height: 1.7;
+            resize: vertical;
+            transition: all 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px var(--accent-glow);
+        }
+
+        textarea::placeholder {
+            color: var(--text-muted);
+        }
+
+        .output-text {
+            min-height: 260px;
+            background: var(--bg-input);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 15px;
+            line-height: 1.7;
+            color: var(--text-primary);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .output-text.empty {
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .output-text .correction {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+            padding: 2px 4px;
+            border-radius: 4px;
+            text-decoration: underline;
+            text-decoration-style: wavy;
+            text-decoration-color: var(--success);
+        }
+
+        /* Action Buttons */
+        .action-bar {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 40px;
+        }
+
+        .btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--gradient-2);
+            color: var(--bg-primary);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px var(--accent-glow);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-secondary);
+            border-color: var(--accent);
+        }
+
+        .btn .spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid transparent;
+            border-top-color: currentColor;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Examples Section */
+        .examples-section {
+            margin-top: 48px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .examples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .example-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .example-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .example-label {
+            font-size: 12px;
+            color: var(--accent);
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .example-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Stats Section */
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            padding: 20px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            margin-top: 32px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 16px 24px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .toast.success {
+            border-color: var(--success);
+        }
+
+        .toast.error {
+            border-color: var(--error);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 32px;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .header-content {
+                flex-direction: column;
+                gap: 12px;
+            }
+            
+            .hero h2 {
+                font-size: 28px;
+            }
+            
+            .action-bar {
+                flex-direction: column;
+            }
+            
+            .stats-bar {
+                flex-wrap: wrap;
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">✨</div>
+                <div>
+                    <h1>Auto-Corrector</h1>
+                    <span>Day 50 • LLM-Powered</span>
+                </div>
+            </div>
+            <div class="status-badge">
+                <span class="status-dot" id="statusDot"></span>
+                <span id="statusText">Loading model...</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Hero -->
+        <section class="hero">
+            <h2>Fix Your Text Instantly</h2>
+            <p>Powered by T5 Transformer model. Corrects spelling, grammar, and punctuation errors with AI precision.</p>
+        </section>
+
+        <!-- Editor -->
+        <div class="editor-container">
+            <!-- Input Panel -->
+            <div class="editor-panel">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        <span class="icon">📝</span>
+                        Original Text
+                    </div>
+                    <span class="panel-badge" id="charCount">0 chars</span>
+                </div>
+                <div class="editor-area">
+                    <textarea 
+                        id="inputText" 
+                        placeholder="Type or paste your text here...
+
+Example: I cant beleive how grate this is working."
+                        oninput="updateCharCount()"
+                    ></textarea>
+                </div>
+            </div>
+
+            <!-- Output Panel -->
+            <div class="editor-panel">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        <span class="icon">✅</span>
+                        Corrected Text
+                    </div>
+                    <span class="panel-badge changes" id="changeCount" style="display: none;">0 changes</span>
+                </div>
+                <div class="editor-area">
+                    <div class="output-text empty" id="outputText">
+                        Your corrected text will appear here...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-bar">
+            <button class="btn btn-primary" id="correctBtn" onclick="correctText()">
+                <span>✨</span>
+                Correct Text
+            </button>
+            <button class="btn btn-secondary" onclick="clearAll()">
+                <span>🗑️</span>
+                Clear
+            </button>
+            <button class="btn btn-secondary" onclick="copyResult()">
+                <span>📋</span>
+                Copy Result
+            </button>
+        </div>
+
+        <!-- Examples -->
+        <section class="examples-section">
+            <div class="section-header">
+                <h3 class="section-title">Try These Examples</h3>
+            </div>
+            <div class="examples-grid" id="examplesGrid">
+                <!-- Examples loaded dynamically -->
+            </div>
+        </section>
+
+        <!-- Stats -->
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-value" id="statCorrections">0</div>
+                <div class="stat-label">Corrections Made</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="statCharacters">0</div>
+                <div class="stat-label">Characters Processed</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">T5</div>
+                <div class="stat-label">Model Type</div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        Day 50 of 100 Days of AI • Built with Hugging Face Transformers
+    </footer>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        let isReady = false;
+
+        // Check status on load
+        window.onload = function() {
+            checkStatus();
+            loadExamples();
+        };
+
+        async function checkStatus() {
+            try {
+                const response = await fetch('/status');
+                const data = await response.json();
+                isReady = data.ready;
+                
+                const dot = document.getElementById('statusDot');
+                const text = document.getElementById('statusText');
+                
+                if (isReady) {
+                    dot.classList.add('ready');
+                    text.textContent = 'Ready';
+                    document.getElementById('correctBtn').disabled = false;
+                    
+                    // Update stats
+                    if (data.stats) {
+                        document.getElementById('statCorrections').textContent = data.stats.total_corrections;
+                        document.getElementById('statCharacters').textContent = formatNumber(data.stats.total_characters);
+                    }
+                } else {
+                    text.textContent = 'Loading model...';
+                    document.getElementById('correctBtn').disabled = true;
+                    setTimeout(checkStatus, 2000);
+                }
+            } catch (error) {
+                console.error('Status check failed:', error);
+                setTimeout(checkStatus, 3000);
+            }
+        }
+
+        async function loadExamples() {
+            try {
+                const response = await fetch('/examples');
+                const examples = await response.json();
+                
+                const grid = document.getElementById('examplesGrid');
+                grid.innerHTML = examples.map(ex => `
+                    <div class="example-card" onclick="useExample('${escapeHtml(ex.text)}')">
+                        <div class="example-label">${ex.description}</div>
+                        <div class="example-text">"${ex.text}"</div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Failed to load examples:', error);
+            }
+        }
+
+        function useExample(text) {
+            document.getElementById('inputText').value = text;
+            updateCharCount();
+            correctText();
+        }
+
+        async function correctText() {
+            const input = document.getElementById('inputText').value.trim();
+            
+            if (!input) {
+                showToast('Please enter some text to correct.', 'error');
+                return;
+            }
+
+            if (!isReady) {
+                showToast('Model is still loading. Please wait...', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('correctBtn');
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = '<div class="spinner"></div> Correcting...';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch('/correct', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: input })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const outputEl = document.getElementById('outputText');
+                    outputEl.classList.remove('empty');
+                    outputEl.textContent = data.corrected;
+                    
+                    // Update change count
+                    const changeEl = document.getElementById('changeCount');
+                    if (data.change_count > 0) {
+                        changeEl.textContent = `${data.change_count} change${data.change_count > 1 ? 's' : ''}`;
+                        changeEl.style.display = 'inline';
+                    } else {
+                        changeEl.style.display = 'none';
+                    }
+                    
+                    showToast('Text corrected successfully!', 'success');
+                    
+                    // Refresh stats
+                    checkStatus();
+                } else {
+                    showToast(data.error || 'Correction failed.', 'error');
+                }
+            } catch (error) {
+                showToast('Error connecting to server.', 'error');
+            } finally {
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+            }
+        }
+
+        function clearAll() {
+            document.getElementById('inputText').value = '';
+            document.getElementById('outputText').textContent = 'Your corrected text will appear here...';
+            document.getElementById('outputText').classList.add('empty');
+            document.getElementById('changeCount').style.display = 'none';
+            updateCharCount();
+        }
+
+        function copyResult() {
+            const output = document.getElementById('outputText');
+            if (output.classList.contains('empty')) {
+                showToast('Nothing to copy yet.', 'error');
+                return;
+            }
+            
+            navigator.clipboard.writeText(output.textContent).then(() => {
+                showToast('Copied to clipboard!', 'success');
+            }).catch(() => {
+                showToast('Failed to copy.', 'error');
+            });
+        }
+
+        function updateCharCount() {
+            const count = document.getElementById('inputText').value.length;
+            document.getElementById('charCount').textContent = `${count} chars`;
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} show`;
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        function formatNumber(num) {
+            if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'k';
+            }
+            return num.toString();
+        }
+
+        function escapeHtml(text) {
+            return text.replace(/'/g, "\\'").replace(/"/g, '\\"');
+        }
+
+        // Keyboard shortcut
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'Enter') {
+                correctText();
+            }
+        });
+    </script>
+</body>
+</html>

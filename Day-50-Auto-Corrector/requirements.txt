@@ -1,0 +1,5 @@
+# Day 50: Auto-Corrector (LLM-Powered)
+flask>=2.0.0
+transformers>=4.30.0
+torch>=2.0.0
+sentencepiece>=0.1.99

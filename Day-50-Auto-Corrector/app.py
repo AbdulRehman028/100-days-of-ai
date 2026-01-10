@@ -19,6 +19,7 @@ class AutoCorrector:
     - Punctuation fixes
     - Capitalization fixes
     - Context-aware corrections
+    - Statistics tracking
     """
     
     def __init__(self):

@@ -18,6 +18,7 @@ class AutoCorrector:
     - Spelling correction
     - Punctuation fixes
     - Capitalization fixes
+    - Context-aware corrections
     """
     
     def __init__(self):

@@ -13,7 +13,7 @@ This project implements an **Auto-Corrector** using Hugging Face Transformers:
 - **T5 Model**: Fine-tuned for grammar correction
 - **Spelling Fixes**: Corrects misspelled words
 - **Grammar Correction**: Fixes grammatical errors
-- **Punctuation**: Adds missing punctuation
+- **Punctuation**: Adds missing punctuation.
 - **Real-time**: Instant corrections via web UI
 
 ## 🏗️ Architecture

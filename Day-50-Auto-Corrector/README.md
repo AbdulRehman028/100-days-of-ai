@@ -52,12 +52,12 @@ Corrected Text
 ## 📦 Installation
 
 1. **Navigate to the project folder:**
-   ```bash
+   ```
    cd Day-50-Auto-Corrector
    ```
 
 2. **Create a virtual environment:**
-   ```bash
+   ```
    python -m venv venv
    ```
 

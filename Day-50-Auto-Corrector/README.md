@@ -169,7 +169,7 @@ By building this project, you'll learn:
 
 This project is part of the 100 Days of AI challenge.
 
-mADE bY AbdurRehman Baig with ❤️
+made bY AbdurRehman Baig with ❤️
 
 ---
 

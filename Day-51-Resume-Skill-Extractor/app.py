@@ -8,9 +8,7 @@ import os
 app = Flask(__name__)
 app.secret_key = 'day51-resume-skill-extractor-secret-key'
 
-# ============================================
 # Skill Categories & Patterns
-# ============================================
 
 SKILL_CATEGORIES = {
     'programming_languages': [

@@ -1,0 +1,5 @@
+# Day 51: Resume Skill Extractor
+flask>=2.0.0
+transformers>=4.30.0
+torch>=2.0.0
+spacy>=3.5.0

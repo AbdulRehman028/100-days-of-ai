@@ -57,9 +57,7 @@ for skills in SKILL_CATEGORIES.values():
     ALL_SKILLS.update(skills)
 
 
-# ============================================
 # Resume Skill Extractor Engine
-# ============================================
 
 class ResumeSkillExtractor:
     """
@@ -335,9 +333,7 @@ class ResumeSkillExtractor:
 extractor = ResumeSkillExtractor()
 
 
-# ============================================
 # Flask Routes
-# ============================================
 
 @app.route('/')
 def index():
@@ -439,9 +435,7 @@ def sample():
     return jsonify({'sample': sample_resume.strip()})
 
 
-# ============================================
 # Main Entry Point
-# ============================================
 
 if __name__ == '__main__':
     print("""

@@ -162,6 +162,7 @@ By building this project, you'll learn:
 ## 📝 License
 
 This project is part of the 100 Days of AI challenge.
+by AbdurRehman Baig with ❤️
 
 ---
 

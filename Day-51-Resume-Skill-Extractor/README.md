@@ -130,7 +130,7 @@ SKILL_CATEGORIES = {
 ```python
 self.summarizer = pipeline(
     "summarization",
-    model="t5-base",  # or other models
+    model="t5-base", 
     max_length=200
 )
 ```

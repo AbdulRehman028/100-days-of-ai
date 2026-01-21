@@ -79,7 +79,7 @@ class ResumeSkillExtractor:
         try:
             print("🔧 Loading spaCy model...")
             
-            # Try to load spaCymodel
+            # Try to load spaCy model
             try:
                 self.nlp = spacy.load("en_core_web_sm")
             except OSError:

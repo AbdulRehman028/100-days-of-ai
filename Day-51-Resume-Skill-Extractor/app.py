@@ -128,7 +128,7 @@ class ResumeSkillExtractor:
         text_lower = text.lower()
         found_skills = {category: [] for category in SKILL_CATEGORIES}
         
-        # Pattern matching for known skills
+        # Pattern matching for knownSkills
         for category, skills in SKILL_CATEGORIES.items():
             for skill in skills:
                 # Use word boundary matching

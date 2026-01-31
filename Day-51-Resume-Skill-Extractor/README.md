@@ -164,4 +164,4 @@ By building this project, you'll learn:
 This project is part of the 100 Days of AI challenge.
 by Abdur Rehman Baig with ❤️
 
-**Day 51 of 100** - Building AI, one day at a time!
+**Day 51 of 100** - Building AI, one day at a time

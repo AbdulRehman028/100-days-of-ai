@@ -6,6 +6,8 @@ A dual-mode Question-Answering system that evolves from **Extractive** to **Gene
 ![Python](https://img.shields.io/badge/Python-3.8+-blue?style=for-the-badge&logo=python)
 ![Transformers](https://img.shields.io/badge/Transformers-HuggingFace-yellow?style=for-the-badge)
 
+![alt text](image.png)
+
 ## 🎯 Overview
 
 This project demonstrates the evolution of Question-Answering systems:

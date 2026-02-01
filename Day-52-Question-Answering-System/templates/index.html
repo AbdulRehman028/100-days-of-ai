@@ -3,327 +3,734 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Day 52: Question-Answering System</title>
+    <title>AI Question Answering | Day 52</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                }
-            }
-        }
-    </script>
     <style>
+        * { font-family: 'Inter', sans-serif; }
+        
+        :root {
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --accent: #22d3ee;
+            --success: #10b981;
+            --bg-dark: #0f0f1a;
+            --bg-card: rgba(30, 30, 50, 0.6);
+        }
+        
         body {
-            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+            background: var(--bg-dark);
+            background-image: 
+                radial-gradient(ellipse at 20% 0%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 100%, rgba(34, 211, 238, 0.1) 0%, transparent 50%);
             min-height: 100vh;
         }
-        .glass-card {
-            background: rgba(30, 41, 59, 0.7);
+        
+        /* Glass Card */
+        .glass {
+            background: var(--bg-card);
             backdrop-filter: blur(20px);
-            border: 1px solid rgba(148, 163, 184, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
-        .mode-btn.active {
-            background: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%);
+        
+        /* Progress Steps */
+        .step-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            flex: 1;
+        }
+        
+        .step-item:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 60%;
+            width: 80%;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .step-item.active:not(:last-child)::after,
+        .step-item.completed:not(:last-child)::after {
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+        
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.4);
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .step-item.active .step-circle {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-color: transparent;
+            color: white;
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+        }
+        
+        .step-item.completed .step-circle {
+            background: var(--success);
+            border-color: transparent;
             color: white;
         }
-        .answer-glow {
-            box-shadow: 0 0 40px rgba(139, 92, 246, 0.3);
+        
+        .step-label {
+            margin-top: 8px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.4);
+            font-weight: 500;
         }
-        .loading-pulse {
-            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        
+        .step-item.active .step-label,
+        .step-item.completed .step-label {
+            color: rgba(255, 255, 255, 0.8);
         }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: .5; }
+        
+        /* Mode Pills */
+        .mode-pill {
+            padding: 12px 24px;
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-        .typing-indicator span {
+        
+        .mode-pill:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+        
+        .mode-pill.active {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-color: transparent;
+            color: white;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+        }
+        
+        /* Input Styles */
+        .input-area {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .input-area:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        }
+        
+        .input-area textarea {
+            background: transparent;
+            border: none;
+            outline: none;
+            resize: none;
+            color: white;
+            width: 100%;
+        }
+        
+        .input-area textarea::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+        
+        /* Primary Button */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), #7c3aed);
+            color: white;
+            font-weight: 600;
+            padding: 16px 32px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(99, 102, 241, 0.4);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* Sample Cards */
+        .sample-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .sample-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--primary);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        
+        .sample-card .emoji {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+        
+        /* Answer Box */
+        .answer-box {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(34, 211, 238, 0.1));
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 16px;
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .answer-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--primary), var(--accent));
+        }
+        
+        /* Confidence Bar */
+        .confidence-track {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 4px;
+            transition: width 1s ease-out;
+        }
+        
+        /* Loading Animation */
+        .loading-dots {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+        }
+        
+        .loading-dots span {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
             animation: bounce 1.4s infinite ease-in-out both;
         }
-        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
-        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+        
+        .loading-dots span:nth-child(1) { 
+            background: var(--primary);
+            animation-delay: -0.32s; 
+        }
+        .loading-dots span:nth-child(2) { 
+            background: var(--accent);
+            animation-delay: -0.16s; 
+        }
+        .loading-dots span:nth-child(3) { 
+            background: var(--success);
+        }
+        
         @keyframes bounce {
             0%, 80%, 100% { transform: scale(0); }
             40% { transform: scale(1); }
         }
-        .gradient-text {
-            background: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 50%, #10b981 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+        
+        /* Quick Question Pills */
+        .quick-pill {
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
         }
-        .sample-card:hover {
-            transform: translateY(-2px);
-            border-color: rgba(139, 92, 246, 0.5);
+        
+        .quick-pill:hover {
+            background: rgba(99, 102, 241, 0.2);
+            color: white;
+            border-color: var(--primary);
         }
-        .confidence-bar {
-            transition: width 0.8s ease-out;
+        
+        /* Comparison Cards */
+        .comparison-card {
+            border-radius: 20px;
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .comparison-card.extractive {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(34, 211, 238, 0.1));
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+        
+        .comparison-card.generative {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(236, 72, 153, 0.1));
+            border: 1px solid rgba(168, 85, 247, 0.2);
+        }
+        
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 16px 24px;
+            border-radius: 12px;
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { 
+            background: rgba(255, 255, 255, 0.1); 
+            border-radius: 3px; 
+        }
+        ::-webkit-scrollbar-thumb:hover { 
+            background: rgba(255, 255, 255, 0.2); 
+        }
+        
+        /* Highlight */
+        .highlight {
+            background: linear-gradient(90deg, rgba(99, 102, 241, 0.3), rgba(34, 211, 238, 0.3));
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        
+        /* Fade In Animation */
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+        }
+        
+        .tooltip::after {
+            content: attr(data-tip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 8px 12px;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            font-size: 12px;
+            border-radius: 8px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease;
+            margin-bottom: 8px;
+        }
+        
+        .tooltip:hover::after {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* Character Counter */
+        .char-counter {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .char-counter.warning {
+            color: #fbbf24;
+        }
+        
+        .char-counter.good {
+            color: var(--success);
         }
     </style>
 </head>
-<body class="font-sans text-gray-100 antialiased">
-    <div class="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-6xl mx-auto">
+<body class="text-white antialiased">
+    <div class="min-h-screen py-6 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-5xl mx-auto">
             
             <!-- Header -->
-            <header class="text-center mb-10">
-                <div class="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-violet-500 to-cyan-500 mb-6 shadow-lg shadow-violet-500/30">
-                    <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <header class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-cyan-500 mb-4 shadow-lg shadow-indigo-500/30">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                 </div>
-                <h1 class="text-4xl sm:text-5xl font-extrabold mb-3">
-                    <span class="gradient-text">Question-Answering System</span>
+                <h1 class="text-3xl sm:text-4xl font-bold mb-2">
+                    <span class="bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
+                        AI Question Answering
+                    </span>
                 </h1>
-                <p class="text-gray-400 text-lg max-w-2xl mx-auto">
-                    Day 52 • Extractive & Generative QA powered by DistilBERT and BART
+                <p class="text-gray-400 text-sm">
+                    Day 52 • Extractive & Generative QA with DistilBERT + BART
                 </p>
             </header>
 
+            <!-- Progress Steps -->
+            <div class="flex justify-center mb-8">
+                <div class="flex items-start w-full max-w-md">
+                    <div class="step-item" id="step1">
+                        <div class="step-circle">1</div>
+                        <span class="step-label">Add Context</span>
+                    </div>
+                    <div class="step-item" id="step2">
+                        <div class="step-circle">2</div>
+                        <span class="step-label">Ask Question</span>
+                    </div>
+                    <div class="step-item" id="step3">
+                        <div class="step-circle">3</div>
+                        <span class="step-label">Get Answer</span>
+                    </div>
+                </div>
+            </div>
+
             <!-- Mode Selection -->
-            <div class="glass-card rounded-2xl p-6 mb-8">
-                <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Select Mode</h2>
-                <div class="flex flex-wrap gap-3">
-                    <button onclick="setMode('extractive')" class="mode-btn active px-6 py-3 rounded-xl font-semibold transition-all duration-300 bg-slate-700/50 hover:bg-slate-600/50 flex items-center gap-2" data-mode="extractive">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                        </svg>
-                        Extractive
-                    </button>
-                    <button onclick="setMode('generative')" class="mode-btn px-6 py-3 rounded-xl font-semibold transition-all duration-300 bg-slate-700/50 hover:bg-slate-600/50 flex items-center gap-2" data-mode="generative">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                        </svg>
-                        Generative
-                    </button>
-                    <button onclick="setMode('hybrid')" class="mode-btn px-6 py-3 rounded-xl font-semibold transition-all duration-300 bg-slate-700/50 hover:bg-slate-600/50 flex items-center gap-2" data-mode="hybrid">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                        </svg>
-                        Hybrid (Both)
-                    </button>
-                </div>
-                <div id="modeDescription" class="mt-4 p-4 rounded-xl bg-slate-800/50 text-sm text-gray-300">
-                    <span class="font-semibold text-violet-400">Extractive Mode:</span> Finds and extracts the exact answer span from the context. Best for factual questions with answers directly stated in the text.
+            <div class="glass rounded-2xl p-5 mb-6">
+                <div class="flex flex-wrap items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-sm font-semibold text-gray-300 mb-1">Select Mode</h2>
+                        <p class="text-xs text-gray-500" id="modeHint">Extractive finds exact answers, Generative creates new text</p>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="setMode('extractive')" class="mode-pill active" data-mode="extractive">
+                            🎯 Extractive
+                        </button>
+                        <button onclick="setMode('generative')" class="mode-pill" data-mode="generative">
+                            ✨ Generative
+                        </button>
+                        <button onclick="setMode('hybrid')" class="mode-pill" data-mode="hybrid">
+                            ⚖️ Compare Both
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <!-- Main Content Grid -->
-            <div class="grid lg:grid-cols-2 gap-8 mb-8">
-                
-                <!-- Context Input -->
-                <div class="glass-card rounded-2xl p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <h2 class="text-lg font-semibold flex items-center gap-2">
-                            <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                            </svg>
-                            Context
-                        </h2>
-                        <span id="contextLength" class="text-xs text-gray-500">0 characters</span>
+            <!-- Main Input Section -->
+            <div class="glass rounded-2xl p-6 mb-6">
+                <!-- Context Section -->
+                <div class="mb-6">
+                    <div class="flex items-center justify-between mb-3">
+                        <label class="text-sm font-semibold text-gray-300 flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-full bg-cyan-500/20 flex items-center justify-center text-cyan-400 text-xs font-bold">1</span>
+                            Context Passage
+                        </label>
+                        <span class="char-counter" id="contextCounter">0 chars</span>
                     </div>
-                    <textarea 
-                        id="contextInput" 
-                        class="w-full h-64 bg-slate-800/50 border border-slate-600/50 rounded-xl p-4 text-gray-200 placeholder-gray-500 focus:outline-none focus:border-violet-500/50 focus:ring-2 focus:ring-violet-500/20 resize-none transition-all"
-                        placeholder="Paste your context here... This is the passage from which the AI will extract or generate answers."
-                        oninput="updateContextLength()"
-                    ></textarea>
+                    <div class="input-area p-4">
+                        <textarea 
+                            id="contextInput" 
+                            class="h-40 text-sm leading-relaxed"
+                            placeholder="Paste or type the text passage here. This is the source from which the AI will find or generate answers..."
+                            oninput="handleContextInput()"
+                        ></textarea>
+                    </div>
+                    
+                    <!-- Sample Context Buttons -->
+                    <div class="mt-3">
+                        <p class="text-xs text-gray-500 mb-2">Or try a sample:</p>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="loadSample('science')" class="sample-btn px-3 py-1.5 text-xs rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20 transition-all">
+                                🔬 Science
+                            </button>
+                            <button onclick="loadSample('history')" class="sample-btn px-3 py-1.5 text-xs rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 hover:bg-amber-500/20 transition-all">
+                                📜 History
+                            </button>
+                            <button onclick="loadSample('technology')" class="sample-btn px-3 py-1.5 text-xs rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 hover:bg-blue-500/20 transition-all">
+                                💻 Technology
+                            </button>
+                            <button onclick="loadSample('literature')" class="sample-btn px-3 py-1.5 text-xs rounded-lg bg-pink-500/10 border border-pink-500/20 text-pink-400 hover:bg-pink-500/20 transition-all">
+                                📚 Literature
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Question Input -->
-                <div class="glass-card rounded-2xl p-6">
-                    <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
-                        <svg class="w-5 h-5 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        Question
-                    </h2>
-                    <textarea 
-                        id="questionInput" 
-                        class="w-full h-32 bg-slate-800/50 border border-slate-600/50 rounded-xl p-4 text-gray-200 placeholder-gray-500 focus:outline-none focus:border-violet-500/50 focus:ring-2 focus:ring-violet-500/20 resize-none transition-all"
-                        placeholder="Ask a question about the context..."
-                    ></textarea>
+                <!-- Question Section -->
+                <div class="mb-6">
+                    <div class="flex items-center justify-between mb-3">
+                        <label class="text-sm font-semibold text-gray-300 flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 text-xs font-bold">2</span>
+                            Your Question
+                        </label>
+                    </div>
+                    <div class="input-area p-4">
+                        <textarea 
+                            id="questionInput" 
+                            class="h-20 text-sm"
+                            placeholder="What would you like to know about the context above?"
+                            oninput="handleQuestionInput()"
+                        ></textarea>
+                    </div>
                     
-                    <button 
-                        id="askBtn"
-                        onclick="askQuestion()" 
-                        class="w-full mt-4 py-4 px-6 bg-gradient-to-r from-violet-600 to-cyan-600 hover:from-violet-500 hover:to-cyan-500 rounded-xl font-bold text-lg transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-violet-500/25 flex items-center justify-center gap-2"
-                    >
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                        </svg>
-                        Get Answer
-                    </button>
-
                     <!-- Quick Questions -->
-                    <div id="quickQuestions" class="mt-4 hidden">
-                        <p class="text-xs text-gray-500 mb-2">Quick questions:</p>
-                        <div class="flex flex-wrap gap-2" id="quickQuestionsContainer"></div>
+                    <div id="quickQuestionsBox" class="mt-3 hidden">
+                        <p class="text-xs text-gray-500 mb-2">💡 Suggested questions:</p>
+                        <div class="flex flex-wrap gap-2" id="quickQuestions"></div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Sample Contexts -->
-            <div class="glass-card rounded-2xl p-6 mb-8">
-                <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
-                    <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                <!-- Submit Button -->
+                <button 
+                    id="askBtn"
+                    onclick="askQuestion()" 
+                    class="btn-primary w-full text-base"
+                    disabled
+                >
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                     </svg>
-                    Sample Contexts
-                </h2>
-                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {% for key, sample in samples.items() %}
-                    <button 
-                        onclick="loadSample('{{ key }}')"
-                        class="sample-card p-4 rounded-xl bg-slate-800/50 border border-slate-600/30 hover:border-violet-500/50 text-left transition-all duration-300"
-                    >
-                        <div class="text-2xl mb-2">{{ sample.title.split()[0] }}</div>
-                        <div class="font-semibold text-sm">{{ sample.title.split()[1:] | join(' ') }}</div>
-                        <div class="text-xs text-gray-500 mt-1">Click to load</div>
-                    </button>
-                    {% endfor %}
-                </div>
+                    Get Answer
+                </button>
             </div>
 
-            <!-- Answer Section -->
-            <div id="answerSection" class="hidden">
-                <!-- Single Mode Answer -->
-                <div id="singleAnswer" class="glass-card rounded-2xl p-6 answer-glow">
-                    <div class="flex items-center justify-between mb-4">
-                        <h2 class="text-lg font-semibold flex items-center gap-2">
-                            <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                            Answer
-                        </h2>
-                        <div class="flex items-center gap-4">
-                            <span id="answerMode" class="px-3 py-1 rounded-full text-xs font-semibold bg-violet-500/20 text-violet-300"></span>
-                            <span id="answerTime" class="text-xs text-gray-500"></span>
-                        </div>
-                    </div>
-                    
-                    <div id="answerText" class="text-xl font-medium text-white mb-6 p-4 rounded-xl bg-gradient-to-r from-violet-500/10 to-cyan-500/10 border border-violet-500/20"></div>
-                    
-                    <!-- Confidence Bar -->
-                    <div class="mb-4">
-                        <div class="flex justify-between text-sm mb-2">
-                            <span class="text-gray-400">Confidence</span>
-                            <span id="confidenceValue" class="font-semibold text-emerald-400"></span>
-                        </div>
-                        <div class="h-3 bg-slate-700 rounded-full overflow-hidden">
-                            <div id="confidenceBar" class="confidence-bar h-full bg-gradient-to-r from-violet-500 to-cyan-500 rounded-full" style="width: 0%"></div>
-                        </div>
-                    </div>
-
-                    <!-- Highlighted Context (for extractive) -->
-                    <div id="highlightedContextSection" class="hidden mt-6">
-                        <h3 class="text-sm font-semibold text-gray-400 mb-2">Answer in Context:</h3>
-                        <div id="highlightedContext" class="p-4 rounded-xl bg-slate-800/50 text-gray-300 text-sm leading-relaxed"></div>
-                    </div>
-
-                    <!-- Model Info -->
-                    <div id="modelInfo" class="mt-4 flex items-center gap-2 text-xs text-gray-500">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                        </svg>
-                        Model: <span id="modelName" class="text-gray-400"></span>
-                    </div>
+            <!-- Loading State -->
+            <div id="loadingState" class="hidden glass rounded-2xl p-8 mb-6 text-center fade-in">
+                <div class="loading-dots mb-4">
+                    <span></span>
+                    <span></span>
+                    <span></span>
                 </div>
+                <p class="text-gray-400 text-sm" id="loadingText">Analyzing context...</p>
+                <p class="text-gray-600 text-xs mt-2">This may take a moment for longer passages</p>
+            </div>
 
-                <!-- Hybrid Mode Answers -->
-                <div id="hybridAnswer" class="hidden grid lg:grid-cols-2 gap-6">
-                    <!-- Extractive -->
-                    <div class="glass-card rounded-2xl p-6">
-                        <div class="flex items-center gap-2 mb-4">
-                            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
+            <!-- Answer Section (Single Mode) -->
+            <div id="answerSection" class="hidden mb-6">
+                <div class="glass rounded-2xl p-6 fade-in">
+                    <!-- Answer Header -->
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center">
                                 <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
                             </div>
                             <div>
-                                <h3 class="font-semibold">Extractive Answer</h3>
+                                <h2 class="font-semibold">Answer</h2>
+                                <p class="text-xs text-gray-500">
+                                    <span id="answerMode">Extractive</span> • 
+                                    <span id="modelName">DistilBERT</span> • 
+                                    <span id="answerTime">0.5s</span>
+                                </p>
+                            </div>
+                        </div>
+                        <button onclick="copyAnswer()" class="tooltip p-2 rounded-lg hover:bg-white/5 transition-all" data-tip="Copy answer">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Answer Content -->
+                    <div class="answer-box mb-4">
+                        <p id="answerText" class="text-lg font-medium leading-relaxed"></p>
+                    </div>
+
+                    <!-- Confidence -->
+                    <div class="mb-4">
+                        <div class="flex justify-between text-sm mb-2">
+                            <span class="text-gray-400">Confidence Score</span>
+                            <span id="confidenceValue" class="font-semibold text-emerald-400">85%</span>
+                        </div>
+                        <div class="confidence-track">
+                            <div id="confidenceBar" class="confidence-fill" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Highlighted Context -->
+                    <div id="highlightedSection" class="hidden">
+                        <div class="flex items-center gap-2 mb-2">
+                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            <span class="text-sm text-gray-400">Answer in context</span>
+                        </div>
+                        <div id="highlightedContext" class="text-sm text-gray-300 leading-relaxed p-4 rounded-xl bg-black/20"></div>
+                    </div>
+
+                    <!-- Ask Another -->
+                    <button onclick="resetQuestion()" class="mt-4 w-full py-3 rounded-xl border border-gray-600 text-gray-400 hover:border-indigo-500 hover:text-indigo-400 transition-all flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                        Ask Another Question
+                    </button>
+                </div>
+            </div>
+
+            <!-- Hybrid Answer Section -->
+            <div id="hybridSection" class="hidden mb-6 fade-in">
+                <div class="grid md:grid-cols-2 gap-4 mb-4">
+                    <!-- Extractive -->
+                    <div class="comparison-card extractive glass">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
+                                🎯
+                            </div>
+                            <div>
+                                <h3 class="font-semibold">Extractive</h3>
                                 <p class="text-xs text-gray-500">DistilBERT-SQuAD</p>
                             </div>
                         </div>
-                        <div id="extractiveAnswer" class="p-4 rounded-xl bg-slate-800/50 text-white font-medium mb-4"></div>
-                        <div class="flex items-center justify-between text-sm">
-                            <span class="text-gray-400">Confidence</span>
-                            <span id="extractiveConfidence" class="font-semibold text-cyan-400"></span>
+                        <div class="p-4 rounded-xl bg-black/20 mb-4">
+                            <p id="extractiveAnswer" class="font-medium"></p>
                         </div>
-                        <div class="h-2 bg-slate-700 rounded-full overflow-hidden mt-2">
-                            <div id="extractiveBar" class="confidence-bar h-full bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full" style="width: 0%"></div>
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-gray-400">Confidence</span>
+                            <span id="extractiveConfidence" class="font-semibold text-cyan-400">0%</span>
+                        </div>
+                        <div class="confidence-track mt-2">
+                            <div id="extractiveBar" class="confidence-fill" style="width: 0%; background: linear-gradient(90deg, #3b82f6, #22d3ee)"></div>
                         </div>
                     </div>
 
                     <!-- Generative -->
-                    <div class="glass-card rounded-2xl p-6">
-                        <div class="flex items-center gap-2 mb-4">
-                            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-pink-500 flex items-center justify-center">
-                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                                </svg>
+                    <div class="comparison-card generative glass">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                                ✨
                             </div>
                             <div>
-                                <h3 class="font-semibold">Generative Answer</h3>
+                                <h3 class="font-semibold">Generative</h3>
                                 <p class="text-xs text-gray-500">BART-large-CNN</p>
                             </div>
                         </div>
-                        <div id="generativeAnswer" class="p-4 rounded-xl bg-slate-800/50 text-white font-medium mb-4"></div>
-                        <div class="flex items-center justify-between text-sm">
+                        <div class="p-4 rounded-xl bg-black/20 mb-4">
+                            <p id="generativeAnswer" class="font-medium"></p>
+                        </div>
+                        <div class="flex justify-between items-center text-sm">
                             <span class="text-gray-400">Relevance</span>
-                            <span id="generativeConfidence" class="font-semibold text-violet-400"></span>
+                            <span id="generativeConfidence" class="font-semibold text-purple-400">0%</span>
                         </div>
-                        <div class="h-2 bg-slate-700 rounded-full overflow-hidden mt-2">
-                            <div id="generativeBar" class="confidence-bar h-full bg-gradient-to-r from-violet-500 to-pink-500 rounded-full" style="width: 0%"></div>
-                        </div>
-                    </div>
-
-                    <!-- Recommendation -->
-                    <div class="lg:col-span-2 glass-card rounded-xl p-4">
-                        <div class="flex items-start gap-3">
-                            <div class="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
-                                <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold text-sm text-emerald-400 mb-1">Recommendation</h4>
-                                <p id="hybridRecommendation" class="text-sm text-gray-300"></p>
-                            </div>
+                        <div class="confidence-track mt-2">
+                            <div id="generativeBar" class="confidence-fill" style="width: 0%; background: linear-gradient(90deg, #a855f7, #ec4899)"></div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Loading State -->
-            <div id="loadingState" class="hidden glass-card rounded-2xl p-8 text-center">
-                <div class="typing-indicator flex justify-center gap-1 mb-4">
-                    <span class="w-3 h-3 bg-violet-500 rounded-full"></span>
-                    <span class="w-3 h-3 bg-cyan-500 rounded-full"></span>
-                    <span class="w-3 h-3 bg-emerald-500 rounded-full"></span>
+                <!-- Recommendation -->
+                <div class="glass rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-sm text-emerald-400 mb-1">AI Recommendation</h4>
+                            <p id="recommendation" class="text-sm text-gray-300"></p>
+                        </div>
+                    </div>
                 </div>
-                <p class="text-gray-400" id="loadingText">Analyzing context and generating answer...</p>
+
+                <!-- Ask Another -->
+                <button onclick="resetQuestion()" class="mt-4 w-full py-3 rounded-xl border border-gray-600 text-gray-400 hover:border-indigo-500 hover:text-indigo-400 transition-all flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                    </svg>
+                    Ask Another Question
+                </button>
             </div>
 
             <!-- Footer -->
-            <footer class="text-center mt-12 text-gray-500 text-sm">
-                <p>Day 52 of 100 Days of AI • Question-Answering System</p>
-                <p class="mt-1">Powered by Hugging Face Transformers 🤗</p>
+            <footer class="text-center text-gray-600 text-xs mt-8">
+                <p>Day 52 of 100 Days of AI • Powered by Abdul Rehman Baig With ❤️</p>
             </footer>
         </div>
     </div>
 
+    <!-- Toast -->
+    <div id="toast" class="toast">
+        <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        </svg>
+        <span id="toastMessage">Copied to clipboard!</span>
+    </div>
+
     <script>
-        // Sample data from server
+        // Sample data
         const samples = {
             science: {
                 context: `Photosynthesis is a process used by plants and other organisms to convert light energy into chemical energy that can be stored and later released to fuel the organism's activities. This process takes place primarily in the chloroplasts of plant cells, specifically in structures called thylakoids. During photosynthesis, plants absorb carbon dioxide from the air through small pores called stomata and water from the soil through their roots. Using sunlight as an energy source, they convert these raw materials into glucose (a simple sugar) and oxygen. The overall chemical equation for photosynthesis is: 6CO2 + 6H2O + light energy → C6H12O6 + 6O2. Chlorophyll, the green pigment in plants, plays a crucial role by absorbing light energy, primarily from the blue and red portions of the electromagnetic spectrum.`,
-                questions: ["Where does photosynthesis take place?", "What is chlorophyll?", "What is the equation for photosynthesis?"]
+                questions: ["Where does photosynthesis take place?", "What is chlorophyll?", "What is the chemical equation for photosynthesis?"]
             },
             history: {
                 context: `The Apollo 11 mission was the first crewed mission to land on the Moon. Commander Neil Armstrong and lunar module pilot Buzz Aldrin landed the Apollo Lunar Module Eagle on July 20, 1969, at 20:17 UTC. Armstrong became the first person to step onto the lunar surface six hours and 39 minutes later on July 21 at 02:56 UTC. Aldrin joined him 19 minutes later. They spent about two and a quarter hours together outside the spacecraft, and collected 47.5 pounds (21.5 kg) of lunar material to bring back to Earth. Command module pilot Michael Collins flew the Command Module Columbia alone in lunar orbit while they were on the Moon's surface. Armstrong's first step onto the lunar surface was broadcast on live TV to a worldwide audience, and he described the event as "one small step for man, one giant leap for mankind."`,
@@ -340,66 +747,117 @@
         };
 
         let currentMode = 'extractive';
+        let currentAnswer = '';
 
-        const modeDescriptions = {
-            extractive: '<span class="font-semibold text-cyan-400">Extractive Mode:</span> Finds and extracts the exact answer span from the context. Best for factual questions with answers directly stated in the text.',
-            generative: '<span class="font-semibold text-violet-400">Generative Mode:</span> Generates a natural language answer using BART. Best for questions requiring synthesis or explanation.',
-            hybrid: '<span class="font-semibold text-emerald-400">Hybrid Mode:</span> Uses both extractive and generative approaches, providing two perspectives and a recommendation on which to trust.'
-        };
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            updateSteps(1);
+        });
 
+        // Step Progress
+        function updateSteps(activeStep) {
+            for (let i = 1; i <= 3; i++) {
+                const step = document.getElementById(`step${i}`);
+                step.classList.remove('active', 'completed');
+                if (i < activeStep) {
+                    step.classList.add('completed');
+                } else if (i === activeStep) {
+                    step.classList.add('active');
+                }
+            }
+        }
+
+        // Mode Selection
         function setMode(mode) {
             currentMode = mode;
-            document.querySelectorAll('.mode-btn').forEach(btn => {
-                btn.classList.remove('active');
-                if (btn.dataset.mode === mode) {
-                    btn.classList.add('active');
-                }
+            document.querySelectorAll('.mode-pill').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.mode === mode);
             });
-            document.getElementById('modeDescription').innerHTML = modeDescriptions[mode];
+            
+            const hints = {
+                extractive: 'Finds exact answer spans from the text',
+                generative: 'Creates natural language responses',
+                hybrid: 'Compares both approaches side by side'
+            };
+            document.getElementById('modeHint').textContent = hints[mode];
         }
 
-        function updateContextLength() {
-            const length = document.getElementById('contextInput').value.length;
-            document.getElementById('contextLength').textContent = `${length} characters`;
+        // Handle Context Input
+        function handleContextInput() {
+            const context = document.getElementById('contextInput').value;
+            const counter = document.getElementById('contextCounter');
+            const len = context.length;
+            
+            counter.textContent = `${len} chars`;
+            counter.classList.remove('warning', 'good');
+            
+            if (len > 0 && len < 100) {
+                counter.classList.add('warning');
+            } else if (len >= 100) {
+                counter.classList.add('good');
+            }
+            
+            updateButtonState();
+            
+            if (len > 0) {
+                updateSteps(2);
+            } else {
+                updateSteps(1);
+            }
         }
 
+        // Handle Question Input
+        function handleQuestionInput() {
+            updateButtonState();
+        }
+
+        // Update Button State
+        function updateButtonState() {
+            const context = document.getElementById('contextInput').value.trim();
+            const question = document.getElementById('questionInput').value.trim();
+            const btn = document.getElementById('askBtn');
+            
+            btn.disabled = !(context && question);
+        }
+
+        // Load Sample
         function loadSample(key) {
             const sample = samples[key];
             document.getElementById('contextInput').value = sample.context;
-            updateContextLength();
+            handleContextInput();
             
             // Show quick questions
-            const container = document.getElementById('quickQuestionsContainer');
+            const container = document.getElementById('quickQuestions');
             container.innerHTML = '';
             sample.questions.forEach(q => {
-                const btn = document.createElement('button');
-                btn.className = 'px-3 py-1 text-xs rounded-full bg-slate-700 hover:bg-violet-500/30 text-gray-300 hover:text-white transition-all';
-                btn.textContent = q;
-                btn.onclick = () => {
+                const pill = document.createElement('button');
+                pill.className = 'quick-pill';
+                pill.textContent = q;
+                pill.onclick = () => {
                     document.getElementById('questionInput').value = q;
+                    handleQuestionInput();
                 };
-                container.appendChild(btn);
+                container.appendChild(pill);
             });
-            document.getElementById('quickQuestions').classList.remove('hidden');
+            document.getElementById('quickQuestionsBox').classList.remove('hidden');
+            
+            showToast('Sample loaded! Try one of the suggested questions.');
         }
 
+        // Ask Question
         async function askQuestion() {
             const context = document.getElementById('contextInput').value.trim();
             const question = document.getElementById('questionInput').value.trim();
             
-            if (!context) {
-                alert('Please provide a context');
-                return;
-            }
-            if (!question) {
-                alert('Please provide a question');
-                return;
-            }
+            if (!context || !question) return;
 
             // Show loading
-            document.getElementById('answerSection').classList.add('hidden');
             document.getElementById('loadingState').classList.remove('hidden');
+            document.getElementById('answerSection').classList.add('hidden');
+            document.getElementById('hybridSection').classList.add('hidden');
             document.getElementById('askBtn').disabled = true;
+            
+            updateSteps(3);
             
             const loadingTexts = [
                 'Analyzing context...',
@@ -407,10 +865,10 @@
                 'Generating answer...',
                 'Almost there...'
             ];
-            let textIndex = 0;
+            let idx = 0;
             const loadingInterval = setInterval(() => {
-                document.getElementById('loadingText').textContent = loadingTexts[textIndex % loadingTexts.length];
-                textIndex++;
+                document.getElementById('loadingText').textContent = loadingTexts[idx % loadingTexts.length];
+                idx++;
             }, 1500);
 
             try {
@@ -424,7 +882,7 @@
                 clearInterval(loadingInterval);
 
                 if (data.error) {
-                    alert(data.error);
+                    showToast(data.error, true);
                     document.getElementById('loadingState').classList.add('hidden');
                     document.getElementById('askBtn').disabled = false;
                     return;
@@ -433,7 +891,7 @@
                 displayAnswer(data);
             } catch (error) {
                 clearInterval(loadingInterval);
-                alert('An error occurred. Please try again.');
+                showToast('An error occurred. Please try again.', true);
                 console.error(error);
             }
 
@@ -441,13 +899,12 @@
             document.getElementById('askBtn').disabled = false;
         }
 
+        // Display Answer
         function displayAnswer(data) {
-            document.getElementById('answerSection').classList.remove('hidden');
-            
             if (data.mode === 'hybrid') {
                 // Hybrid mode
-                document.getElementById('singleAnswer').classList.add('hidden');
-                document.getElementById('hybridAnswer').classList.remove('hidden');
+                document.getElementById('answerSection').classList.add('hidden');
+                document.getElementById('hybridSection').classList.remove('hidden');
                 
                 // Extractive
                 document.getElementById('extractiveAnswer').textContent = data.extractive.answer;
@@ -464,15 +921,18 @@
                 }, 100);
                 
                 // Recommendation
-                document.getElementById('hybridRecommendation').textContent = data.recommendation;
+                document.getElementById('recommendation').textContent = data.recommendation;
+                
+                currentAnswer = `Extractive: ${data.extractive.answer}\n\nGenerative: ${data.generative.answer}`;
             } else {
                 // Single mode
-                document.getElementById('singleAnswer').classList.remove('hidden');
-                document.getElementById('hybridAnswer').classList.add('hidden');
+                document.getElementById('answerSection').classList.remove('hidden');
+                document.getElementById('hybridSection').classList.add('hidden');
                 
+                currentAnswer = data.answer;
                 document.getElementById('answerText').textContent = data.answer;
                 document.getElementById('answerMode').textContent = data.mode.charAt(0).toUpperCase() + data.mode.slice(1);
-                document.getElementById('answerTime').textContent = `${data.processing_time}s`;
+                document.getElementById('answerTime').textContent = data.processing_time + 's';
                 document.getElementById('confidenceValue').textContent = data.confidence + '%';
                 document.getElementById('modelName').textContent = data.model;
                 
@@ -480,24 +940,62 @@
                     document.getElementById('confidenceBar').style.width = data.confidence + '%';
                 }, 100);
                 
-                // Show highlighted context for extractive
+                // Highlighted context
                 if (data.mode === 'extractive' && data.highlighted_context) {
-                    document.getElementById('highlightedContextSection').classList.remove('hidden');
+                    document.getElementById('highlightedSection').classList.remove('hidden');
                     document.getElementById('highlightedContext').innerHTML = data.highlighted_context;
                 } else {
-                    document.getElementById('highlightedContextSection').classList.add('hidden');
+                    document.getElementById('highlightedSection').classList.add('hidden');
                 }
             }
 
             // Scroll to answer
-            document.getElementById('answerSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            setTimeout(() => {
+                const target = data.mode === 'hybrid' ? 'hybridSection' : 'answerSection';
+                document.getElementById(target).scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
         }
 
-        // Enter key to submit
+        // Copy Answer
+        function copyAnswer() {
+            navigator.clipboard.writeText(currentAnswer).then(() => {
+                showToast('Answer copied to clipboard!');
+            });
+        }
+
+        // Reset Question
+        function resetQuestion() {
+            document.getElementById('questionInput').value = '';
+            document.getElementById('answerSection').classList.add('hidden');
+            document.getElementById('hybridSection').classList.add('hidden');
+            document.getElementById('confidenceBar').style.width = '0%';
+            document.getElementById('extractiveBar').style.width = '0%';
+            document.getElementById('generativeBar').style.width = '0%';
+            updateSteps(2);
+            document.getElementById('questionInput').focus();
+        }
+
+        // Show Toast
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            const msgEl = document.getElementById('toastMessage');
+            
+            msgEl.textContent = message;
+            toast.querySelector('svg').style.color = isError ? '#ef4444' : '#10b981';
+            
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Enter key handler
         document.getElementById('questionInput').addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
-                askQuestion();
+                if (!document.getElementById('askBtn').disabled) {
+                    askQuestion();
+                }
             }
         });
     </script>

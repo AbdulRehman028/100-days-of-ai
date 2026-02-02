@@ -174,4 +174,4 @@ MIT License - Part of the 100 Days of AI Challenge
 
 *From Extractive to Generative - Exploring the Evolution of QA Systems*
 
-Develop by Abdur Rehman Baig with love.
+Develop by AbdurRehman Baig with love.

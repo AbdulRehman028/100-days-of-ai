@@ -1,6 +1,6 @@
 # 🤖 Day 52: Question-Answering System
 
-A dual-mode Question-Answering system that evolves from **Extractive** to **Generative** approaches, demonstrating two fundamental paradigms in NLP.
+A dual-mode Question-Answering system that evolves from Extractive to Generative approaches, demonstrating two fundamental paradigms in NLP.
 
 ![QA System](https://img.shields.io/badge/Day-52-violet?style=for-the-badge)
 ![Python](https://img.shields.io/badge/Python-3.8+-blue?style=for-the-badge&logo=python)

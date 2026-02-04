@@ -16,19 +16,6 @@ import re
 
 app = Flask(__name__)
 
-# Banner
-print("""
-    ╔══════════════════════════════════════════════════════════════╗
-    ║         Day 52: Question-Answering System                    ║
-    ╠══════════════════════════════════════════════════════════════╣
-    ║  Extractive: DistilBERT (distilbert-base-uncased-distilled   ║
-    ║              -squad)                                         ║
-    ║  Generative: BART (facebook/bart-large-cnn) [Cached]         ║
-    ║  Features: Dual QA Modes + Confidence Scoring                ║
-    ╚══════════════════════════════════════════════════════════════╝
-""")
-
-
 class QuestionAnsweringSystem:
     """Dual-mode Question Answering System"""
     

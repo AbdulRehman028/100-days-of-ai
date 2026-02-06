@@ -1,13 +1,3 @@
-"""
-Day 52: Question-Answering System (Extractive to Generative)
-A QA system that supports both extractive and generative approaches.
-
-Extractive QA: Finds and extracts the answer span from the context
-Generative QA: Generates a natural language answer based on the context
-
-Tech Stack: Python, Flask, Hugging Face Transformers
-"""
-
 from flask import Flask, render_template, request, jsonify
 from transformers import pipeline, AutoTokenizer, AutoModelForQuestionAnswering, AutoModelForSeq2SeqLM
 import torch

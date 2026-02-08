@@ -1,0 +1,51 @@
+{
+  "topics": {
+    "Neural Networks": {
+      "count": 1,
+      "last_studied": "2026-02-08",
+      "dates": [
+        "2026-02-08"
+      ]
+    },
+    "Blockchain": {
+      "count": 1,
+      "last_studied": "2026-02-08",
+      "dates": [
+        "2026-02-08"
+      ]
+    },
+    "Artificial Intelligence": {
+      "count": 2,
+      "last_studied": "2026-02-08",
+      "dates": [
+        "2026-02-08"
+      ]
+    },
+    "Quantum Computing": {
+      "count": 2,
+      "last_studied": "2026-02-08",
+      "dates": [
+        "2026-02-08"
+      ]
+    }
+  },
+  "bookmarks": [
+    {
+      "id": "9c527b39",
+      "topic": "Artificial Intelligence",
+      "timestamp": 24.481563,
+      "note": "",
+      "created": "2026-02-08T21:00:43.182349"
+    },
+    {
+      "id": "7f95e56e",
+      "topic": "Quantum Computing",
+      "timestamp": 29.933345,
+      "note": "",
+      "created": "2026-02-08T21:23:45.317083"
+    }
+  ],
+  "challenges": [],
+  "streak": 1,
+  "last_study": "2026-02-08"
+}

@@ -3,205 +3,199 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Notes to Speech | Day 53</title>
+    <title>NoteFlow AI — Transform Ideas into Audio Notes</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        * { font-family: 'Inter', sans-serif; }
+        * { font-family: 'Plus Jakarta Sans', sans-serif; }
         
         :root {
-            --primary: #8b5cf6;
+            --primary: #7c3aed;
             --primary-light: #a78bfa;
-            --accent: #f472b6;
+            --primary-dark: #5b21b6;
+            --accent: #06b6d4;
+            --accent-pink: #ec4899;
             --success: #10b981;
-            --bg-dark: #0a0a12;
-            --bg-card: rgba(25, 25, 40, 0.7);
+            --warning: #f59e0b;
+            --bg-primary: #030014;
+            --bg-secondary: #0a0a1f;
+            --bg-card: rgba(15, 15, 35, 0.6);
+            --border-color: rgba(124, 58, 237, 0.15);
         }
         
         body {
-            background: var(--bg-dark);
-            background-image: 
-                radial-gradient(ellipse at 0% 50%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
-                radial-gradient(ellipse at 100% 50%, rgba(244, 114, 182, 0.08) 0%, transparent 50%);
-            min-height: 100vh;
+            background: var(--bg-primary);
+            color: white;
+            overflow-x: hidden;
         }
         
-        .glass {
-            background: var(--bg-card);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.06);
+        /* Animated Background */
+        .bg-gradient-animate {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background: var(--bg-primary);
         }
         
-        /* Progress Timeline */
-        .timeline {
-            display: flex;
-            justify-content: center;
-            gap: 0;
-            position: relative;
-        }
-        
-        .timeline-step {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            position: relative;
-            flex: 1;
-            max-width: 150px;
-        }
-        
-        .timeline-step:not(:last-child)::after {
+        .bg-gradient-animate::before {
             content: '';
             position: absolute;
-            top: 20px;
-            left: 60%;
-            width: 80%;
-            height: 3px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 2px;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(124, 58, 237, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 80% 80%, rgba(6, 182, 212, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(236, 72, 153, 0.05) 0%, transparent 50%);
+            animation: bgPulse 15s ease-in-out infinite;
         }
         
-        .timeline-step.completed:not(:last-child)::after {
-            background: linear-gradient(90deg, var(--success), var(--primary));
+        @keyframes bgPulse {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-5%, -5%) scale(1.1); }
         }
         
-        .timeline-step.active:not(:last-child)::after {
-            background: linear-gradient(90deg, var(--primary), rgba(255,255,255,0.1));
-        }
-        
-        .step-icon {
-            width: 44px;
-            height: 44px;
+        /* Floating Orbs */
+        .orb {
+            position: fixed;
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            color: rgba(255, 255, 255, 0.3);
-            font-size: 18px;
-            transition: all 0.4s ease;
-            position: relative;
-            z-index: 2;
+            filter: blur(80px);
+            opacity: 0.5;
+            animation: float 20s ease-in-out infinite;
+            pointer-events: none;
         }
         
-        .timeline-step.active .step-icon {
+        .orb-1 {
+            width: 400px;
+            height: 400px;
             background: linear-gradient(135deg, var(--primary), var(--accent));
-            border-color: transparent;
-            color: white;
-            box-shadow: 0 0 25px rgba(139, 92, 246, 0.5);
-            transform: scale(1.1);
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
         }
         
-        .timeline-step.completed .step-icon {
-            background: var(--success);
-            border-color: transparent;
-            color: white;
+        .orb-2 {
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(135deg, var(--accent-pink), var(--primary));
+            bottom: 20%;
+            right: 10%;
+            animation-delay: -7s;
         }
         
-        .step-label {
-            margin-top: 10px;
-            font-size: 12px;
-            font-weight: 500;
-            color: rgba(255, 255, 255, 0.3);
-            text-align: center;
+        .orb-3 {
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(135deg, var(--accent), var(--success));
+            top: 60%;
+            left: 50%;
+            animation-delay: -14s;
         }
         
-        .timeline-step.active .step-label,
-        .timeline-step.completed .step-label {
-            color: rgba(255, 255, 255, 0.8);
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(30px, -30px) rotate(5deg); }
+            50% { transform: translate(-20px, 20px) rotate(-5deg); }
+            75% { transform: translate(20px, 30px) rotate(3deg); }
         }
         
-        /* Input Styling */
-        .topic-input {
-            background: rgba(0, 0, 0, 0.3);
-            border: 2px solid rgba(255, 255, 255, 0.08);
+        /* Glass Card Premium */
+        .glass-premium {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+            backdrop-filter: blur(40px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+        
+        .glass-premium:hover {
+            border-color: rgba(124, 58, 237, 0.3);
+            box-shadow: 
+                0 8px 32px rgba(124, 58, 237, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        }
+        
+        /* Premium Input */
+        .input-premium {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 16px;
             padding: 20px 24px;
+            color: white;
             font-size: 18px;
-            color: white;
             width: 100%;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
-        .topic-input:focus {
+        .input-premium:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15);
+            box-shadow: 
+                0 0 0 4px rgba(124, 58, 237, 0.15),
+                0 0 40px rgba(124, 58, 237, 0.1);
+            background: rgba(0, 0, 0, 0.6);
         }
         
-        .topic-input::placeholder {
-            color: rgba(255, 255, 255, 0.25);
+        .input-premium::placeholder {
+            color: rgba(255, 255, 255, 0.3);
         }
         
-        /* Style Pills */
-        .style-pill {
-            padding: 10px 18px;
-            border-radius: 12px;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            color: rgba(255, 255, 255, 0.5);
-            font-weight: 500;
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        
-        .style-pill:hover {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: rgba(255, 255, 255, 0.15);
-        }
-        
-        .style-pill.active {
-            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(244, 114, 182, 0.2));
-            border-color: var(--primary);
-            color: white;
-        }
-        
-        /* Length Slider */
-        .length-slider {
-            -webkit-appearance: none;
-            width: 100%;
-            height: 6px;
-            border-radius: 3px;
-            background: rgba(255, 255, 255, 0.1);
-            outline: none;
-        }
-        
-        .length-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            cursor: pointer;
-            box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
-        }
-        
-        /* Primary Button */
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary), #7c3aed);
+        /* Premium Button */
+        .btn-premium {
+            position: relative;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
             font-weight: 600;
-            padding: 18px 36px;
-            border-radius: 14px;
+            padding: 18px 40px;
+            border-radius: 16px;
             border: none;
             cursor: pointer;
-            transition: all 0.3s ease;
+            font-size: 16px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            font-size: 16px;
-            position: relative;
-            overflow: hidden;
+            gap: 12px;
         }
         
-        .btn-primary::before {
+        .btn-premium::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .btn-premium:hover::before {
+            opacity: 1;
+        }
+        
+        .btn-premium:hover {
+            transform: translateY(-3px);
+            box-shadow: 
+                0 20px 40px rgba(124, 58, 237, 0.4),
+                0 0 60px rgba(124, 58, 237, 0.2);
+        }
+        
+        .btn-premium:active {
+            transform: translateY(-1px);
+        }
+        
+        .btn-premium:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        /* Shine Effect */
+        .btn-premium::after {
             content: '';
             position: absolute;
             top: 0;
@@ -209,32 +203,22 @@
             width: 100%;
             height: 100%;
             background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s ease;
+            transition: left 0.5s;
         }
         
-        .btn-primary:hover::before {
+        .btn-premium:hover::after {
             left: 100%;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 40px rgba(139, 92, 246, 0.4);
-        }
-        
-        .btn-primary:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
         }
         
         /* Secondary Button */
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            color: white;
-            font-weight: 500;
+            color: rgba(255, 255, 255, 0.8);
             padding: 12px 20px;
-            border-radius: 10px;
+            border-radius: 12px;
+            font-weight: 500;
+            font-size: 14px;
             cursor: pointer;
             transition: all 0.3s ease;
             display: flex;
@@ -243,20 +227,146 @@
         }
         
         .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(124, 58, 237, 0.1);
+            border-color: rgba(124, 58, 237, 0.3);
+            color: white;
         }
         
-        /* Notes Box */
-        .notes-box {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(139, 92, 246, 0.2);
+        /* Select Premium */
+        .select-premium {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='rgba(255,255,255,0.5)'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+            padding-right: 40px;
+            transition: all 0.3s ease;
+        }
+        
+        .select-premium:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .select-premium option {
+            background: #1a1a2e;
+            color: white;
+        }
+        
+        /* Topic Pills */
+        .topic-pill {
+            padding: 10px 18px;
+            border-radius: 100px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .topic-pill:hover {
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(6, 182, 212, 0.15));
+            border-color: rgba(124, 58, 237, 0.3);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        /* Settings Row */
+        .settings-card {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 16px;
-            padding: 24px;
-            position: relative;
+            padding: 16px 20px;
         }
         
-        .notes-box::before {
+        .settings-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 8px;
+        }
+        
+        /* Stats Card Mini */
+        .stat-mini {
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.08), rgba(6, 182, 212, 0.04));
+            border: 1px solid rgba(124, 58, 237, 0.15);
+            border-radius: 12px;
+            padding: 12px 16px;
+            text-align: center;
+        }
+        
+        .stat-mini-value {
+            font-size: 18px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff, var(--primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .stat-mini-label {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Stat Card */
+        .stat-card {
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(6, 182, 212, 0.05));
+            border: 1px solid rgba(124, 58, 237, 0.2);
+            border-radius: 20px;
+            padding: 24px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(124, 58, 237, 0.4);
+            box-shadow: 0 12px 40px rgba(124, 58, 237, 0.2);
+        }
+        
+        .stat-value {
+            font-size: 36px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff, var(--primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 6px;
+        }
+        
+        /* Notes Box Premium */
+        .notes-box-premium {
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.08), rgba(6, 182, 212, 0.04));
+            border: 1px solid rgba(124, 58, 237, 0.2);
+            border-radius: 24px;
+            padding: 28px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .notes-box-premium::before {
             content: '';
             position: absolute;
             top: 0;
@@ -267,129 +377,217 @@
             border-radius: 4px 0 0 4px;
         }
         
-        /* Audio Player */
-        .audio-container {
-            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(244, 114, 182, 0.1));
-            border: 1px solid rgba(139, 92, 246, 0.3);
-            border-radius: 20px;
-            padding: 24px;
+        /* Text Highlight for Read Aloud */
+        .word-highlight {
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.4), rgba(6, 182, 212, 0.3));
+            border-radius: 4px;
+            padding: 2px 4px;
+            margin: -2px -4px;
+            transition: all 0.15s ease;
         }
         
-        .audio-player {
-            width: 100%;
-            height: 50px;
-            border-radius: 10px;
+        .sentence-highlight {
+            background: rgba(124, 58, 237, 0.15);
+            border-radius: 4px;
+            padding: 2px 0;
         }
         
-        audio::-webkit-media-controls-panel {
+        /* Read Aloud Controls */
+        .read-aloud-bar {
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(124, 58, 237, 0.1));
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            border-radius: 16px;
+            padding: 16px 20px;
+            margin-top: 20px;
+        }
+        
+        .play-btn {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--primary));
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 24px rgba(6, 182, 212, 0.4);
+        }
+        
+        .play-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 32px rgba(6, 182, 212, 0.5);
+        }
+        
+        .play-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .play-btn.playing {
+            animation: pulse-glow 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 8px 24px rgba(6, 182, 212, 0.4); }
+            50% { box-shadow: 0 8px 40px rgba(6, 182, 212, 0.7); }
+        }
+        
+        /* Progress Bar */
+        .progress-track {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--primary));
+            border-radius: 3px;
+            transition: width 0.1s linear;
+        }
+        
+        /* Generation Mode Toggle */
+        .mode-toggle {
+            display: flex;
             background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 4px;
+            gap: 4px;
         }
         
-        /* Loading Animation */
-        .loader {
+        .mode-btn {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.5);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        
+        .mode-btn:hover {
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .mode-btn.active {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            box-shadow: 0 4px 16px rgba(124, 58, 237, 0.4);
+        }
+        
+        /* Loading Animation Premium */
+        .loader-premium {
             display: flex;
             gap: 8px;
             justify-content: center;
             align-items: center;
         }
         
-        .loader-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            animation: bounce 1.4s infinite ease-in-out both;
-        }
-        
-        .loader-dot:nth-child(1) { 
-            background: var(--primary);
-            animation-delay: -0.32s; 
-        }
-        .loader-dot:nth-child(2) { 
-            background: var(--accent);
-            animation-delay: -0.16s; 
-        }
-        .loader-dot:nth-child(3) { 
-            background: var(--success);
-        }
-        
-        @keyframes bounce {
-            0%, 80%, 100% { transform: scale(0); }
-            40% { transform: scale(1); }
-        }
-        
-        /* Pulse Animation */
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-        
-        .animate-pulse {
-            animation: pulse 2s ease-in-out infinite;
-        }
-        
-        /* Sound Wave Animation */
-        .sound-wave {
-            display: flex;
-            align-items: center;
-            gap: 3px;
-            height: 30px;
-        }
-        
-        .sound-bar {
+        .loader-bar {
             width: 4px;
+            height: 40px;
             background: linear-gradient(180deg, var(--primary), var(--accent));
-            border-radius: 2px;
-            animation: soundWave 1s ease-in-out infinite;
+            border-radius: 4px;
+            animation: soundwave 1s ease-in-out infinite;
         }
         
-        .sound-bar:nth-child(1) { height: 30%; animation-delay: 0s; }
-        .sound-bar:nth-child(2) { height: 60%; animation-delay: 0.1s; }
-        .sound-bar:nth-child(3) { height: 100%; animation-delay: 0.2s; }
-        .sound-bar:nth-child(4) { height: 60%; animation-delay: 0.3s; }
-        .sound-bar:nth-child(5) { height: 30%; animation-delay: 0.4s; }
+        .loader-bar:nth-child(1) { animation-delay: 0s; }
+        .loader-bar:nth-child(2) { animation-delay: 0.1s; }
+        .loader-bar:nth-child(3) { animation-delay: 0.2s; }
+        .loader-bar:nth-child(4) { animation-delay: 0.3s; }
+        .loader-bar:nth-child(5) { animation-delay: 0.4s; }
         
-        @keyframes soundWave {
-            0%, 100% { transform: scaleY(1); }
-            50% { transform: scaleY(0.5); }
+        @keyframes soundwave {
+            0%, 100% { transform: scaleY(0.3); }
+            50% { transform: scaleY(1); }
         }
         
-        /* Fade In */
-        .fade-in {
-            animation: fadeIn 0.5s ease-out;
+        /* Concept Tag Premium */
+        .concept-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 100px;
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(6, 182, 212, 0.1));
+            border: 1px solid rgba(124, 58, 237, 0.3);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--primary-light);
+            margin: 4px;
+            transition: all 0.3s ease;
         }
         
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        .concept-tag:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 20px rgba(124, 58, 237, 0.3);
         }
         
-        /* Topic Suggestions */
-        .topic-chip {
-            padding: 8px 14px;
-            border-radius: 20px;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 12px;
+        /* Flashcard Premium */
+        .flashcard-premium {
+            perspective: 1000px;
+            height: 280px;
             cursor: pointer;
-            transition: all 0.2s ease;
         }
         
-        .topic-chip:hover {
-            background: rgba(139, 92, 246, 0.15);
-            border-color: var(--primary);
-            color: white;
+        .flashcard-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
         }
         
-        /* Toast */
-        .toast {
+        .flashcard-premium.flipped .flashcard-inner {
+            transform: rotateY(180deg);
+        }
+        
+        .flashcard-front, .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 32px;
+        }
+        
+        .flashcard-front {
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(124, 58, 237, 0.05));
+            border: 1px solid rgba(124, 58, 237, 0.3);
+        }
+        
+        .flashcard-back {
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(16, 185, 129, 0.1));
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            transform: rotateY(180deg);
+        }
+        
+        /* Toast Premium */
+        .toast-premium {
             position: fixed;
-            bottom: 24px;
-            right: 24px;
+            bottom: 32px;
+            right: 32px;
             padding: 16px 24px;
-            border-radius: 12px;
-            background: var(--bg-card);
+            border-radius: 16px;
+            background: linear-gradient(135deg, rgba(15, 15, 35, 0.95), rgba(30, 30, 60, 0.95));
             border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
             color: white;
             font-weight: 500;
             display: flex;
@@ -397,375 +595,852 @@
             gap: 12px;
             transform: translateY(100px);
             opacity: 0;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 1000;
-            backdrop-filter: blur(20px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
         }
         
-        .toast.show {
+        .toast-premium.show {
             transform: translateY(0);
             opacity: 1;
         }
         
-        /* Stats Card */
-        .stat-card {
-            background: rgba(255, 255, 255, 0.03);
+        /* Modal Premium */
+        .modal-premium {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-premium.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content-premium {
+            background: linear-gradient(135deg, rgba(15, 15, 35, 0.98), rgba(30, 30, 60, 0.95));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 28px;
+            padding: 32px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            transform: scale(0.9);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-premium.show .modal-content-premium {
+            transform: scale(1);
+        }
+        
+        /* Icon Button */
+        .btn-icon {
+            width: 44px;
+            height: 44px;
             border-radius: 12px;
-            padding: 16px;
-            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
         
-        .stat-value {
-            font-size: 24px;
-            font-weight: 700;
+        .btn-icon:hover {
+            background: rgba(124, 58, 237, 0.15);
+            border-color: rgba(124, 58, 237, 0.3);
+            color: var(--primary-light);
+            transform: scale(1.05);
+        }
+        
+        .btn-icon-sm {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+        }
+        
+        /* Badge */
+        .badge-pro {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 100px;
             background: linear-gradient(135deg, var(--primary), var(--accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        
-        .stat-label {
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.4);
+            font-size: 10px;
+            font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-top: 4px;
+        }
+        
+        /* Tabs Premium */
+        .tab-premium {
+            padding: 14px 28px;
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.5);
+            background: transparent;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .tab-premium:hover {
+            color: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.03);
+        }
+        
+        .tab-premium.active {
+            color: white;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-color: transparent;
+            box-shadow: 0 8px 24px rgba(124, 58, 237, 0.4);
+        }
+        
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeUp 0.4s ease; }
+        
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         /* Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
+        ::-webkit-scrollbar-thumb { 
+            background: rgba(124, 58, 237, 0.3); 
+            border-radius: 4px; 
+        }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(124, 58, 237, 0.5); }
+        
+        /* Audio Hidden */
+        audio { display: none; }
+        
+        /* Responsive */
+        @media (max-width: 640px) {
+            .stat-value { font-size: 28px; }
+            .btn-premium { padding: 16px 24px; font-size: 15px; }
+            .mode-btn { padding: 10px 12px; font-size: 12px; }
+        }
     </style>
 </head>
-<body class="text-white antialiased">
-    <div class="min-h-screen py-6 px-4 sm:px-6 lg:px-8">
+<body class="antialiased min-h-screen">
+    <!-- Animated Background -->
+    <div class="bg-gradient-animate"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <div class="relative z-10 py-8 px-4 sm:px-6 lg:px-8">
         <div class="max-w-4xl mx-auto">
             
             <!-- Header -->
-            <header class="text-center mb-8">
-                <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 mb-4 shadow-lg shadow-purple-500/30">
-                    <span class="text-2xl">🎙️</span>
+            <header class="flex items-center justify-between mb-10">
+                <div class="flex items-center gap-4">
+                    <div class="relative">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-600 via-purple-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-purple-500/40">
+                            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+                            </svg>
+                        </div>
+                        <div class="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-gradient-to-r from-cyan-400 to-green-400 flex items-center justify-center">
+                            <span class="text-[8px] font-bold">AI</span>
+                        </div>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold">
+                            <span class="bg-gradient-to-r from-white via-purple-200 to-cyan-200 bg-clip-text text-transparent">NoteFlow</span>
+                            <span class="text-purple-400">AI</span>
+                        </h1>
+                        <p class="text-xs text-gray-500">Transform Ideas into Audio Notes</p>
+                    </div>
                 </div>
-                <h1 class="text-3xl sm:text-4xl font-bold mb-2">
-                    <span class="bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">
-                        AI Notes to Speech
-                    </span>
-                </h1>
-                <p class="text-gray-400 text-sm">
-                    Day 53 • Generate notes with AI & convert to audio instantly
-                </p>
+                
+                <!-- Header Actions -->
+                <div class="flex items-center gap-3">
+                    <button onclick="showProgressModal()" class="btn-icon" title="Progress">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                    </button>
+                    <button onclick="showShortcuts()" class="btn-icon" title="Shortcuts (?)">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </button>
+                    <div class="badge-pro">
+                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                        </svg>
+                        PRO
+                    </div>
+                </div>
             </header>
 
-            <!-- Progress Timeline -->
-            <div class="timeline mb-8">
-                <div class="timeline-step active" id="step1">
-                    <div class="step-icon">📝</div>
-                    <span class="step-label">Enter Topic</span>
-                </div>
-                <div class="timeline-step" id="step2">
-                    <div class="step-icon">🤖</div>
-                    <span class="step-label">Generate Notes</span>
-                </div>
-                <div class="timeline-step" id="step3">
-                    <div class="step-icon">🔊</div>
-                    <span class="step-label">Listen</span>
-                </div>
-            </div>
-
-            <!-- Main Input Section -->
-            <div class="glass rounded-2xl p-6 mb-6">
-                <!-- Topic Input -->
-                <div class="mb-6">
-                    <label class="block text-sm font-semibold text-gray-300 mb-3">
-                        What topic do you want notes on?
-                    </label>
-                    <input 
-                        type="text"
-                        id="topicInput"
-                        class="topic-input"
-                        placeholder="e.g., Machine Learning, Photosynthesis, World War II..."
-                        maxlength="200"
-                        oninput="handleTopicInput()"
-                    >
-                    <div class="flex items-center justify-between mt-2">
-                        <span class="text-xs text-gray-500" id="charCount">0/200</span>
-                    </div>
-                    
-                    <!-- Topic Suggestions -->
-                    <div class="mt-4">
-                        <p class="text-xs text-gray-500 mb-2">💡 Quick suggestions:</p>
-                        <div class="flex flex-wrap gap-2">
-                            <button onclick="setTopic('Artificial Intelligence')" class="topic-chip">🤖 Artificial Intelligence</button>
-                            <button onclick="setTopic('Climate Change')" class="topic-chip">🌍 Climate Change</button>
-                            <button onclick="setTopic('Quantum Computing')" class="topic-chip">⚛️ Quantum Computing</button>
-                            <button onclick="setTopic('The Solar System')" class="topic-chip">🪐 The Solar System</button>
-                            <button onclick="setTopic('Human Brain')" class="topic-chip">🧠 Human Brain</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Options Row -->
-                <div class="grid sm:grid-cols-2 gap-6 mb-6">
-                    <!-- Note Style -->
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-300 mb-3">Note Style</label>
-                        <div class="flex flex-wrap gap-2">
-                            <button onclick="setStyle('detailed')" class="style-pill active" data-style="detailed">
-                                📖 Detailed
-                            </button>
-                            <button onclick="setStyle('bullet')" class="style-pill" data-style="bullet">
-                                • Bullet Points
-                            </button>
-                            <button onclick="setStyle('summary')" class="style-pill" data-style="summary">
-                                📋 Summary
-                            </button>
-                            <button onclick="setStyle('study')" class="style-pill" data-style="study">
-                                📚 Study Notes
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Length -->
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-300 mb-3">
-                            Length: <span id="lengthLabel" class="text-purple-400">Medium</span>
-                        </label>
-                        <input 
-                            type="range" 
-                            id="lengthSlider"
-                            class="length-slider"
-                            min="1" 
-                            max="3" 
-                            value="2"
-                            oninput="updateLength()"
-                        >
-                        <div class="flex justify-between text-xs text-gray-500 mt-1">
-                            <span>Short</span>
-                            <span>Medium</span>
-                            <span>Long</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Voice Options -->
-                <div class="mb-6">
-                    <label class="block text-sm font-semibold text-gray-300 mb-3">Voice Settings</label>
-                    <div class="flex flex-wrap gap-4">
-                        <select id="languageSelect" class="bg-black/30 border border-white/10 rounded-lg px-4 py-2 text-sm text-gray-300 focus:outline-none focus:border-purple-500">
-                            <option value="en">🇺🇸 English (US)</option>
-                            <option value="en-uk">🇬🇧 English (UK)</option>
-                            <option value="en-au">🇦🇺 English (AU)</option>
-                            <option value="es">🇪🇸 Spanish</option>
-                            <option value="fr">🇫🇷 French</option>
-                            <option value="de">🇩🇪 German</option>
-                            <option value="it">🇮🇹 Italian</option>
-                            <option value="pt">🇵🇹 Portuguese</option>
-                            <option value="ja">🇯🇵 Japanese</option>
-                            <option value="ko">🇰🇷 Korean</option>
-                            <option value="zh-CN">🇨🇳 Chinese</option>
-                            <option value="hi">🇮🇳 Hindi</option>
-                        </select>
-                        <label class="flex items-center gap-2 text-sm text-gray-400 cursor-pointer">
-                            <input type="checkbox" id="slowSpeed" class="w-4 h-4 rounded bg-black/30 border-white/20 text-purple-500 focus:ring-purple-500">
-                            🐢 Slower speech
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Generate Button -->
-                <button 
-                    id="generateBtn"
-                    onclick="generateAndSpeak()" 
-                    class="btn-primary w-full"
-                    disabled
-                >
-                    <span class="text-xl">✨</span>
-                    Generate Notes & Audio
+            <!-- Main Tabs -->
+            <div class="glass-premium rounded-2xl p-2 mb-8 flex flex-wrap gap-2">
+                <button onclick="switchTab('generate')" class="tab-premium active" data-tab="generate">
+                    <span class="mr-2">✨</span>Generate
+                </button>
+                <button onclick="switchTab('tools')" class="tab-premium" data-tab="tools">
+                    <span class="mr-2">🛠️</span>Tools
+                </button>
+                <button onclick="switchTab('compare')" class="tab-premium" data-tab="compare">
+                    <span class="mr-2">⚖️</span>Compare
                 </button>
             </div>
 
-            <!-- Loading State -->
-            <div id="loadingState" class="hidden glass rounded-2xl p-8 mb-6 text-center fade-in">
-                <div class="loader mb-4">
-                    <div class="loader-dot"></div>
-                    <div class="loader-dot"></div>
-                    <div class="loader-dot"></div>
-                </div>
-                <p class="text-gray-300 font-medium" id="loadingText">Generating notes with AI...</p>
-                <p class="text-gray-500 text-sm mt-2" id="loadingSubtext">This may take a moment</p>
-            </div>
+            <!-- TAB: Generate -->
+            <div id="tab-generate" class="tab-content active">
+                <div class="glass-premium rounded-3xl p-8 mb-8 transition-all duration-300">
+                    <!-- Hero Text -->
+                    <div class="text-center mb-8">
+                        <h2 class="text-3xl sm:text-4xl font-bold mb-3">
+                            <span class="bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">What would you like to</span>
+                            <span class="bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent"> learn today?</span>
+                        </h2>
+                        <p class="text-gray-400">Enter any topic and we'll create comprehensive notes with audio</p>
+                    </div>
 
-            <!-- Results Section -->
-            <div id="resultsSection" class="hidden fade-in">
-                <!-- Stats -->
-                <div class="grid grid-cols-3 gap-4 mb-6">
-                    <div class="stat-card glass">
-                        <div class="stat-value" id="wordCount">0</div>
-                        <div class="stat-label">Words</div>
-                    </div>
-                    <div class="stat-card glass">
-                        <div class="stat-value" id="genTime">0s</div>
-                        <div class="stat-label">Gen Time</div>
-                    </div>
-                    <div class="stat-card glass">
-                        <div class="stat-value" id="audioSize">0KB</div>
-                        <div class="stat-label">Audio Size</div>
-                    </div>
-                </div>
-
-                <!-- Notes Display -->
-                <div class="glass rounded-2xl p-6 mb-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-                                📝
-                            </div>
-                            <div>
-                                <h2 class="font-semibold">Generated Notes</h2>
-                                <p class="text-xs text-gray-500">Topic: <span id="topicLabel">-</span></p>
-                            </div>
-                        </div>
-                        <div class="flex gap-2">
-                            <button onclick="copyNotes()" class="btn-secondary text-sm">
+                    <!-- Topic Input -->
+                    <div class="mb-6">
+                        <input 
+                            type="text"
+                            id="topicInput"
+                            class="input-premium"
+                            placeholder="e.g., Quantum Computing, Machine Learning, Climate Science..."
+                            maxlength="200"
+                            oninput="handleTopicInput()"
+                            onkeydown="if(event.key === 'Enter' && !document.getElementById('generateBtn').disabled) generate()"
+                        >
+                        <div class="flex items-center justify-between mt-3 px-1">
+                            <span class="text-xs text-gray-600" id="charCount">0/200 characters</span>
+                            <button onclick="toggleAdvanced()" class="text-xs text-purple-400 hover:text-purple-300 flex items-center gap-1 transition-colors">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
                                 </svg>
-                                Copy
+                                Advanced Settings
                             </button>
                         </div>
                     </div>
-                    <div class="notes-box">
-                        <p id="notesContent" class="text-gray-200 leading-relaxed whitespace-pre-wrap"></p>
+
+                    <!-- Quick Topics -->
+                    <div class="mb-6">
+                        <p class="text-xs text-gray-500 mb-3 flex items-center gap-2">
+                            <span class="w-1 h-1 rounded-full bg-purple-500"></span>
+                            Popular Topics
+                        </p>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="setTopic('Artificial Intelligence')" class="topic-pill">🤖 Artificial Intelligence</button>
+                            <button onclick="setTopic('Quantum Computing')" class="topic-pill">⚛️ Quantum Computing</button>
+                            <button onclick="setTopic('Climate Change')" class="topic-pill">🌍 Climate Change</button>
+                            <button onclick="setTopic('Blockchain Technology')" class="topic-pill">⛓️ Blockchain</button>
+                            <button onclick="setTopic('Neural Networks')" class="topic-pill">🧠 Neural Networks</button>
+                        </div>
+                    </div>
+
+                    <!-- Generation Mode Toggle -->
+                    <div class="mb-6">
+                        <p class="text-xs text-gray-500 mb-3 flex items-center gap-2">
+                            <span class="w-1 h-1 rounded-full bg-cyan-500"></span>
+                            Output Mode
+                        </p>
+                        <div class="mode-toggle">
+                            <button onclick="setMode('notes')" class="mode-btn" data-mode="notes">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                                Notes Only
+                            </button>
+                            <button onclick="setMode('audio')" class="mode-btn" data-mode="audio">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path>
+                                </svg>
+                                Audio Only
+                            </button>
+                            <button onclick="setMode('both')" class="mode-btn active" data-mode="both">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                </svg>
+                                Both
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Advanced Settings (Hidden by default) -->
+                    <div id="advancedSettings" class="hidden mb-6 space-y-4">
+                        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div class="settings-card">
+                                <p class="settings-label">🎭 Tone</p>
+                                <select id="toneSelect" class="select-premium w-full">
+                                    <option value="academic">Academic</option>
+                                    <option value="casual">Casual</option>
+                                    <option value="motivational">Motivational</option>
+                                    <option value="exam_focused">Exam Prep</option>
+                                </select>
+                            </div>
+                            <div class="settings-card">
+                                <p class="settings-label">📊 Level</p>
+                                <select id="difficultySelect" class="select-premium w-full">
+                                    <option value="beginner">Beginner</option>
+                                    <option value="intermediate" selected>Intermediate</option>
+                                    <option value="advanced">Advanced</option>
+                                </select>
+                            </div>
+                            <div class="settings-card">
+                                <p class="settings-label">📋 Style</p>
+                                <select id="styleSelect" class="select-premium w-full">
+                                    <option value="detailed">Detailed</option>
+                                    <option value="bullet">Bullet Points</option>
+                                    <option value="summary">Summary</option>
+                                    <option value="exam">Exam Notes</option>
+                                </select>
+                            </div>
+                            <div class="settings-card">
+                                <p class="settings-label">🎤 Voice</p>
+                                <select id="voiceSelect" class="select-premium w-full">
+                                    <option value="female_us">🇺🇸 US English</option>
+                                    <option value="female_uk">🇬🇧 UK English</option>
+                                    <option value="female_au">🇦🇺 Australian</option>
+                                    <option value="male_in">🇮🇳 Indian</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="flex flex-wrap items-center gap-4">
+                            <div class="settings-card flex-1 min-w-[200px]">
+                                <p class="settings-label">🌐 Language</p>
+                                <select id="languageSelect" class="select-premium w-full">
+                                    <option value="en">English</option>
+                                    <option value="es">Spanish</option>
+                                    <option value="fr">French</option>
+                                    <option value="de">German</option>
+                                    <option value="hi">Hindi</option>
+                                    <option value="ja">Japanese</option>
+                                    <option value="ko">Korean</option>
+                                    <option value="zh-CN">Chinese</option>
+                                </select>
+                            </div>
+                            <label class="flex items-center gap-3 cursor-pointer p-4 rounded-xl bg-black/20 border border-white/5">
+                                <input type="checkbox" id="slowSpeed" class="w-5 h-5 rounded accent-purple-500">
+                                <span class="text-sm text-gray-300">🐢 Slower Speech</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Generate Button -->
+                    <button id="generateBtn" onclick="generate()" class="btn-premium w-full" disabled>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                        <span id="generateBtnText">Generate Notes & Audio</span>
+                    </button>
+                </div>
+
+                <!-- Loading State -->
+                <div id="loadingState" class="hidden glass-premium rounded-3xl p-12 mb-8 text-center">
+                    <div class="loader-premium mb-6">
+                        <div class="loader-bar"></div>
+                        <div class="loader-bar"></div>
+                        <div class="loader-bar"></div>
+                        <div class="loader-bar"></div>
+                        <div class="loader-bar"></div>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2" id="loadingText">Generating your notes...</h3>
+                    <p class="text-gray-400" id="loadingSubtext">Our AI is crafting comprehensive content</p>
+                    <div class="mt-6 flex justify-center gap-2">
+                        <div class="w-2 h-2 rounded-full bg-purple-500 animate-pulse"></div>
+                        <div class="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" style="animation-delay: 0.2s"></div>
+                        <div class="w-2 h-2 rounded-full bg-pink-500 animate-pulse" style="animation-delay: 0.4s"></div>
                     </div>
                 </div>
 
-                <!-- Audio Player -->
-                <div class="audio-container mb-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="flex items-center gap-3">
-                            <div class="sound-wave">
-                                <div class="sound-bar"></div>
-                                <div class="sound-bar"></div>
-                                <div class="sound-bar"></div>
-                                <div class="sound-bar"></div>
-                                <div class="sound-bar"></div>
+                <!-- Results Section -->
+                <div id="resultsSection" class="hidden">
+                    <!-- Notes Card with Integrated Controls -->
+                    <div class="glass-premium rounded-3xl p-8 mb-6">
+                        <!-- Header -->
+                        <div class="flex items-start justify-between mb-6">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-lg">Generated Notes</h3>
+                                    <p class="text-sm text-gray-400">Topic: <span id="topicLabel" class="text-purple-300">-</span></p>
+                                </div>
                             </div>
-                            <div>
-                                <h3 class="font-semibold">Audio Notes</h3>
-                                <p class="text-xs text-gray-400">Listen or download</p>
+                            <!-- Action Buttons -->
+                            <div class="flex gap-2">
+                                <button onclick="copyNotes()" class="btn-icon btn-icon-sm" title="Copy Notes">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path>
+                                    </svg>
+                                </button>
+                                <button onclick="addBookmark()" class="btn-icon btn-icon-sm" title="Bookmark">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+                                    </svg>
+                                </button>
+                                <button onclick="downloadAudio()" id="downloadBtn" class="btn-icon btn-icon-sm" title="Download Audio">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                    </svg>
+                                </button>
                             </div>
                         </div>
-                        <button onclick="downloadAudio()" class="btn-secondary text-sm">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-                            </svg>
-                            Download MP3
+
+                        <!-- Key Concepts -->
+                        <div id="keyConcepts" class="mb-6 hidden">
+                            <p class="text-xs text-gray-500 mb-3">🔑 Key Concepts</p>
+                            <div id="conceptTags"></div>
+                        </div>
+
+                        <!-- Notes Content with Highlighting -->
+                        <div class="notes-box-premium">
+                            <div id="notesContent" class="text-gray-200 leading-relaxed text-[15px]"></div>
+                        </div>
+
+                        <!-- Read Aloud Controls (Integrated) -->
+                        <div id="readAloudSection" class="read-aloud-bar hidden">
+                            <div class="flex items-center gap-4">
+                                <!-- Play Button -->
+                                <button onclick="togglePlayPause()" id="playBtn" class="play-btn">
+                                    <svg id="playIcon" class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M8 5v14l11-7z"/>
+                                    </svg>
+                                    <svg id="pauseIcon" class="w-6 h-6 text-white hidden" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
+                                    </svg>
+                                </button>
+                                
+                                <!-- Progress & Time -->
+                                <div class="flex-1">
+                                    <div class="flex items-center justify-between text-xs text-gray-400 mb-2">
+                                        <span id="currentTime">0:00</span>
+                                        <span id="totalTime">0:00</span>
+                                    </div>
+                                    <div class="progress-track" onclick="seekAudio(event)">
+                                        <div id="progressFill" class="progress-fill" style="width: 0%"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Speed Control -->
+                                <select id="speedSelect" onchange="changeSpeed()" class="select-premium text-sm py-2 px-3">
+                                    <option value="0.75">0.75x</option>
+                                    <option value="1" selected>1x</option>
+                                    <option value="1.25">1.25x</option>
+                                    <option value="1.5">1.5x</option>
+                                    <option value="2">2x</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Stats Row (Below Notes) -->
+                        <div class="grid grid-cols-4 gap-3 mt-6 pt-6 border-t border-white/5">
+                            <div class="stat-mini">
+                                <div class="stat-mini-value" id="wordCount">0</div>
+                                <div class="stat-mini-label">Words</div>
+                            </div>
+                            <div class="stat-mini">
+                                <div class="stat-mini-value" id="duration">0:00</div>
+                                <div class="stat-mini-label">Duration</div>
+                            </div>
+                            <div class="stat-mini">
+                                <div class="stat-mini-value" id="genTime">0s</div>
+                                <div class="stat-mini-label">Generated</div>
+                            </div>
+                            <div class="stat-mini">
+                                <div class="stat-mini-value" id="audioSize">-</div>
+                                <div class="stat-mini-label">File Size</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hidden Audio Player -->
+                    <audio id="audioPlayer" ontimeupdate="updateProgress()" onended="onAudioEnd()"></audio>
+
+                    <!-- Action Buttons -->
+                    <div class="grid sm:grid-cols-3 gap-4 mb-8">
+                        <button onclick="generateQuestions('mcq')" class="btn-secondary justify-center py-4">
+                            <span class="text-lg">❓</span> Generate MCQs
+                        </button>
+                        <button onclick="generateFlashcards()" class="btn-secondary justify-center py-4">
+                            <span class="text-lg">🃏</span> Create Flashcards
+                        </button>
+                        <button onclick="splitPomodoro()" class="btn-secondary justify-center py-4">
+                            <span class="text-lg">🍅</span> Pomodoro Split
                         </button>
                     </div>
-                    <audio id="audioPlayer" class="audio-player" controls></audio>
-                </div>
 
-                <!-- New Topic Button -->
-                <button onclick="resetAll()" class="w-full py-4 rounded-xl border border-gray-600 text-gray-400 hover:border-purple-500 hover:text-purple-400 transition-all flex items-center justify-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                    </svg>
-                    Generate Notes on Another Topic
-                </button>
+                    <!-- New Topic -->
+                    <button onclick="resetAll()" class="w-full py-4 rounded-2xl border border-gray-700 text-gray-400 hover:border-purple-500 hover:text-purple-400 transition-all flex items-center justify-center gap-3 font-medium">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                        Start New Topic
+                    </button>
+                </div>
+            </div>
+
+            <!-- TAB: Tools -->
+            <div id="tab-tools" class="tab-content">
+                <div class="grid sm:grid-cols-2 gap-6">
+                    <!-- Questions Tool -->
+                    <div class="glass-premium rounded-3xl p-6">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center">
+                                <span class="text-2xl">❓</span>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold">Question Generator</h3>
+                                <p class="text-sm text-gray-400">Create practice questions</p>
+                            </div>
+                        </div>
+                        <select id="questionType" class="select-premium w-full mb-4">
+                            <option value="mcq">Multiple Choice</option>
+                            <option value="short">Short Answer</option>
+                        </select>
+                        <button onclick="generateQuestions()" class="btn-premium w-full">Generate Questions</button>
+                        <div id="questionsResult" class="mt-4 hidden"></div>
+                    </div>
+
+                    <!-- Flashcards Tool -->
+                    <div class="glass-premium rounded-3xl p-6">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center">
+                                <span class="text-2xl">🃏</span>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold">Flashcards</h3>
+                                <p class="text-sm text-gray-400">Quick revision cards</p>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-400 mb-4">Create interactive Q&A flashcards from your generated notes.</p>
+                        <button onclick="generateFlashcards()" class="btn-premium w-full">Create Flashcards</button>
+                    </div>
+
+                    <!-- Simplify Tool -->
+                    <div class="glass-premium rounded-3xl p-6">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center">
+                                <span class="text-2xl">💡</span>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold">Simplify Text</h3>
+                                <p class="text-sm text-gray-400">Make it easier</p>
+                            </div>
+                        </div>
+                        <textarea id="simplifyInput" class="input-premium h-24 text-sm mb-4 resize-none" placeholder="Paste complex text here..."></textarea>
+                        <button onclick="explainSimplerText()" class="btn-premium w-full">Simplify</button>
+                        <div id="simplifyResult" class="mt-4 hidden"></div>
+                    </div>
+
+                    <!-- Pomodoro Tool -->
+                    <div class="glass-premium rounded-3xl p-6">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-red-500 to-pink-500 flex items-center justify-center">
+                                <span class="text-2xl">🍅</span>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold">Pomodoro Mode</h3>
+                                <p class="text-sm text-gray-400">Split into sessions</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="text-sm text-gray-400">Sessions:</span>
+                            <select id="pomodoroSessions" class="select-premium">
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4" selected>4</option>
+                                <option value="5">5</option>
+                            </select>
+                        </div>
+                        <button onclick="splitPomodoro()" class="btn-premium w-full">Split Notes</button>
+                        <div id="pomodoroResult" class="mt-4 hidden"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: Compare -->
+            <div id="tab-compare" class="tab-content">
+                <div class="glass-premium rounded-3xl p-8">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-pink-500 to-purple-500 flex items-center justify-center">
+                            <span class="text-2xl">⚖️</span>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-lg">Compare Topics</h3>
+                            <p class="text-sm text-gray-400">Side-by-side comparison</p>
+                        </div>
+                    </div>
+                    
+                    <div class="grid sm:grid-cols-2 gap-4 mb-6">
+                        <div>
+                            <label class="settings-label">Topic 1</label>
+                            <input type="text" id="compareTopic1" class="input-premium" placeholder="e.g., Machine Learning">
+                        </div>
+                        <div>
+                            <label class="settings-label">Topic 2</label>
+                            <input type="text" id="compareTopic2" class="input-premium" placeholder="e.g., Deep Learning">
+                        </div>
+                    </div>
+                    
+                    <button onclick="compareTopics()" class="btn-premium w-full mb-6">Compare Topics</button>
+                    
+                    <div id="compareResult" class="hidden">
+                        <div class="notes-box-premium">
+                            <p id="comparisonText" class="text-gray-200 leading-relaxed whitespace-pre-wrap"></p>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Footer -->
-            <footer class="text-center text-gray-600 text-xs mt-8">
-                <p>Day 53 of 100 Days of AI • Powered by GPT-2 & gTTS</p>
+            <footer class="text-center mt-12 pb-8">
+                <p class="text-gray-600 text-sm">
+                    Built with ❤️ using GPT-2 + gTTS
+                </p>
+                <p class="text-gray-700 text-xs mt-2">
+                    Press <kbd class="px-2 py-1 bg-gray-800 rounded text-gray-400">?</kbd> for keyboard shortcuts
+                </p>
             </footer>
         </div>
     </div>
 
+    <!-- Progress Modal -->
+    <div id="progressModal" class="modal-premium">
+        <div class="modal-content-premium">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-semibold">📊 Your Progress</h3>
+                <button onclick="closeModal('progressModal')" class="btn-icon">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalTopics">0</div>
+                    <div class="stat-label">Topics</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalSessions">0</div>
+                    <div class="stat-label">Sessions</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="streak">0</div>
+                    <div class="stat-label">Streak</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="bookmarksCount">0</div>
+                    <div class="stat-label">Bookmarks</div>
+                </div>
+            </div>
+            <div>
+                <p class="settings-label mb-3">Recent Topics</p>
+                <div id="recentTopics" class="space-y-2">
+                    <p class="text-sm text-gray-500">No topics yet</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shortcuts Modal -->
+    <div id="shortcutsModal" class="modal-premium">
+        <div class="modal-content-premium">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-semibold">⌨️ Keyboard Shortcuts</h3>
+                <button onclick="closeModal('shortcutsModal')" class="btn-icon">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="space-y-3">
+                <div class="flex justify-between items-center p-3 rounded-xl bg-black/20">
+                    <span class="text-gray-300">Generate Notes</span>
+                    <kbd class="px-3 py-1 bg-gray-800 rounded-lg text-sm font-mono">Enter</kbd>
+                </div>
+                <div class="flex justify-between items-center p-3 rounded-xl bg-black/20">
+                    <span class="text-gray-300">Play/Pause</span>
+                    <kbd class="px-3 py-1 bg-gray-800 rounded-lg text-sm font-mono">Space</kbd>
+                </div>
+                <div class="flex justify-between items-center p-3 rounded-xl bg-black/20">
+                    <span class="text-gray-300">Add Bookmark</span>
+                    <kbd class="px-3 py-1 bg-gray-800 rounded-lg text-sm font-mono">B</kbd>
+                </div>
+                <div class="flex justify-between items-center p-3 rounded-xl bg-black/20">
+                    <span class="text-gray-300">Copy Notes</span>
+                    <kbd class="px-3 py-1 bg-gray-800 rounded-lg text-sm font-mono">C</kbd>
+                </div>
+                <div class="flex justify-between items-center p-3 rounded-xl bg-black/20">
+                    <span class="text-gray-300">Show Shortcuts</span>
+                    <kbd class="px-3 py-1 bg-gray-800 rounded-lg text-sm font-mono">?</kbd>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Flashcards Modal -->
+    <div id="flashcardsModal" class="modal-premium">
+        <div class="modal-content-premium">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-semibold">🃏 Flashcards</h3>
+                <button onclick="closeModal('flashcardsModal')" class="btn-icon">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div id="flashcardsContainer"></div>
+            <div class="flex justify-center items-center gap-4 mt-6">
+                <button onclick="prevFlashcard()" class="btn-secondary">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                    Previous
+                </button>
+                <span id="flashcardCounter" class="text-gray-400 font-medium">1/5</span>
+                <button onclick="nextFlashcard()" class="btn-secondary">
+                    Next
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast -->
-    <div id="toast" class="toast">
-        <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div id="toast" class="toast-premium">
+        <svg id="toastIcon" class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
         </svg>
         <span id="toastMessage">Success!</span>
     </div>
 
     <script>
-        let currentStyle = 'detailed';
-        let currentLength = 'medium';
-        let currentAudioFile = '';
+        // ============================================
+        // STATE
+        // ============================================
         let generatedNotes = '';
+        let currentTopic = '';
+        let currentAudioFile = '';
+        let flashcards = [];
+        let currentFlashcardIndex = 0;
+        let bookmarks = [];
+        let generationMode = 'both'; // 'notes', 'audio', 'both'
+        let isPlaying = false;
+        let wordElements = [];
+        let currentWordIndex = -1;
 
-        // Topic Input Handler
-        function handleTopicInput() {
-            const input = document.getElementById('topicInput');
-            const count = input.value.length;
-            document.getElementById('charCount').textContent = `${count}/200`;
-            document.getElementById('generateBtn').disabled = count === 0;
-        }
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProgress();
+            loadBookmarks();
+            setupKeyboardShortcuts();
+            document.getElementById('topicInput').focus();
+        });
 
-        // Set Topic from Suggestion
-        function setTopic(topic) {
-            document.getElementById('topicInput').value = topic;
-            handleTopicInput();
-        }
-
-        // Set Style
-        function setStyle(style) {
-            currentStyle = style;
-            document.querySelectorAll('.style-pill').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.style === style);
+        // ============================================
+        // TABS
+        // ============================================
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-premium').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.tab === tab);
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.toggle('active', content.id === `tab-${tab}`);
             });
         }
 
-        // Update Length
-        function updateLength() {
-            const value = document.getElementById('lengthSlider').value;
-            const labels = { 1: 'Short', 2: 'Medium', 3: 'Long' };
-            const lengths = { 1: 'short', 2: 'medium', 3: 'long' };
-            document.getElementById('lengthLabel').textContent = labels[value];
-            currentLength = lengths[value];
+        // ============================================
+        // GENERATION MODE
+        // ============================================
+        function setMode(mode) {
+            generationMode = mode;
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.mode === mode);
+            });
+            
+            // Update button text
+            const btnText = document.getElementById('generateBtnText');
+            if (mode === 'notes') btnText.textContent = 'Generate Notes Only';
+            else if (mode === 'audio') btnText.textContent = 'Generate Audio Only';
+            else btnText.textContent = 'Generate Notes & Audio';
         }
 
-        // Update Timeline Steps
-        function updateSteps(step) {
-            for (let i = 1; i <= 3; i++) {
-                const el = document.getElementById(`step${i}`);
-                el.classList.remove('active', 'completed');
-                if (i < step) el.classList.add('completed');
-                else if (i === step) el.classList.add('active');
-            }
+        // ============================================
+        // INPUT
+        // ============================================
+        function handleTopicInput() {
+            const input = document.getElementById('topicInput');
+            const count = input.value.length;
+            document.getElementById('charCount').textContent = `${count}/200 characters`;
+            document.getElementById('generateBtn').disabled = count === 0;
         }
 
-        // Generate and Speak
-        async function generateAndSpeak() {
+        function setTopic(topic) {
+            document.getElementById('topicInput').value = topic;
+            handleTopicInput();
+            document.getElementById('topicInput').focus();
+        }
+
+        function toggleAdvanced() {
+            const settings = document.getElementById('advancedSettings');
+            settings.classList.toggle('hidden');
+        }
+
+        // ============================================
+        // GENERATE
+        // ============================================
+        async function generate() {
             const topic = document.getElementById('topicInput').value.trim();
             if (!topic) return;
 
-            const language = document.getElementById('languageSelect').value;
-            const slow = document.getElementById('slowSpeed').checked;
-
-            // Show loading
+            currentTopic = topic;
+            
             document.getElementById('loadingState').classList.remove('hidden');
             document.getElementById('resultsSection').classList.add('hidden');
             document.getElementById('generateBtn').disabled = true;
-            
-            updateSteps(2);
 
-            const loadingSteps = [
-                { text: 'Generating notes with AI...', sub: 'Analyzing topic and creating content' },
-                { text: 'Processing text...', sub: 'Formatting and structuring notes' },
-                { text: 'Converting to speech...', sub: 'Creating audio file' },
-                { text: 'Almost done...', sub: 'Finalizing your audio notes' }
+            const steps = [
+                { text: 'Analyzing your topic...', sub: 'Understanding context and scope' },
+                { text: 'Generating comprehensive notes...', sub: 'AI is crafting your content' },
+                { text: 'Converting to natural speech...', sub: 'Creating audio narration' },
+                { text: 'Finalizing...', sub: 'Almost there!' }
             ];
             
-            let stepIdx = 0;
-            const loadingInterval = setInterval(() => {
-                const step = loadingSteps[stepIdx % loadingSteps.length];
-                document.getElementById('loadingText').textContent = step.text;
-                document.getElementById('loadingSubtext').textContent = step.sub;
-                stepIdx++;
+            if (generationMode === 'notes') {
+                steps.splice(2, 1); // Remove audio step
+            }
+            
+            let step = 0;
+            const interval = setInterval(() => {
+                const s = steps[step % steps.length];
+                document.getElementById('loadingText').textContent = s.text;
+                document.getElementById('loadingSubtext').textContent = s.sub;
+                step++;
             }, 2000);
 
             try {
@@ -774,112 +1449,549 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         topic,
-                        style: currentStyle,
-                        length: currentLength,
-                        language,
-                        slow
+                        style: document.getElementById('styleSelect')?.value || 'detailed',
+                        tone: document.getElementById('toneSelect')?.value || 'academic',
+                        difficulty: document.getElementById('difficultySelect')?.value || 'intermediate',
+                        language: document.getElementById('languageSelect')?.value || 'en',
+                        slow: document.getElementById('slowSpeed')?.checked || false,
+                        voice: document.getElementById('voiceSelect')?.value || 'female_us',
+                        mode: generationMode
                     })
                 });
 
                 const data = await response.json();
-                clearInterval(loadingInterval);
+                clearInterval(interval);
 
                 if (data.error) {
                     showToast(data.error, true);
                     document.getElementById('loadingState').classList.add('hidden');
                     document.getElementById('generateBtn').disabled = false;
-                    updateSteps(1);
                     return;
                 }
 
                 displayResults(data);
-                updateSteps(3);
-                
             } catch (error) {
-                clearInterval(loadingInterval);
-                showToast('An error occurred. Please try again.', true);
+                clearInterval(interval);
+                showToast('Error generating notes', true);
                 console.error(error);
-                updateSteps(1);
             }
 
             document.getElementById('loadingState').classList.add('hidden');
             document.getElementById('generateBtn').disabled = false;
         }
 
-        // Display Results
         function displayResults(data) {
             generatedNotes = data.notes;
-            currentAudioFile = data.audio_file;
+            currentAudioFile = data.audio_file || '';
 
             // Update stats
-            document.getElementById('wordCount').textContent = data.word_count;
-            document.getElementById('genTime').textContent = data.total_time + 's';
-            document.getElementById('audioSize').textContent = data.audio_size;
+            document.getElementById('wordCount').textContent = data.word_count || '-';
+            document.getElementById('duration').textContent = data.duration || '-';
+            document.getElementById('genTime').textContent = (data.total_time || '-') + 's';
+            document.getElementById('audioSize').textContent = data.audio_size || '-';
 
-            // Update notes
             document.getElementById('topicLabel').textContent = data.topic;
-            document.getElementById('notesContent').textContent = data.notes;
+            
+            // Render notes with word spans for highlighting
+            renderNotesWithHighlighting(data.notes);
 
-            // Update audio player
-            const audioPlayer = document.getElementById('audioPlayer');
-            audioPlayer.src = data.audio_file;
+            // Key concepts
+            if (data.key_concepts?.length > 0) {
+                const html = data.key_concepts.map(c => `<span class="concept-tag">${c}</span>`).join('');
+                document.getElementById('conceptTags').innerHTML = html;
+                document.getElementById('keyConcepts').classList.remove('hidden');
+            } else {
+                document.getElementById('keyConcepts').classList.add('hidden');
+            }
 
-            // Show results
+            // Audio section
+            const readAloudSection = document.getElementById('readAloudSection');
+            const downloadBtn = document.getElementById('downloadBtn');
+            
+            if (currentAudioFile && generationMode !== 'notes') {
+                document.getElementById('audioPlayer').src = currentAudioFile;
+                readAloudSection.classList.remove('hidden');
+                downloadBtn.classList.remove('hidden');
+            } else {
+                readAloudSection.classList.add('hidden');
+                downloadBtn.classList.add('hidden');
+            }
+
             document.getElementById('resultsSection').classList.remove('hidden');
 
-            // Scroll to results
             setTimeout(() => {
                 document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
             }, 100);
 
-            showToast('Notes generated and audio ready!');
+            showToast('Notes generated successfully!');
+            loadProgress();
         }
 
-        // Copy Notes
-        function copyNotes() {
-            navigator.clipboard.writeText(generatedNotes).then(() => {
-                showToast('Notes copied to clipboard!');
+        function renderNotesWithHighlighting(text) {
+            const container = document.getElementById('notesContent');
+            
+            // Split text into words while preserving whitespace
+            const words = text.split(/(\s+)/);
+            wordElements = [];
+            
+            let html = '';
+            let wordIndex = 0;
+            
+            words.forEach(part => {
+                if (part.match(/^\s+$/)) {
+                    // Whitespace - preserve it
+                    html += part;
+                } else if (part.length > 0) {
+                    // Word - wrap in span
+                    html += `<span class="word" data-index="${wordIndex}">${part}</span>`;
+                    wordIndex++;
+                }
             });
+            
+            container.innerHTML = html;
+            wordElements = container.querySelectorAll('.word');
         }
 
-        // Download Audio
+        // ============================================
+        // AUDIO CONTROLS
+        // ============================================
+        function togglePlayPause() {
+            const audio = document.getElementById('audioPlayer');
+            const playBtn = document.getElementById('playBtn');
+            const playIcon = document.getElementById('playIcon');
+            const pauseIcon = document.getElementById('pauseIcon');
+            
+            if (!currentAudioFile) {
+                showToast('No audio available', true);
+                return;
+            }
+            
+            if (audio.paused) {
+                audio.play();
+                isPlaying = true;
+                playBtn.classList.add('playing');
+                playIcon.classList.add('hidden');
+                pauseIcon.classList.remove('hidden');
+            } else {
+                audio.pause();
+                isPlaying = false;
+                playBtn.classList.remove('playing');
+                playIcon.classList.remove('hidden');
+                pauseIcon.classList.add('hidden');
+            }
+        }
+
+        function updateProgress() {
+            const audio = document.getElementById('audioPlayer');
+            const progress = (audio.currentTime / audio.duration) * 100;
+            document.getElementById('progressFill').style.width = `${progress}%`;
+            document.getElementById('currentTime').textContent = formatTime(audio.currentTime);
+            document.getElementById('totalTime').textContent = formatTime(audio.duration || 0);
+            
+            // Highlight current word based on audio progress
+            highlightCurrentWord(audio.currentTime, audio.duration);
+        }
+
+        function highlightCurrentWord(currentTime, duration) {
+            if (!wordElements.length || !duration) return;
+            
+            // Calculate which word should be highlighted based on audio progress
+            const progress = currentTime / duration;
+            const targetIndex = Math.floor(progress * wordElements.length);
+            
+            if (targetIndex !== currentWordIndex && targetIndex < wordElements.length) {
+                // Remove previous highlight
+                if (currentWordIndex >= 0 && currentWordIndex < wordElements.length) {
+                    wordElements[currentWordIndex].classList.remove('word-highlight');
+                }
+                
+                // Add new highlight
+                currentWordIndex = targetIndex;
+                if (currentWordIndex >= 0 && currentWordIndex < wordElements.length) {
+                    wordElements[currentWordIndex].classList.add('word-highlight');
+                    
+                    // Scroll word into view if needed
+                    wordElements[currentWordIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+        }
+
+        function onAudioEnd() {
+            isPlaying = false;
+            document.getElementById('playBtn').classList.remove('playing');
+            document.getElementById('playIcon').classList.remove('hidden');
+            document.getElementById('pauseIcon').classList.add('hidden');
+            
+            // Remove highlight
+            if (currentWordIndex >= 0 && currentWordIndex < wordElements.length) {
+                wordElements[currentWordIndex].classList.remove('word-highlight');
+            }
+            currentWordIndex = -1;
+        }
+
+        function seekAudio(event) {
+            const audio = document.getElementById('audioPlayer');
+            const rect = event.currentTarget.getBoundingClientRect();
+            const percent = (event.clientX - rect.left) / rect.width;
+            audio.currentTime = percent * audio.duration;
+        }
+
+        function changeSpeed() {
+            const audio = document.getElementById('audioPlayer');
+            const speed = parseFloat(document.getElementById('speedSelect').value);
+            audio.playbackRate = speed;
+        }
+
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return '0:00';
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // ============================================
+        // TOOLS
+        // ============================================
+        async function generateQuestions(type) {
+            if (!generatedNotes) {
+                showToast('Generate notes first', true);
+                return;
+            }
+
+            const qType = type || document.getElementById('questionType')?.value || 'mcq';
+
+            try {
+                const response = await fetch('/generate-questions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ notes: generatedNotes, topic: currentTopic, type: qType })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    const html = data.questions.map(q => `
+                        <div class="p-4 rounded-xl bg-black/20 border border-white/5 mb-3">
+                            <p class="text-sm font-medium">${q.id}. ${q.question}</p>
+                        </div>
+                    `).join('');
+                    
+                    document.getElementById('questionsResult').innerHTML = html;
+                    document.getElementById('questionsResult').classList.remove('hidden');
+                    showToast('Questions generated!');
+                }
+            } catch (error) {
+                showToast('Error generating questions', true);
+            }
+        }
+
+        async function generateFlashcards() {
+            if (!generatedNotes) {
+                showToast('Generate notes first', true);
+                return;
+            }
+
+            try {
+                const response = await fetch('/generate-flashcards', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ notes: generatedNotes, topic: currentTopic })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    flashcards = data.flashcards;
+                    currentFlashcardIndex = 0;
+                    renderFlashcard();
+                    document.getElementById('flashcardsModal').classList.add('show');
+                }
+            } catch (error) {
+                showToast('Error generating flashcards', true);
+            }
+        }
+
+        function renderFlashcard() {
+            if (!flashcards.length) return;
+            
+            const card = flashcards[currentFlashcardIndex];
+            document.getElementById('flashcardsContainer').innerHTML = `
+                <div class="flashcard-premium" onclick="this.classList.toggle('flipped')">
+                    <div class="flashcard-inner">
+                        <div class="flashcard-front">
+                            <p class="text-xs text-purple-400 mb-3 font-semibold uppercase tracking-wider">Question</p>
+                            <p class="font-medium text-lg">${card.question}</p>
+                            <p class="text-xs text-gray-500 mt-6">Tap to reveal answer</p>
+                        </div>
+                        <div class="flashcard-back">
+                            <p class="text-xs text-cyan-400 mb-3 font-semibold uppercase tracking-wider">Answer</p>
+                            <p class="font-medium text-lg">${card.answer}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('flashcardCounter').textContent = `${currentFlashcardIndex + 1}/${flashcards.length}`;
+        }
+
+        function prevFlashcard() {
+            if (currentFlashcardIndex > 0) {
+                currentFlashcardIndex--;
+                renderFlashcard();
+            }
+        }
+
+        function nextFlashcard() {
+            if (currentFlashcardIndex < flashcards.length - 1) {
+                currentFlashcardIndex++;
+                renderFlashcard();
+            }
+        }
+
+        async function explainSimplerText() {
+            const text = document.getElementById('simplifyInput').value;
+            if (!text) return;
+
+            try {
+                const response = await fetch('/explain-simpler', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('simplifyResult').innerHTML = `
+                        <div class="notes-box-premium">
+                            <p class="text-sm text-gray-200">${data.explanation}</p>
+                        </div>
+                    `;
+                    document.getElementById('simplifyResult').classList.remove('hidden');
+                    showToast('Text simplified!');
+                }
+            } catch (error) {
+                showToast('Error simplifying', true);
+            }
+        }
+
+        async function splitPomodoro() {
+            if (!generatedNotes) {
+                showToast('Generate notes first', true);
+                return;
+            }
+
+            const sessions = parseInt(document.getElementById('pomodoroSessions')?.value || 4);
+
+            try {
+                const response = await fetch('/pomodoro-split', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: generatedNotes, session_count: sessions })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    const html = data.sessions.map(s => `
+                        <div class="p-4 rounded-xl bg-black/20 border border-white/5 mb-3">
+                            <p class="text-xs text-red-400 font-semibold mb-2">🍅 Session ${s.id} · ${s.word_count} words</p>
+                            <p class="text-sm text-gray-300">${s.text.substring(0, 150)}...</p>
+                        </div>
+                    `).join('');
+                    
+                    document.getElementById('pomodoroResult').innerHTML = html;
+                    document.getElementById('pomodoroResult').classList.remove('hidden');
+                    showToast(`Split into ${data.session_count} sessions`);
+                }
+            } catch (error) {
+                showToast('Error splitting', true);
+            }
+        }
+
+        async function compareTopics() {
+            const topic1 = document.getElementById('compareTopic1').value.trim();
+            const topic2 = document.getElementById('compareTopic2').value.trim();
+
+            if (!topic1 || !topic2) {
+                showToast('Enter both topics', true);
+                return;
+            }
+
+            try {
+                const response = await fetch('/compare-topics', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ topic1, topic2 })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('comparisonText').textContent = data.comparison;
+                    document.getElementById('compareResult').classList.remove('hidden');
+                    showToast('Comparison complete');
+                }
+            } catch (error) {
+                showToast('Error comparing', true);
+            }
+        }
+
+        // ============================================
+        // BOOKMARKS
+        // ============================================
+        async function addBookmark() {
+            if (!currentTopic) return;
+            
+            const audio = document.getElementById('audioPlayer');
+            const timestamp = audio.currentTime || 0;
+
+            try {
+                const response = await fetch('/bookmark', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ topic: currentTopic, timestamp, note: '' })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    showToast(`Bookmark added${timestamp > 0 ? ' at ' + formatTime(timestamp) : ''}`);
+                    loadBookmarks();
+                }
+            } catch (error) {
+                showToast('Error adding bookmark', true);
+            }
+        }
+
+        async function loadBookmarks() {
+            try {
+                const response = await fetch('/bookmarks');
+                const data = await response.json();
+                bookmarks = data.bookmarks || [];
+            } catch (error) {
+                console.error('Error loading bookmarks');
+            }
+        }
+
+        // ============================================
+        // PROGRESS
+        // ============================================
+        async function loadProgress() {
+            try {
+                const response = await fetch('/progress');
+                const data = await response.json();
+                
+                document.getElementById('totalTopics').textContent = data.total_topics;
+                document.getElementById('totalSessions').textContent = data.total_sessions;
+                document.getElementById('streak').textContent = data.streak;
+                document.getElementById('bookmarksCount').textContent = data.bookmarks_count;
+
+                if (data.recent_topics?.length > 0) {
+                    const html = data.recent_topics.map(t => `
+                        <button onclick="setTopic('${t}'); switchTab('generate')" class="topic-pill text-left w-full">
+                            ${t}
+                        </button>
+                    `).join('');
+                    document.getElementById('recentTopics').innerHTML = html;
+                }
+            } catch (error) {
+                console.error('Error loading progress');
+            }
+        }
+
+        function showProgressModal() {
+            loadProgress();
+            document.getElementById('progressModal').classList.add('show');
+        }
+
+        // ============================================
+        // UTILITIES
+        // ============================================
+        function copyNotes() {
+            navigator.clipboard.writeText(generatedNotes).then(() => showToast('Notes copied!'));
+        }
+
         function downloadAudio() {
             if (currentAudioFile) {
                 const link = document.createElement('a');
                 link.href = currentAudioFile;
-                link.download = 'ai_notes.mp3';
+                link.download = `${currentTopic.replace(/\s+/g, '_')}_notes.mp3`;
                 link.click();
-                showToast('Download started!');
+                showToast('Download started');
+            } else {
+                showToast('No audio to download', true);
             }
         }
 
-        // Reset All
         function resetAll() {
+            // Pause audio first
+            const audio = document.getElementById('audioPlayer');
+            audio.pause();
+            onAudioEnd();
+            
             document.getElementById('topicInput').value = '';
             document.getElementById('resultsSection').classList.add('hidden');
-            document.getElementById('audioPlayer').src = '';
+            document.getElementById('keyConcepts').classList.add('hidden');
             generatedNotes = '';
+            currentTopic = '';
             currentAudioFile = '';
             handleTopicInput();
-            updateSteps(1);
             document.getElementById('topicInput').focus();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // Show Toast
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('show');
+        }
+
+        function showShortcuts() {
+            document.getElementById('shortcutsModal').classList.add('show');
+        }
+
         function showToast(message, isError = false) {
             const toast = document.getElementById('toast');
-            const msgEl = document.getElementById('toastMessage');
-            msgEl.textContent = message;
-            toast.querySelector('svg').style.color = isError ? '#ef4444' : '#10b981';
+            document.getElementById('toastMessage').textContent = message;
+            document.getElementById('toastIcon').style.color = isError ? '#ef4444' : '#10b981';
             toast.classList.add('show');
             setTimeout(() => toast.classList.remove('show'), 3000);
         }
 
-        // Enter key handler
-        document.getElementById('topicInput').addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !document.getElementById('generateBtn').disabled) {
-                generateAndSpeak();
-            }
+        // ============================================
+        // KEYBOARD SHORTCUTS
+        // ============================================
+        function setupKeyboardShortcuts() {
+            document.addEventListener('keydown', (e) => {
+                const tag = document.activeElement.tagName;
+                
+                if (e.key === '?' && !['INPUT', 'TEXTAREA'].includes(tag)) {
+                    e.preventDefault();
+                    showShortcuts();
+                }
+                
+                if (e.key === 'b' && !['INPUT', 'TEXTAREA'].includes(tag)) {
+                    e.preventDefault();
+                    addBookmark();
+                }
+                
+                if (e.key === 'c' && !['INPUT', 'TEXTAREA'].includes(tag) && !e.ctrlKey) {
+                    e.preventDefault();
+                    copyNotes();
+                }
+                
+                if (e.key === ' ' && !['INPUT', 'TEXTAREA'].includes(tag)) {
+                    e.preventDefault();
+                    if (currentAudioFile) togglePlayPause();
+                }
+                
+                if (e.key === 'Escape') {
+                    document.querySelectorAll('.modal-premium.show').forEach(m => m.classList.remove('show'));
+                }
+            });
+        }
+
+        // Close modals on backdrop click
+        document.querySelectorAll('.modal-premium').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) modal.classList.remove('show');
+            });
         });
     </script>
 </body>

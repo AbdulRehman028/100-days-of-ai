@@ -93,8 +93,13 @@ class NotesGenerator:
         """Load GPT-2 model for text generation"""
         try:
             print("📦 Loading GPT-2 model...")
-            self.tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
-            self.model = GPT2LMHeadModel.from_pretrained('gpt2')
+            try:
+                self.tokenizer = GPT2Tokenizer.from_pretrained('gpt2', local_files_only=True)
+                self.model = GPT2LMHeadModel.from_pretrained('gpt2', local_files_only=True)
+            except Exception:
+                print("⚠️ Cached model not found, downloading...")
+                self.tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
+                self.model = GPT2LMHeadModel.from_pretrained('gpt2')
             self.tokenizer.pad_token = self.tokenizer.eos_token
             self.model.config.pad_token_id = self.tokenizer.eos_token_id
             print("✅ GPT-2 model loaded successfully!")
@@ -605,6 +610,7 @@ def generate_and_speak():
     """Generate notes and convert to speech"""
     data = request.json
     topic = data.get('topic', '').strip()
+    mode = data.get('mode', 'both')  # 'notes' or 'both'
     
     if not topic:
         return jsonify({"error": "Please provide a topic"}), 400
@@ -621,20 +627,23 @@ def generate_and_speak():
     if not notes_result["success"]:
         return jsonify({"error": notes_result.get("error")}), 500
     
-    tts_options = {
-        'language': data.get('language', 'en'),
-        'slow': data.get('slow', False),
-        'voice': data.get('voice', 'female_us')
-    }
-    
-    tts_result = tts_engine.convert_to_speech(notes_result["notes"], tts_options)
-    
-    if not tts_result["success"]:
-        return jsonify({"error": tts_result.get("error")}), 500
+    # Only generate audio if mode is 'both'
+    tts_result = None
+    if mode == 'both':
+        tts_options = {
+            'language': data.get('language', 'en'),
+            'slow': data.get('slow', False),
+            'voice': data.get('voice', 'female_us')
+        }
+        
+        tts_result = tts_engine.convert_to_speech(notes_result["notes"], tts_options)
+        
+        if not tts_result["success"]:
+            return jsonify({"error": tts_result.get("error")}), 500
     
     study_tracker.track_topic(topic)
     
-    return jsonify({
+    response = {
         "success": True,
         "topic": topic,
         "notes": notes_result["notes"],
@@ -642,15 +651,28 @@ def generate_and_speak():
         "sections": notes_result["sections"],
         "word_count": notes_result["word_count"],
         "notes_time": notes_result["processing_time"],
-        "audio_file": tts_result["filepath"],
-        "audio_size": tts_result["file_size"],
-        "duration": tts_result["duration"],
-        "tts_time": tts_result["processing_time"],
-        "sentences": tts_result["sentences"],
-        "timestamps": tts_result["timestamps"],
-        "total_time": round(notes_result["processing_time"] + tts_result["processing_time"], 2),
         "options": notes_options
-    })
+    }
+    
+    if tts_result:
+        response.update({
+            "audio_file": tts_result["filepath"],
+            "audio_size": tts_result["file_size"],
+            "duration": tts_result["duration"],
+            "tts_time": tts_result["processing_time"],
+            "sentences": tts_result["sentences"],
+            "timestamps": tts_result["timestamps"],
+            "total_time": round(notes_result["processing_time"] + tts_result["processing_time"], 2),
+        })
+    else:
+        response.update({
+            "audio_file": "",
+            "audio_size": "-",
+            "duration": "-",
+            "total_time": round(notes_result["processing_time"], 2),
+        })
+    
+    return jsonify(response)
 
 
 @app.route('/generate-questions', methods=['POST'])

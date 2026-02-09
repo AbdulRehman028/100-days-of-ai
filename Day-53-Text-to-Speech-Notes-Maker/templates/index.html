@@ -867,24 +867,18 @@
                                 </svg>
                                 Notes Only
                             </button>
-                            <button onclick="setMode('audio')" class="mode-btn" data-mode="audio">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path>
-                                </svg>
-                                Audio Only
-                            </button>
                             <button onclick="setMode('both')" class="mode-btn active" data-mode="both">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                                 </svg>
-                                Both
+                                Notes & Audio
                             </button>
                         </div>
                     </div>
 
                     <!-- Advanced Settings (Hidden by default) -->
                     <div id="advancedSettings" class="hidden mb-6 space-y-4">
-                        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                             <div class="settings-card">
                                 <p class="settings-label">🎭 Tone</p>
                                 <select id="toneSelect" class="select-premium w-full">
@@ -911,29 +905,23 @@
                                     <option value="exam">Exam Notes</option>
                                 </select>
                             </div>
-                            <div class="settings-card">
-                                <p class="settings-label">🎤 Voice</p>
-                                <select id="voiceSelect" class="select-premium w-full">
-                                    <option value="female_us">🇺🇸 US English</option>
-                                    <option value="female_uk">🇬🇧 UK English</option>
-                                    <option value="female_au">🇦🇺 Australian</option>
-                                    <option value="male_in">🇮🇳 Indian</option>
-                                </select>
-                            </div>
                         </div>
                         
                         <div class="flex flex-wrap items-center gap-4">
                             <div class="settings-card flex-1 min-w-[200px]">
-                                <p class="settings-label">🌐 Language</p>
+                                <p class="settings-label">🌐 Language & Voice</p>
                                 <select id="languageSelect" class="select-premium w-full">
-                                    <option value="en">English</option>
-                                    <option value="es">Spanish</option>
-                                    <option value="fr">French</option>
-                                    <option value="de">German</option>
-                                    <option value="hi">Hindi</option>
-                                    <option value="ja">Japanese</option>
-                                    <option value="ko">Korean</option>
-                                    <option value="zh-CN">Chinese</option>
+                                    <option value="en">🇺🇸 English (US)</option>
+                                    <option value="en-uk">🇬🇧 English (UK)</option>
+                                    <option value="en-au">🇦🇺 English (Australian)</option>
+                                    <option value="en-in">🇮🇳 English (Indian)</option>
+                                    <option value="es">🇪🇸 Spanish</option>
+                                    <option value="fr">🇫🇷 French</option>
+                                    <option value="de">🇩🇪 German</option>
+                                    <option value="hi">🇮🇳 Hindi</option>
+                                    <option value="ja">🇯🇵 Japanese</option>
+                                    <option value="ko">🇰🇷 Korean</option>
+                                    <option value="zh-CN">🇨🇳 Chinese</option>
                                 </select>
                             </div>
                             <label class="flex items-center gap-3 cursor-pointer p-4 rounded-xl bg-black/20 border border-white/5">
@@ -1383,7 +1371,6 @@
             // Update button text
             const btnText = document.getElementById('generateBtnText');
             if (mode === 'notes') btnText.textContent = 'Generate Notes Only';
-            else if (mode === 'audio') btnText.textContent = 'Generate Audio Only';
             else btnText.textContent = 'Generate Notes & Audio';
         }
 
@@ -1421,24 +1408,26 @@
             document.getElementById('resultsSection').classList.add('hidden');
             document.getElementById('generateBtn').disabled = true;
 
-            const steps = [
+            // Build steps based on mode
+            let steps = [
                 { text: 'Analyzing your topic...', sub: 'Understanding context and scope' },
-                { text: 'Generating comprehensive notes...', sub: 'AI is crafting your content' },
-                { text: 'Converting to natural speech...', sub: 'Creating audio narration' },
-                { text: 'Finalizing...', sub: 'Almost there!' }
+                { text: 'Generating comprehensive notes...', sub: 'AI is crafting your content' }
             ];
             
-            if (generationMode === 'notes') {
-                steps.splice(2, 1); // Remove audio step
+            if (generationMode === 'both') {
+                steps.push({ text: 'Converting to natural speech...', sub: 'Creating audio narration' });
             }
             
             let step = 0;
+            const totalSteps = steps.length;
             const interval = setInterval(() => {
-                const s = steps[step % steps.length];
-                document.getElementById('loadingText').textContent = s.text;
-                document.getElementById('loadingSubtext').textContent = s.sub;
-                step++;
-            }, 2000);
+                if (step < totalSteps) {
+                    const s = steps[step];
+                    document.getElementById('loadingText').textContent = s.text;
+                    document.getElementById('loadingSubtext').textContent = s.sub;
+                    step++;
+                }
+            }, 3000);
 
             try {
                 const response = await fetch('/generate-and-speak', {
@@ -1451,7 +1440,6 @@
                         difficulty: document.getElementById('difficultySelect')?.value || 'intermediate',
                         language: document.getElementById('languageSelect')?.value || 'en',
                         slow: document.getElementById('slowSpeed')?.checked || false,
-                        voice: document.getElementById('voiceSelect')?.value || 'female_us',
                         mode: generationMode
                     })
                 });
@@ -1527,25 +1515,83 @@
         function renderNotesWithHighlighting(text) {
             const container = document.getElementById('notesContent');
             
-            // Split text into words while preserving whitespace
-            const words = text.split(/(\s+)/);
-            wordElements = [];
+            // Check if text has bullet points (lines starting with - or •)
+            const hasBullets = /^[\-•●▪]/m.test(text) || text.includes('\n-') || text.includes('\n•');
             
-            let html = '';
-            let wordIndex = 0;
+            if (hasBullets) {
+                // Format as proper list with line breaks
+                const lines = text.split('\n');
+                let html = '<div class="notes-formatted">';
+                let wordIndex = 0;
+                
+                lines.forEach((line, lineIdx) => {
+                    const trimmedLine = line.trim();
+                    if (!trimmedLine) {
+                        html += '<br>';
+                        return;
+                    }
+                    
+                    // Check if it's a bullet point
+                    const isBullet = /^[\-•●▪]/.test(trimmedLine);
+                    
+                    if (isBullet) {
+                        html += '<div class="bullet-item" style="display:flex;align-items:flex-start;gap:8px;margin:8px 0;padding-left:8px;">';
+                        html += '<span style="color:#a78bfa;flex-shrink:0;">•</span>';
+                        html += '<span>';
+                        // Remove the bullet character and wrap words
+                        const content = trimmedLine.replace(/^[\-•●▪]\s*/, '');
+                        const words = content.split(/(\s+)/);
+                        words.forEach(part => {
+                            if (part.match(/^\s+$/)) {
+                                html += part;
+                            } else if (part.length > 0) {
+                                html += `<span class="word" data-index="${wordIndex}">${part}</span>`;
+                                wordIndex++;
+                            }
+                        });
+                        html += '</span></div>';
+                    } else {
+                        // Regular paragraph
+                        html += '<p style="margin:12px 0;">';
+                        const words = trimmedLine.split(/(\s+)/);
+                        words.forEach(part => {
+                            if (part.match(/^\s+$/)) {
+                                html += part;
+                            } else if (part.length > 0) {
+                                html += `<span class="word" data-index="${wordIndex}">${part}</span>`;
+                                wordIndex++;
+                            }
+                        });
+                        html += '</p>';
+                    }
+                });
+                
+                html += '</div>';
+                container.innerHTML = html;
+            } else {
+                // Regular text - split into paragraphs
+                const paragraphs = text.split(/\n\n+/);
+                let html = '';
+                let wordIndex = 0;
+                
+                paragraphs.forEach(para => {
+                    if (!para.trim()) return;
+                    html += '<p style="margin:12px 0;">';
+                    const words = para.split(/(\s+)/);
+                    words.forEach(part => {
+                        if (part.match(/^\s+$/)) {
+                            html += ' ';
+                        } else if (part.length > 0) {
+                            html += `<span class="word" data-index="${wordIndex}">${part}</span> `;
+                            wordIndex++;
+                        }
+                    });
+                    html += '</p>';
+                });
+                
+                container.innerHTML = html;
+            }
             
-            words.forEach(part => {
-                if (part.match(/^\s+$/)) {
-                    // Whitespace - preserve it
-                    html += part;
-                } else if (part.length > 0) {
-                    // Word - wrap in span
-                    html += `<span class="word" data-index="${wordIndex}">${part}</span>`;
-                    wordIndex++;
-                }
-            });
-            
-            container.innerHTML = html;
             wordElements = container.querySelectorAll('.word');
         }
 
@@ -1590,9 +1636,10 @@
         }
 
         function highlightCurrentWord(currentTime, duration) {
-            if (!wordElements.length || !duration) return;
+            if (!wordElements.length || !duration || !isPlaying) return;
             
-            // Calculate which word should be highlighted based on audio progress
+            // Sync highlight to actual audio duration and word count
+            // This maps audio progress directly to word position
             const progress = currentTime / duration;
             const targetIndex = Math.floor(progress * wordElements.length);
             
@@ -1606,9 +1653,7 @@
                 currentWordIndex = targetIndex;
                 if (currentWordIndex >= 0 && currentWordIndex < wordElements.length) {
                     wordElements[currentWordIndex].classList.add('word-highlight');
-                    
-                    // Scroll word into view if needed
-                    wordElements[currentWordIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    // NO auto-scroll - let user control scroll
                 }
             }
         }

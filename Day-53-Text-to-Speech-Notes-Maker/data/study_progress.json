@@ -27,6 +27,13 @@
       "dates": [
         "2026-02-08"
       ]
+    },
+    "manipulation techniques": {
+      "count": 2,
+      "last_studied": "2026-02-09",
+      "dates": [
+        "2026-02-09"
+      ]
     }
   },
   "bookmarks": [
@@ -46,6 +53,6 @@
     }
   ],
   "challenges": [],
-  "streak": 1,
-  "last_study": "2026-02-08"
+  "streak": 2,
+  "last_study": "2026-02-09"
 }

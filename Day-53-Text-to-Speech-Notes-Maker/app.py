@@ -1,8 +1,3 @@
-"""
-Day 53: Text-to-Speech Notes Maker - Enhanced Edition
-40+ Features: AI Upgrades, Learning Tools, Audio Enhancements, UX Improvements
-"""
-
 from flask import Flask, render_template, request, jsonify, send_file, session
 from transformers import GPT2LMHeadModel, GPT2Tokenizer
 from gtts import gTTS

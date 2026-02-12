@@ -20,9 +20,7 @@ DATA_DIR = os.path.join(BASE_DIR, 'data')
 os.makedirs(AUDIO_DIR, exist_ok=True)
 os.makedirs(DATA_DIR, exist_ok=True)
 
-# ============================================
 # CONFIGURATION & PRESETS
-# ============================================
 
 TONE_PRESETS = {
     "academic": {

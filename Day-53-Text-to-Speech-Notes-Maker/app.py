@@ -547,10 +547,7 @@ notes_generator = NotesGenerator()
 tts_engine = TextToSpeech()
 study_tracker = StudyTracker()
 
-
-# ============================================
 # ROUTES
-# ============================================
 
 @app.route('/')
 def index():

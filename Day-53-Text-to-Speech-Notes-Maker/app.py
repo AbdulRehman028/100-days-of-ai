@@ -70,7 +70,7 @@ STYLE_TEMPLATES = {
     "flashcard": "Flashcard content for {topic}:\n\nQ: What is {topic}?\nA: {topic} is"
 }
 
-# Voice settings for different TTS option
+# Voice settings for different TTS options
 VOICE_SETTINGS = {
     "female_us": {"lang": "en", "tld": "com"},
     "female_uk": {"lang": "en", "tld": "co.uk"},

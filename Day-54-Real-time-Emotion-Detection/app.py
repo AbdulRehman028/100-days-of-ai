@@ -1,9 +1,3 @@
-"""
-Day 54: Real-time Emotion Detection
-Flask web app that detects emotions from webcam or uploaded images
-using a CNN model with OpenCV face detection.
-"""
-
 import os
 import cv2
 import numpy as np

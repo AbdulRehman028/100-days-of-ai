@@ -1,0 +1,6 @@
+transformers>=4.30.0
+torch>=2.0.0
+imap_tools>=1.0.0
+streamlit>=1.28.0
+sentencepiece>=0.1.99
+accelerate>=0.24.0

@@ -1,13 +1,3 @@
-"""
-Maillim - End-to-End Email Assistant
-Day 55: 100 Days of AI
-
-An intelligent email assistant that uses LLMs to:
-- Triage emails into Urgent, Routine, or Spam
-- Generate context-aware draft responses
-- Analyze and match tone/sentiment
-"""
-
 import streamlit as st
 from transformers import pipeline, AutoTokenizer, AutoModelForSeq2SeqLM
 from imap_tools import MailBox, AND
@@ -15,9 +5,8 @@ from dataclasses import dataclass
 from typing import Optional, List
 import torch
 
-# =====================
 # Data Classes
-# =====================
+
 @dataclass
 class Email:
     """Represents an email message"""
@@ -38,9 +27,8 @@ class TriagedEmail:
     draft_response: Optional[str] = None
 
 
-# =====================
 # Maillim Core Engine
-# =====================
+
 class MaillimEngine:
     """Core AI engine for email processing"""
     
@@ -201,9 +189,8 @@ Draft a polite and helpful response:"""
         )
 
 
-# =====================
 # Email Fetcher (IMAP)
-# =====================
+
 class EmailFetcher:
     """Fetches emails from IMAP server"""
     
@@ -241,9 +228,8 @@ class EmailFetcher:
         return emails
 
 
-# =====================
 # Streamlit UI
-# =====================
+
 def main():
     st.set_page_config(
         page_title="Maillim - Email Assistant",

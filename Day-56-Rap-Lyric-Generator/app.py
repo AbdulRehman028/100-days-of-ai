@@ -305,7 +305,6 @@ Real recognize real, no need to justify
         return stats
 
 
-# ============================================
 # FINE-TUNING ENGINE
 # ============================================
 class FineTuner:
@@ -442,7 +441,6 @@ class FineTuner:
         }
 
 
-# ============================================
 # LYRICS GENERATOR
 # ============================================
 class RapGenerator:
@@ -1107,7 +1105,6 @@ class RapGenerator:
         return {k: v["desc"] for k, v in self.BEAT_STYLES.items()}
 
 
-# ============================================
 # INITIALIZE
 # ============================================
 print("=" * 50)
@@ -1122,7 +1119,6 @@ print(f"\n🌐 Starting server at http://localhost:5000")
 print("=" * 50)
 
 
-# ============================================
 # ROUTES
 # ============================================
 @app.route('/')
@@ -1208,7 +1204,6 @@ def get_themes():
     })
 
 
-# ============================================
 # RUN
 # ============================================
 if __name__ == '__main__':

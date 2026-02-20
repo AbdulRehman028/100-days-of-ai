@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BarsAI — Rap Lyric Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        :root {
+            --primary: #f97316;
+            --primary-light: #fb923c;
+            --primary-dark: #ea580c;
+            --accent: #a855f7;
+            --accent-light: #c084fc;
+            --success: #10b981;
+            --bg: #0a0a0a;
+        }
+
+        body { background: var(--bg); color: white; overflow-x: hidden; }
+
+        /* Animated BG */
+        .bg-anim { position: fixed; inset: 0; z-index: -1; }
+        .bg-anim::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background:
+                radial-gradient(circle at 25% 25%, rgba(249, 115, 22, 0.12) 0%, transparent 45%),
+                radial-gradient(circle at 75% 75%, rgba(168, 85, 247, 0.08) 0%, transparent 45%),
+                radial-gradient(circle at 50% 50%, rgba(249, 115, 22, 0.04) 0%, transparent 60%);
+            animation: pulse 18s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: translate(0,0) scale(1); }
+            50% { transform: translate(-3%,-3%) scale(1.08); }
+        }
+
+        .orb { position: fixed; border-radius: 50%; filter: blur(90px); opacity: 0.4; pointer-events: none; animation: floatOrb 22s ease-in-out infinite; }
+        .orb-1 { width: 350px; height: 350px; background: linear-gradient(135deg, var(--primary), var(--accent)); top: 5%; left: 8%; }
+        .orb-2 { width: 250px; height: 250px; background: linear-gradient(135deg, var(--accent), #ec4899); bottom: 15%; right: 8%; animation-delay: -8s; }
+        @keyframes floatOrb {
+            0%,100% { transform: translate(0,0); }
+            25% { transform: translate(25px,-20px); }
+            50% { transform: translate(-15px,20px); }
+            75% { transform: translate(15px,25px); }
+        }
+
+        /* Glass */
+        .glass {
+            background: linear-gradient(135deg, rgba(255,255,255,.04), rgba(255,255,255,.01));
+            backdrop-filter: blur(40px);
+            border: 1px solid rgba(255,255,255,.06);
+            box-shadow: 0 8px 32px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.04);
+        }
+        .glass:hover { border-color: rgba(249,115,22,.2); }
+
+        /* Inputs */
+        .input-dark {
+            background: rgba(0,0,0,.5);
+            border: 1px solid rgba(255,255,255,.08);
+            border-radius: 14px;
+            padding: 14px 18px;
+            color: white;
+            font-size: 15px;
+            width: 100%;
+            transition: all .3s;
+        }
+        .input-dark:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(249,115,22,.15); }
+        .input-dark::placeholder { color: rgba(255,255,255,.25); }
+
+        .select-dark {
+            background: rgba(0,0,0,.5);
+            border: 1px solid rgba(255,255,255,.08);
+            border-radius: 12px;
+            padding: 12px 40px 12px 16px;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='rgba(255,255,255,0.4)'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+            transition: all .3s;
+        }
+        .select-dark:focus { outline: none; border-color: var(--primary); }
+        .select-dark option { background: #1a1a2e; color: white; }
+
+        /* Buttons */
+        .btn-fire {
+            position: relative;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white; font-weight: 700;
+            padding: 16px 36px; border-radius: 16px; border: none;
+            cursor: pointer; font-size: 16px;
+            overflow: hidden; transition: all .4s cubic-bezier(.4,0,.2,1);
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+        .btn-fire::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,.2), transparent); opacity: 0; transition: opacity .3s; }
+        .btn-fire:hover::before { opacity: 1; }
+        .btn-fire:hover { transform: translateY(-3px); box-shadow: 0 16px 40px rgba(249,115,22,.4); }
+        .btn-fire:active { transform: translateY(-1px); }
+        .btn-fire:disabled { opacity: .4; cursor: not-allowed; transform: none; box-shadow: none; }
+        .btn-fire::after { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,.15), transparent); transition: left .5s; }
+        .btn-fire:hover::after { left: 100%; }
+
+        .btn-ghost {
+            background: rgba(255,255,255,.03);
+            border: 1px solid rgba(255,255,255,.08);
+            color: rgba(255,255,255,.7);
+            padding: 12px 20px; border-radius: 12px;
+            font-weight: 600; font-size: 14px;
+            cursor: pointer; transition: all .3s;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .btn-ghost:hover { background: rgba(249,115,22,.1); border-color: rgba(249,115,22,.3); color: white; }
+
+        .btn-icon {
+            width: 42px; height: 42px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.06);
+            color: rgba(255,255,255,.5); cursor: pointer; transition: all .3s;
+        }
+        .btn-icon:hover { background: rgba(249,115,22,.15); border-color: rgba(249,115,22,.3); color: var(--primary-light); }
+
+        /* Theme pill */
+        .theme-pill {
+            padding: 10px 18px; border-radius: 100px;
+            background: rgba(255,255,255,.02); border: 1px solid rgba(255,255,255,.06);
+            color: rgba(255,255,255,.5); font-size: 13px; font-weight: 600;
+            cursor: pointer; transition: all .3s; white-space: nowrap;
+        }
+        .theme-pill:hover, .theme-pill.active {
+            background: linear-gradient(135deg, rgba(249,115,22,.15), rgba(168,85,247,.1));
+            border-color: rgba(249,115,22,.4);
+            color: white; transform: translateY(-2px);
+        }
+        .theme-pill.active { box-shadow: 0 4px 16px rgba(249,115,22,.3); }
+
+        /* Beat card */
+        .beat-card {
+            padding: 14px 16px; border-radius: 14px;
+            background: rgba(0,0,0,.3); border: 1px solid rgba(255,255,255,.05);
+            cursor: pointer; transition: all .3s; text-align: center;
+        }
+        .beat-card:hover, .beat-card.active {
+            border-color: rgba(168,85,247,.4);
+            background: linear-gradient(135deg, rgba(168,85,247,.12), rgba(249,115,22,.06));
+        }
+        .beat-card.active { box-shadow: 0 4px 20px rgba(168,85,247,.25); }
+        .beat-card .beat-name { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+        .beat-card .beat-desc { font-size: 11px; color: rgba(255,255,255,.4); }
+
+        /* Lyrics box */
+        .lyrics-box {
+            background: linear-gradient(135deg, rgba(249,115,22,.06), rgba(168,85,247,.03));
+            border: 1px solid rgba(249,115,22,.15);
+            border-radius: 24px; padding: 28px; position: relative; overflow: hidden;
+        }
+        .lyrics-box::before {
+            content: ''; position: absolute; top: 0; left: 0;
+            width: 4px; height: 100%;
+            background: linear-gradient(180deg, var(--primary), var(--accent));
+            border-radius: 4px 0 0 4px;
+        }
+        .lyrics-line {
+            padding: 4px 0; line-height: 1.8;
+            font-size: 15px; color: rgba(255,255,255,.85);
+            transition: all .3s;
+        }
+        .lyrics-line:hover { color: white; padding-left: 8px; }
+
+        /* Stat mini */
+        .stat-mini {
+            background: linear-gradient(135deg, rgba(249,115,22,.06), rgba(168,85,247,.03));
+            border: 1px solid rgba(249,115,22,.12);
+            border-radius: 12px; padding: 12px 16px; text-align: center;
+        }
+        .stat-val { font-size: 20px; font-weight: 800; background: linear-gradient(135deg, #fff, var(--primary-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .stat-lbl { font-size: 10px; color: rgba(255,255,255,.35); text-transform: uppercase; letter-spacing: .5px; }
+
+        /* Tabs */
+        .tab-btn {
+            padding: 14px 28px; border-radius: 14px;
+            font-weight: 700; font-size: 14px;
+            color: rgba(255,255,255,.4); background: transparent;
+            border: 1px solid transparent; cursor: pointer; transition: all .3s;
+        }
+        .tab-btn:hover { color: rgba(255,255,255,.7); background: rgba(255,255,255,.02); }
+        .tab-btn.active { color: white; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); box-shadow: 0 8px 24px rgba(249,115,22,.35); }
+
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; animation: fadeUp .4s ease; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Badge */
+        .badge-ai {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 4px 10px; border-radius: 100px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .5px;
+        }
+
+        /* Fine-tune progress */
+        .ft-progress { height: 6px; background: rgba(255,255,255,.08); border-radius: 3px; overflow: hidden; }
+        .ft-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--accent)); border-radius: 3px; transition: width .5s ease; }
+
+        /* Loader */
+        .loader-bars { display: flex; gap: 6px; justify-content: center; align-items: center; }
+        .lbar { width: 4px; height: 36px; background: linear-gradient(180deg, var(--primary), var(--accent)); border-radius: 4px; animation: wave 1s ease-in-out infinite; }
+        .lbar:nth-child(1) { animation-delay: 0s; }
+        .lbar:nth-child(2) { animation-delay: .1s; }
+        .lbar:nth-child(3) { animation-delay: .2s; }
+        .lbar:nth-child(4) { animation-delay: .3s; }
+        .lbar:nth-child(5) { animation-delay: .4s; }
+        @keyframes wave { 0%,100% { transform: scaleY(.3); } 50% { transform: scaleY(1); } }
+
+        /* Toast */
+        .toast {
+            position: fixed; bottom: 28px; right: 28px;
+            padding: 14px 22px; border-radius: 14px;
+            background: linear-gradient(135deg, rgba(10,10,10,.95), rgba(30,30,40,.95));
+            border: 1px solid rgba(255,255,255,.08); backdrop-filter: blur(20px);
+            color: white; font-weight: 600; font-size: 14px;
+            display: flex; align-items: center; gap: 10px;
+            transform: translateY(100px); opacity: 0;
+            transition: all .4s cubic-bezier(.4,0,.2,1); z-index: 1000;
+            box-shadow: 0 16px 40px rgba(0,0,0,.5);
+        }
+        .toast.show { transform: translateY(0); opacity: 1; }
+
+        /* Modal */
+        .modal-bg {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,.8); backdrop-filter: blur(6px);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 1000; opacity: 0; visibility: hidden; transition: all .3s;
+        }
+        .modal-bg.show { opacity: 1; visibility: visible; }
+        .modal-box {
+            background: linear-gradient(135deg, rgba(15,15,20,.98), rgba(25,25,40,.95));
+            border: 1px solid rgba(255,255,255,.08); border-radius: 24px;
+            padding: 28px; max-width: 520px; width: 92%; max-height: 80vh; overflow-y: auto;
+            transform: scale(.92); transition: transform .4s cubic-bezier(.4,0,.2,1);
+            box-shadow: 0 40px 80px rgba(0,0,0,.6);
+        }
+        .modal-bg.show .modal-box { transform: scale(1); }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(249,115,22,.25); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(249,115,22,.4); }
+
+        /* Slider */
+        input[type="range"] {
+            -webkit-appearance: none; width: 100%; height: 6px;
+            background: rgba(255,255,255,.1); border-radius: 3px; outline: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            cursor: pointer; box-shadow: 0 2px 8px rgba(249,115,22,.4);
+        }
+
+        @media (max-width: 640px) {
+            .stat-val { font-size: 16px; }
+            .btn-fire { padding: 14px 20px; font-size: 15px; }
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen">
+    <div class="bg-anim"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+
+    <div class="relative z-10 py-8 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-4xl mx-auto">
+
+            <!-- Header -->
+            <header class="flex items-center justify-between mb-10">
+                <div class="flex items-center gap-4">
+                    <div class="relative">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-500 via-orange-600 to-purple-500 flex items-center justify-center shadow-lg shadow-orange-500/30">
+                            <span class="text-2xl">🎤</span>
+                        </div>
+                        <div class="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-gradient-to-r from-purple-400 to-orange-400 flex items-center justify-center">
+                            <span class="text-[7px] font-black">AI</span>
+                        </div>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-extrabold">
+                            <span class="bg-gradient-to-r from-orange-300 via-white to-purple-300 bg-clip-text text-transparent">Bars</span><span class="text-orange-400">AI</span>
+                        </h1>
+                        <p class="text-[11px] text-gray-500 font-medium">Fine-Tuned Rap Lyric Generator</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="loadStatus()" class="btn-icon" title="Refresh Status">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                    </button>
+                    <div class="badge-ai">
+                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                        GPT-2
+                    </div>
+                    <div id="ftBadge" class="hidden badge-ai" style="background:linear-gradient(135deg,#10b981,#06b6d4);">🔥 Fine-Tuned</div>
+                </div>
+            </header>
+
+            <!-- Tabs -->
+            <div class="glass rounded-2xl p-2 mb-8 flex flex-wrap gap-2">
+                <button onclick="switchTab('generate')" class="tab-btn active" data-tab="generate">🎤 Generate</button>
+                <button onclick="switchTab('finetune')" class="tab-btn" data-tab="finetune">🧠 Fine-Tune</button>
+                <button onclick="switchTab('dataset')" class="tab-btn" data-tab="dataset">📝 Dataset</button>
+            </div>
+
+            <!-- ===================== TAB: GENERATE ===================== -->
+            <div id="tab-generate" class="tab-panel active">
+
+                <!-- Base model notice -->
+                <div id="baseNotice" class="hidden mb-4 rounded-2xl bg-yellow-500/5 border border-yellow-500/15 p-4 flex items-start gap-3">
+                    <span class="text-xl mt-0.5">💡</span>
+                    <div>
+                        <p class="text-sm font-bold text-yellow-300">Using Base GPT-2 Model</p>
+                        <p class="text-xs text-gray-400 mt-1">Output quality will improve dramatically after fine-tuning. Go to the <button onclick="switchTab('finetune')" class="text-purple-400 underline font-bold">Fine-Tune tab</button> to train on rap lyrics!</p>
+                    </div>
+                </div>
+
+                <div class="glass rounded-3xl p-8 mb-8">
+                    <!-- Hero -->
+                    <div class="text-center mb-8">
+                        <h2 class="text-3xl sm:text-4xl font-extrabold mb-2">
+                            <span class="bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">Drop some </span>
+                            <span class="bg-gradient-to-r from-orange-400 to-purple-400 bg-clip-text text-transparent">fire bars</span>
+                        </h2>
+                        <p class="text-gray-400 text-sm">Choose a theme, pick a beat, and let the AI spit 🔥</p>
+                    </div>
+
+                    <!-- Theme Select -->
+                    <div class="mb-6">
+                        <p class="text-[11px] text-gray-500 font-semibold uppercase tracking-wider mb-3 flex items-center gap-2">
+                            <span class="w-1 h-1 rounded-full bg-orange-500"></span> Theme
+                        </p>
+                        <div id="themeGrid" class="flex flex-wrap gap-2"></div>
+                    </div>
+
+                    <!-- Beat Style -->
+                    <div class="mb-6">
+                        <p class="text-[11px] text-gray-500 font-semibold uppercase tracking-wider mb-3 flex items-center gap-2">
+                            <span class="w-1 h-1 rounded-full bg-purple-500"></span> Beat Style
+                        </p>
+                        <div id="beatGrid" class="grid grid-cols-3 sm:grid-cols-6 gap-2"></div>
+                    </div>
+
+                    <!-- Custom Prompt -->
+                    <div class="mb-6">
+                        <p class="text-[11px] text-gray-500 font-semibold uppercase tracking-wider mb-3 flex items-center gap-2">
+                            <span class="w-1 h-1 rounded-full bg-green-500"></span> Custom First Line <span class="text-gray-600">(optional)</span>
+                        </p>
+                        <input type="text" id="customPrompt" class="input-dark" placeholder="e.g., They said I'd never make it but look at me now..." maxlength="200">
+                    </div>
+
+                    <!-- Settings Row -->
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div>
+                            <p class="text-[11px] text-gray-500 font-semibold uppercase mb-2">Lines</p>
+                            <div class="flex items-center gap-3">
+                                <input type="range" id="numLines" min="4" max="32" value="16" oninput="document.getElementById('linesVal').textContent=this.value">
+                                <span id="linesVal" class="text-sm font-bold text-orange-400 w-8 text-center">16</span>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-[11px] text-gray-500 font-semibold uppercase mb-2">Creativity</p>
+                            <div class="flex items-center gap-3">
+                                <input type="range" id="tempSlider" min="50" max="120" value="85" oninput="document.getElementById('tempVal').textContent=(this.value/100).toFixed(2)">
+                                <span id="tempVal" class="text-sm font-bold text-purple-400 w-10 text-center">0.85</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Generate Button -->
+                    <button id="genBtn" onclick="generateLyrics()" class="btn-fire w-full">
+                        <span class="text-xl">🎤</span>
+                        <span id="genBtnText">Generate Bars</span>
+                    </button>
+                </div>
+
+                <!-- Loading -->
+                <div id="loadingState" class="hidden glass rounded-3xl p-12 mb-8 text-center">
+                    <div class="loader-bars mb-6">
+                        <div class="lbar"></div><div class="lbar"></div><div class="lbar"></div><div class="lbar"></div><div class="lbar"></div>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2" id="loadingText">Cooking up bars...</h3>
+                    <p class="text-gray-400 text-sm" id="loadingSub">The AI is in the booth 🎙️</p>
+                </div>
+
+                <!-- Results -->
+                <div id="resultsSection" class="hidden">
+                    <div class="glass rounded-3xl p-8 mb-6">
+                        <!-- Header -->
+                        <div class="flex items-start justify-between mb-5">
+                            <div class="flex items-center gap-3">
+                                <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-orange-500 to-purple-500 flex items-center justify-center">
+                                    <span class="text-lg">🔥</span>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-lg">Generated Bars</h3>
+                                    <p class="text-xs text-gray-400">
+                                        <span id="resTheme" class="text-orange-300">-</span> ·
+                                        <span id="resBeat" class="text-purple-300">-</span>
+                                        <span id="resFT" class="hidden ml-2 text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold">FINE-TUNED</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="copyLyrics()" class="btn-icon" title="Copy"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg></button>
+                                <button onclick="saveLyrics()" class="btn-icon" title="Save"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg></button>
+                                <button onclick="downloadLyrics()" class="btn-icon" title="Download"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg></button>
+                            </div>
+                        </div>
+
+                        <!-- Lyrics -->
+                        <div class="lyrics-box">
+                            <div id="lyricsContent"></div>
+                        </div>
+
+                        <!-- Stats -->
+                        <div class="grid grid-cols-4 gap-3 mt-6 pt-5 border-t border-white/5">
+                            <div class="stat-mini"><div class="stat-val" id="sLines">0</div><div class="stat-lbl">Lines</div></div>
+                            <div class="stat-mini"><div class="stat-val" id="sWords">0</div><div class="stat-lbl">Words</div></div>
+                            <div class="stat-mini"><div class="stat-val" id="sRhymes">0</div><div class="stat-lbl">Rhymes</div></div>
+                            <div class="stat-mini"><div class="stat-val" id="sTime">0s</div><div class="stat-lbl">Time</div></div>
+                        </div>
+
+                        <!-- Analysis -->
+                        <div class="mt-5 pt-5 border-t border-white/5">
+                            <div class="flex items-center gap-4">
+                                <div class="flex-1">
+                                    <p class="text-[10px] text-gray-500 uppercase tracking-wider mb-1">Vocab Richness</p>
+                                    <div class="ft-progress"><div id="vocabBar" class="ft-fill" style="width:0%"></div></div>
+                                </div>
+                                <span id="vocabPct" class="text-sm font-bold text-orange-400">0%</span>
+                                <div class="flex-1">
+                                    <p class="text-[10px] text-gray-500 uppercase tracking-wider mb-1">Avg Syllables/Line</p>
+                                    <div class="text-sm font-bold text-purple-400" id="sSyllables">0</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="grid grid-cols-2 gap-4 mb-8">
+                        <button onclick="generateLyrics()" class="btn-ghost justify-center py-4">
+                            <span class="text-lg">🔄</span> Regenerate
+                        </button>
+                        <button onclick="resetAll()" class="btn-ghost justify-center py-4">
+                            <span class="text-lg">✨</span> New Topic
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===================== TAB: FINE-TUNE ===================== -->
+            <div id="tab-finetune" class="tab-panel">
+                <div class="glass rounded-3xl p-8 mb-6">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center"><span class="text-xl">🧠</span></div>
+                        <div>
+                            <h3 class="font-bold text-lg">Fine-Tune Model</h3>
+                            <p class="text-sm text-gray-400">Train GPT-2 on your rap lyrics dataset</p>
+                        </div>
+                    </div>
+
+                    <!-- Model Status -->
+                    <div class="rounded-2xl bg-black/30 border border-white/5 p-4 mb-6">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs text-gray-500 uppercase font-bold tracking-wider">Model Status</span>
+                            <span id="ftStatus" class="text-xs font-bold px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-400">Base Model</span>
+                        </div>
+                        <p class="text-sm text-gray-300" id="ftModelName">GPT-2 (Base)</p>
+                        <p class="text-xs text-gray-500" id="ftModelSize">-</p>
+                    </div>
+
+                    <!-- Settings -->
+                    <div class="grid sm:grid-cols-3 gap-4 mb-6">
+                        <div>
+                            <p class="text-[11px] text-gray-500 uppercase font-bold mb-2">Epochs</p>
+                            <select id="ftEpochs" class="select-dark w-full">
+                                <option value="1">1 (Quick)</option>
+                                <option value="2">2</option>
+                                <option value="3" selected>3 (Recommended)</option>
+                                <option value="5">5</option>
+                                <option value="10">10 (Deep)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <p class="text-[11px] text-gray-500 uppercase font-bold mb-2">Batch Size</p>
+                            <select id="ftBatch" class="select-dark w-full">
+                                <option value="1">1</option>
+                                <option value="2" selected>2</option>
+                                <option value="4">4</option>
+                            </select>
+                        </div>
+                        <div>
+                            <p class="text-[11px] text-gray-500 uppercase font-bold mb-2">Learning Rate</p>
+                            <select id="ftLR" class="select-dark w-full">
+                                <option value="0.00001">1e-5 (Safe)</option>
+                                <option value="0.00003">3e-5</option>
+                                <option value="0.00005" selected>5e-5 (Default)</option>
+                                <option value="0.0001">1e-4 (Aggressive)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Fine-tune Button -->
+                    <button id="ftBtn" onclick="startFineTune()" class="btn-fire w-full" style="background:linear-gradient(135deg,#a855f7,#7c3aed);">
+                        <span class="text-xl">🧠</span>
+                        <span id="ftBtnText">Start Fine-Tuning</span>
+                    </button>
+
+                    <!-- Progress -->
+                    <div id="ftProgress" class="hidden mt-6">
+                        <div class="flex items-center justify-between text-sm mb-2">
+                            <span class="text-gray-400" id="ftProgressText">Training...</span>
+                            <span class="font-bold text-purple-400" id="ftProgressPct">0%</span>
+                        </div>
+                        <div class="ft-progress"><div id="ftProgressBar" class="ft-fill" style="width:0%"></div></div>
+                    </div>
+
+                    <!-- Training Log -->
+                    <div id="ftLog" class="hidden mt-6">
+                        <p class="text-[11px] text-gray-500 uppercase font-bold tracking-wider mb-3">Training Log</p>
+                        <div id="ftLogEntries" class="space-y-2"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===================== TAB: DATASET ===================== -->
+            <div id="tab-dataset" class="tab-panel">
+                <div class="glass rounded-3xl p-8 mb-6">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center"><span class="text-xl">📝</span></div>
+                        <div>
+                            <h3 class="font-bold text-lg">Lyrics Dataset</h3>
+                            <p class="text-sm text-gray-400">Manage training data for fine-tuning</p>
+                        </div>
+                    </div>
+
+                    <!-- Dataset Stats -->
+                    <div class="grid grid-cols-4 gap-3 mb-6">
+                        <div class="stat-mini"><div class="stat-val" id="dsLines">0</div><div class="stat-lbl">Lines</div></div>
+                        <div class="stat-mini"><div class="stat-val" id="dsWords">0</div><div class="stat-lbl">Words</div></div>
+                        <div class="stat-mini"><div class="stat-val" id="dsThemes">0</div><div class="stat-lbl">Themes</div></div>
+                        <div class="stat-mini"><div class="stat-val" id="dsSize">-</div><div class="stat-lbl">Size</div></div>
+                    </div>
+
+                    <!-- Add Lyrics -->
+                    <div class="rounded-2xl bg-black/20 border border-white/5 p-5">
+                        <p class="text-sm font-bold mb-4 flex items-center gap-2">
+                            <span class="text-lg">➕</span> Add Custom Lyrics
+                        </p>
+                        <div class="mb-4">
+                            <p class="text-[11px] text-gray-500 uppercase font-bold mb-2">Theme</p>
+                            <input type="text" id="addTheme" class="input-dark" placeholder="e.g., Hustle, Love, Dreams...">
+                        </div>
+                        <div class="mb-4">
+                            <p class="text-[11px] text-gray-500 uppercase font-bold mb-2">Lyrics</p>
+                            <textarea id="addLyrics" class="input-dark h-32 resize-none" placeholder="Write or paste your rap lyrics here...&#10;One line per bar..."></textarea>
+                        </div>
+                        <button onclick="addCustomLyrics()" class="btn-fire w-full" style="background:linear-gradient(135deg,#10b981,#059669);">
+                            <span>➕</span> Add to Dataset
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="text-center mt-10 pb-8">
+                <p class="text-gray-600 text-sm">Built with 🔥 using GPT-2 + Hugging Face Transformers</p>
+                <p class="text-gray-700 text-xs mt-1">Day 56 — 100 Days of AI</p>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast">
+        <span id="toastIcon">✅</span>
+        <span id="toastMsg">Success!</span>
+    </div>
+
+    <script>
+        // ============================================
+        // STATE
+        // ============================================
+        let selectedTheme = 'freestyle';
+        let selectedBeat = 'boom_bap';
+        let generatedLyrics = '';
+        let themes = [];
+        let beatStyles = {};
+
+        // ============================================
+        // INIT
+        // ============================================
+        document.addEventListener('DOMContentLoaded', () => {
+            loadStatus();
+        });
+
+        // ============================================
+        // TABS
+        // ============================================
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === `tab-${tab}`));
+        }
+
+        // ============================================
+        // STATUS
+        // ============================================
+        async function loadStatus() {
+            try {
+                const r = await fetch('/status');
+                const d = await r.json();
+
+                // Themes
+                themes = d.themes || [];
+                renderThemes();
+
+                // Beat styles
+                beatStyles = d.beat_styles || {};
+                renderBeats();
+
+                // Model status
+                const m = d.model;
+                document.getElementById('ftModelName').textContent = m.model_name;
+                document.getElementById('ftModelSize').textContent = m.model_size + ' · ' + m.device;
+                if (m.is_fine_tuned) {
+                    document.getElementById('ftStatus').textContent = 'Fine-Tuned ✅';
+                    document.getElementById('ftStatus').className = 'text-xs font-bold px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400';
+                    document.getElementById('ftBadge').classList.remove('hidden');
+                    document.getElementById('baseNotice').classList.add('hidden');
+                } else {
+                    document.getElementById('ftStatus').textContent = 'Base Model';
+                    document.getElementById('ftStatus').className = 'text-xs font-bold px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-400';
+                    document.getElementById('ftBadge').classList.add('hidden');
+                    document.getElementById('baseNotice').classList.remove('hidden');
+                }
+
+                // Training log
+                if (m.training_log?.length > 0) {
+                    document.getElementById('ftLog').classList.remove('hidden');
+                    document.getElementById('ftLogEntries').innerHTML = m.training_log.map(l => `
+                        <div class="rounded-xl bg-black/20 border border-white/5 p-3 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">${l.time}</span>
+                                <span class="font-bold ${l.status==='success' ? 'text-emerald-400' : 'text-red-400'}">${l.status}</span>
+                            </div>
+                            <div class="text-xs text-gray-500 mt-1">Loss: ${l.loss} · ${l.epochs} epochs · ${l.elapsed_seconds}s</div>
+                        </div>
+                    `).join('');
+                }
+
+                // Dataset stats
+                const ds = d.dataset;
+                document.getElementById('dsLines').textContent = ds.total_lines;
+                document.getElementById('dsWords').textContent = ds.total_words;
+                document.getElementById('dsThemes').textContent = ds.themes?.length || 0;
+                document.getElementById('dsSize').textContent = ds.file_size || '-';
+
+            } catch (e) {
+                console.error('Status error:', e);
+            }
+        }
+
+        // ============================================
+        // RENDER THEMES & BEATS
+        // ============================================
+        function renderThemes() {
+            const emojis = {
+                hustle: '💰', 'street life': '🏙️', dreams: '✨', love: '❤️', flex: '💎',
+                struggle: '💪', party: '🎉', legacy: '👑', confidence: '🔥',
+                'night life': '🌙', motivation: '🚀', reality: '🎯', freestyle: '🎤'
+            };
+            const grid = document.getElementById('themeGrid');
+            grid.innerHTML = themes.map(t => `
+                <button class="theme-pill ${t === selectedTheme ? 'active' : ''}" onclick="selectTheme('${t}')">
+                    ${emojis[t] || '🎵'} ${t.charAt(0).toUpperCase() + t.slice(1)}
+                </button>
+            `).join('');
+        }
+
+        function renderBeats() {
+            const icons = { boom_bap: '🥁', trap: '🔊', lo_fi: '☁️', drill: '⚡', old_school: '📻', melodic: '🎶' };
+            const grid = document.getElementById('beatGrid');
+            grid.innerHTML = Object.entries(beatStyles).map(([k, desc]) => `
+                <div class="beat-card ${k === selectedBeat ? 'active' : ''}" onclick="selectBeat('${k}')">
+                    <div class="text-xl mb-1">${icons[k] || '🎵'}</div>
+                    <div class="beat-name">${k.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase())}</div>
+                    <div class="beat-desc">${desc}</div>
+                </div>
+            `).join('');
+        }
+
+        function selectTheme(t) {
+            selectedTheme = t;
+            document.querySelectorAll('.theme-pill').forEach(p => p.classList.toggle('active', p.textContent.trim().toLowerCase().includes(t)));
+        }
+
+        function selectBeat(b) {
+            selectedBeat = b;
+            document.querySelectorAll('.beat-card').forEach(c => c.classList.toggle('active', c.onclick.toString().includes(`'${b}'`)));
+        }
+
+        // ============================================
+        // GENERATE
+        // ============================================
+        async function generateLyrics() {
+            const customPrompt = document.getElementById('customPrompt').value.trim();
+            const numLines = parseInt(document.getElementById('numLines').value);
+            const temperature = parseInt(document.getElementById('tempSlider').value) / 100;
+
+            document.getElementById('genBtn').disabled = true;
+            document.getElementById('loadingState').classList.remove('hidden');
+            document.getElementById('resultsSection').classList.add('hidden');
+
+            const msgs = [
+                { t: 'Cooking up bars...', s: 'The AI is in the booth 🎙️' },
+                { t: 'Finding the flow...', s: 'Matching rhythm to the beat 🥁' },
+                { t: 'Dropping verses...', s: 'Almost ready to spit 🔥' }
+            ];
+            let mi = 0;
+            const interval = setInterval(() => {
+                mi++;
+                if (mi < msgs.length) {
+                    document.getElementById('loadingText').textContent = msgs[mi].t;
+                    document.getElementById('loadingSub').textContent = msgs[mi].s;
+                }
+            }, 2500);
+
+            try {
+                const r = await fetch('/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        theme: selectedTheme,
+                        beat_style: selectedBeat,
+                        num_lines: numLines,
+                        custom_prompt: customPrompt,
+                        temperature: temperature
+                    })
+                });
+                const d = await r.json();
+                clearInterval(interval);
+
+                if (d.error) {
+                    toast(d.error, true);
+                } else {
+                    displayResults(d);
+                }
+            } catch (e) {
+                clearInterval(interval);
+                toast('Generation failed', true);
+                console.error(e);
+            }
+
+            document.getElementById('genBtn').disabled = false;
+            document.getElementById('loadingState').classList.add('hidden');
+        }
+
+        function displayResults(d) {
+            generatedLyrics = d.lyrics;
+
+            // Render lyrics line by line
+            const lines = d.lyrics.split('\n').filter(l => l.trim());
+            document.getElementById('lyricsContent').innerHTML = lines.map((l, i) =>
+                `<div class="lyrics-line" style="animation-delay:${i*0.05}s">${l}</div>`
+            ).join('');
+
+            document.getElementById('resTheme').textContent = d.theme;
+            document.getElementById('resBeat').textContent = d.beat_style;
+            if (d.is_fine_tuned) document.getElementById('resFT').classList.remove('hidden');
+            else document.getElementById('resFT').classList.add('hidden');
+
+            // Stats
+            const a = d.analysis || {};
+            document.getElementById('sLines').textContent = a.line_count || d.num_lines || 0;
+            document.getElementById('sWords').textContent = a.word_count || d.word_count || 0;
+            document.getElementById('sRhymes').textContent = a.rhyme_pairs || 0;
+            document.getElementById('sTime').textContent = (d.generation_time || 0) + 's';
+            document.getElementById('sSyllables').textContent = a.avg_syllables_per_line || 0;
+
+            const vr = a.vocab_richness || 0;
+            document.getElementById('vocabBar').style.width = vr + '%';
+            document.getElementById('vocabPct').textContent = vr + '%';
+
+            document.getElementById('resultsSection').classList.remove('hidden');
+            setTimeout(() => {
+                document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+
+            toast('Bars generated! 🔥');
+        }
+
+        // ============================================
+        // FINE-TUNE
+        // ============================================
+        async function startFineTune() {
+            const epochs = parseInt(document.getElementById('ftEpochs').value);
+            const batchSize = parseInt(document.getElementById('ftBatch').value);
+            const lr = parseFloat(document.getElementById('ftLR').value);
+
+            document.getElementById('ftBtn').disabled = true;
+            document.getElementById('ftBtnText').textContent = 'Training...';
+            document.getElementById('ftProgress').classList.remove('hidden');
+
+            // Simulate progress
+            let pct = 0;
+            const pInterval = setInterval(() => {
+                pct = Math.min(pct + Math.random() * 8, 95);
+                document.getElementById('ftProgressBar').style.width = pct + '%';
+                document.getElementById('ftProgressPct').textContent = Math.round(pct) + '%';
+                if (pct < 30) document.getElementById('ftProgressText').textContent = 'Preparing dataset...';
+                else if (pct < 70) document.getElementById('ftProgressText').textContent = 'Training model...';
+                else document.getElementById('ftProgressText').textContent = 'Almost done...';
+            }, 1000);
+
+            try {
+                const r = await fetch('/fine-tune', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ epochs, batch_size: batchSize, learning_rate: lr })
+                });
+                const d = await r.json();
+                clearInterval(pInterval);
+
+                if (d.success) {
+                    document.getElementById('ftProgressBar').style.width = '100%';
+                    document.getElementById('ftProgressPct').textContent = '100%';
+                    document.getElementById('ftProgressText').textContent = `Done! Loss: ${d.loss} · ${d.elapsed}s`;
+                    toast('Fine-tuning complete! 🧠🔥');
+                    loadStatus();
+                } else {
+                    toast(d.error || 'Fine-tuning failed', true);
+                }
+            } catch (e) {
+                clearInterval(pInterval);
+                toast('Fine-tuning failed', true);
+                console.error(e);
+            }
+
+            document.getElementById('ftBtn').disabled = false;
+            document.getElementById('ftBtnText').textContent = 'Start Fine-Tuning';
+        }
+
+        // ============================================
+        // DATASET
+        // ============================================
+        async function addCustomLyrics() {
+            const theme = document.getElementById('addTheme').value.trim();
+            const lyrics = document.getElementById('addLyrics').value.trim();
+
+            if (!theme || !lyrics) { toast('Enter theme and lyrics', true); return; }
+
+            try {
+                const r = await fetch('/add-lyrics', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ theme, lyrics })
+                });
+                const d = await r.json();
+                if (d.success) {
+                    toast('Lyrics added to dataset! 📝');
+                    document.getElementById('addTheme').value = '';
+                    document.getElementById('addLyrics').value = '';
+                    loadStatus();
+                } else {
+                    toast(d.error || 'Failed', true);
+                }
+            } catch (e) {
+                toast('Error adding lyrics', true);
+            }
+        }
+
+        // ============================================
+        // UTILITIES
+        // ============================================
+        function copyLyrics() {
+            navigator.clipboard.writeText(generatedLyrics).then(() => toast('Copied! 📋'));
+        }
+
+        function saveLyrics() {
+            const saved = JSON.parse(localStorage.getItem('barsai_saved') || '[]');
+            saved.push({ lyrics: generatedLyrics, theme: selectedTheme, beat: selectedBeat, ts: Date.now() });
+            localStorage.setItem('barsai_saved', JSON.stringify(saved));
+            toast('Saved to collection! 🔖');
+        }
+
+        function downloadLyrics() {
+            const blob = new Blob([generatedLyrics], { type: 'text/plain' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `barsai_${selectedTheme}_${Date.now()}.txt`;
+            a.click();
+            toast('Downloaded! 📥');
+        }
+
+        function resetAll() {
+            document.getElementById('customPrompt').value = '';
+            document.getElementById('resultsSection').classList.add('hidden');
+            generatedLyrics = '';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toast(msg, isErr = false) {
+            const t = document.getElementById('toast');
+            document.getElementById('toastMsg').textContent = msg;
+            document.getElementById('toastIcon').textContent = isErr ? '❌' : '✅';
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+    </script>
+</body>
+</html>

@@ -185,7 +185,7 @@ body {
 }
 .slider-row input[type="range"] {
     flex: 1; height: 4px;
-    -webkit-appearance: none;
+    appearance: none;
     background: rgba(255,255,255,0.1);
     border-radius: 4px;
     outline: none;
@@ -290,7 +290,7 @@ body {
     font-weight: 700;
     margin-bottom: 12px;
     background: linear-gradient(135deg, var(--text-primary), var(--accent-1));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text; -webkit-text-fill-color: transparent;
 }
 .story-meta {
     display: flex; flex-wrap: wrap; gap: 12px; align-items: center;

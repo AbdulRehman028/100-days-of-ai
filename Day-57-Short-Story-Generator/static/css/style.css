@@ -366,7 +366,7 @@ body {
     font-size: 1.6rem;
     font-weight: 800;
     background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text; -webkit-text-fill-color: transparent;
 }
 .stat-label {
     font-size: 0.7rem;

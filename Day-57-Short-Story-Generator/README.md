@@ -2,7 +2,7 @@
 
 A **LangChain-powered** short story generator that chains multiple AI prompts to create complete narratives from a simple plot premise.
 
-![alt text](chrome_RpOWCh7mqA.gif)
+![alt text](chrome_QkU4u1haU2.gif)
 
 ## Features
 

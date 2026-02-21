@@ -1,0 +1,8 @@
+flask
+langchain
+langchain-core
+langchain-huggingface
+langchain-community
+transformers
+torch
+numpy

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StoryForge AI — Short Story Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,700;1,500&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<!-- Background -->
+<div class="bg-scene"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="quill-loader"></div>
+    <div class="loading-step" id="loadingStep">Initializing LangChain...</div>
+    <div class="loading-chain-visual">
+        <div class="load-dot" id="dot1"></div>
+        <span style="color: var(--text-secondary); font-size: 0.7rem;">→</span>
+        <div class="load-dot" id="dot2"></div>
+        <span style="color: var(--text-secondary); font-size: 0.7rem;">→</span>
+        <div class="load-dot" id="dot3"></div>
+        <span style="color: var(--text-secondary); font-size: 0.7rem;">→</span>
+        <div class="load-dot" id="dot4"></div>
+    </div>
+    <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 8px;" id="loadingTimer">0.0s</div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Header -->
+<header class="app-header">
+    <div class="app-title">StoryForge AI</div>
+    <div class="app-subtitle">LangChain-Powered Short Story Generator — Chain Prompts, Craft Worlds</div>
+</header>
+
+<!-- Main Layout -->
+<main class="main-layout">
+
+    <!-- ═══════════════════════════════ -->
+    <!-- LEFT: Controls                  -->
+    <!-- ═══════════════════════════════ -->
+    <aside class="controls-panel">
+
+        <!-- Chain Pipeline Status -->
+        <div class="glass-card" style="padding: 16px;">
+            <div class="section-label">LangChain Pipeline</div>
+            <div class="chain-pipeline" id="chainPipeline">
+                <div class="chain-step" data-step="0">
+                    <span>📋</span>Plan
+                </div>
+                <span class="chain-arrow">→</span>
+                <div class="chain-step" data-step="1">
+                    <span>📝</span>Write
+                </div>
+                <span class="chain-arrow">→</span>
+                <div class="chain-step" data-step="2">
+                    <span>✨</span>Title
+                </div>
+                <span class="chain-arrow">→</span>
+                <div class="chain-step" data-step="3">
+                    <span>✅</span>Polish
+                </div>
+            </div>
+        </div>
+
+        <!-- Plot Input -->
+        <div class="glass-card" style="padding: 20px;">
+            <div class="section-label">Your Plot Premise</div>
+            <textarea class="plot-textarea" id="plotInput"
+                placeholder="Describe your story idea...&#10;&#10;Example: A lonely lighthouse keeper discovers messages in bottles from their future self"></textarea>
+            <div style="text-align: right; margin-top: 6px;">
+                <span style="font-size: 0.72rem; color: var(--text-secondary);" id="charCount">0 / 500</span>
+            </div>
+        </div>
+
+        <!-- Genre Select -->
+        <div class="glass-card" style="padding: 20px;">
+            <div class="section-label">Genre</div>
+            <div class="genre-grid" id="genreGrid"></div>
+        </div>
+
+        <!-- Tone & Length -->
+        <div class="glass-card" style="padding: 20px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                <div>
+                    <div class="section-label">Tone</div>
+                    <select class="custom-select" id="toneSelect">
+                        <option value="light">Light & Uplifting</option>
+                        <option value="dark">Dark & Gritty</option>
+                        <option value="suspenseful">Suspenseful</option>
+                        <option value="whimsical">Whimsical</option>
+                        <option value="emotional">Deep & Emotional</option>
+                        <option value="action">Action-Packed</option>
+                    </select>
+                </div>
+                <div>
+                    <div class="section-label">Length</div>
+                    <select class="custom-select" id="lengthSelect">
+                        <option value="flash">Flash (~150 words)</option>
+                        <option value="short" selected>Short (~300 words)</option>
+                        <option value="medium">Medium (~500 words)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Creativity Slider -->
+        <div class="glass-card" style="padding: 20px;">
+            <div class="section-label">Creativity Level</div>
+            <div class="slider-row">
+                <span style="font-size: 0.72rem; color: var(--text-secondary);">Focused</span>
+                <input type="range" id="creativitySlider" min="0.3" max="1.0" step="0.05" value="0.85">
+                <span style="font-size: 0.72rem; color: var(--text-secondary);">Wild</span>
+                <span class="slider-value" id="creativityValue">0.85</span>
+            </div>
+        </div>
+
+        <!-- Generate Button -->
+        <button class="generate-btn" id="generateBtn" onclick="generateStory()">
+            <span class="btn-text">✨ Generate Story</span>
+        </button>
+
+        <!-- Inspiration -->
+        <div class="glass-card" style="padding: 16px;">
+            <div class="section-label">Need Inspiration?</div>
+            <div id="inspirationChips" style="display: flex; flex-wrap: wrap; gap: 4px;"></div>
+        </div>
+
+        <!-- History -->
+        <div class="glass-card" style="padding: 20px;">
+            <div class="section-label">Recent Stories</div>
+            <div id="historyList" style="max-height: 200px; overflow-y: auto;">
+                <div style="font-size: 0.8rem; color: var(--text-secondary); text-align: center; padding: 20px 0;">
+                    No stories yet — generate your first!
+                </div>
+            </div>
+        </div>
+
+    </aside>
+
+    <!-- ═══════════════════════════════ -->
+    <!-- RIGHT: Story Display            -->
+    <!-- ═══════════════════════════════ -->
+    <div class="story-area">
+
+        <!-- Story Card -->
+        <div class="glass-card story-card" id="storyCard">
+            <div class="empty-state" id="emptyState">
+                <div class="empty-icon">📖</div>
+                <div class="empty-text">
+                    Craft your premise, choose a genre,<br>
+                    and let LangChain weave the story.
+                </div>
+                <div style="font-size: 0.75rem; color: var(--text-secondary); max-width: 400px;">
+                    The AI chains 4 steps: Outline → Story → Title → Polish,
+                    creating a unique narrative from your idea.
+                </div>
+            </div>
+
+            <div id="storyDisplay" style="display: none;">
+                <!-- Story Header -->
+                <div class="story-header">
+                    <div class="story-title" id="storyTitle"></div>
+                    <div class="story-meta" id="storyMeta"></div>
+                </div>
+
+                <!-- Outline Accordion -->
+                <div style="margin-bottom: 20px;">
+                    <button class="outline-toggle" onclick="toggleOutline()">
+                        <span>📋 View Story Outline (Chain Step 1)</span>
+                        <span id="outlineArrow">▸</span>
+                    </button>
+                    <div class="outline-content" id="outlineContent">
+                        <div class="outline-text" id="outlineText"></div>
+                    </div>
+                </div>
+
+                <!-- Story Body -->
+                <div class="story-content" id="storyBody"></div>
+
+                <!-- Actions -->
+                <div style="display: flex; gap: 10px; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--glass-border);">
+                    <button class="copy-btn" onclick="copyStory()">📋 Copy Story</button>
+                    <button class="copy-btn" onclick="downloadStory()">💾 Download</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Dashboard -->
+        <div class="glass-card" style="padding: 20px;" id="statsCard" hidden>
+            <div class="section-label">Story Analysis</div>
+            <div class="stats-grid" id="statsGrid"></div>
+        </div>
+
+        <!-- Engine Info -->
+        <div class="glass-card" style="padding: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">Engine</div>
+                    <div style="font-size: 0.85rem; margin-top: 2px;" id="engineInfo">Loading...</div>
+                </div>
+                <div>
+                    <div style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">Device</div>
+                    <div style="font-size: 0.85rem; margin-top: 2px;" id="deviceInfo">—</div>
+                </div>
+                <div>
+                    <div style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">Total Stories</div>
+                    <div style="font-size: 0.85rem; margin-top: 2px;" id="totalStories">0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

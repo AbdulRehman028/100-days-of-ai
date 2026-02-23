@@ -1,23 +1,3 @@
-"""
-Day 57: Short Story Generator (LangChain Chain)
-================================================
-Use LangChain LCEL chains with an instruction-following LLM to generate
-complete short stories from a plot premise.
-
-Tech: Python, LangChain, HuggingFace Transformers (TinyLlama-1.1B-Chat), Flask
-
-Architecture:
-  Chain 1 (Story):  PromptTemplate -> TinyLlama -> StrOutputParser
-  Chain 2 (Title):  PromptTemplate -> TinyLlama -> StrOutputParser
-  + Deterministic outline & post-processing steps
-
-Modules:
-  config.py  — constants, genres, tones, model names
-  seeds.py   — GPT-2 narrative seed openings
-  engine.py  — StoryEngine class (model, chains, generation)
-  app.py     — Flask routes (this file)
-"""
-
 from flask import Flask, render_template, request, jsonify
 
 from config import BASE_DIR, TEMPLATE_DIR, STATIC_DIR, GENRES, TONES, LENGTHS, SAMPLE_PROMPTS

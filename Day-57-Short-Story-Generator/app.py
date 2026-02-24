@@ -4,13 +4,11 @@ from config import BASE_DIR, TEMPLATE_DIR, STATIC_DIR, GENRES, TONES, LENGTHS, S
 from engine import StoryEngine
 
 
-# ============================================
 # FLASK APP
 # ============================================
 app = Flask(__name__, template_folder=str(TEMPLATE_DIR), static_folder=str(STATIC_DIR))
 
 
-# ============================================
 # INIT ENGINE
 # ============================================
 print("=" * 50)
@@ -23,7 +21,6 @@ print(f"\nStarting server at http://localhost:5000")
 print("=" * 50)
 
 
-# ============================================
 # ROUTES
 # ============================================
 @app.route('/')
@@ -75,7 +72,6 @@ def sample_prompts():
     return jsonify({"prompts": SAMPLE_PROMPTS})
 
 
-# ============================================
 # RUN
 # ============================================
 if __name__ == '__main__':

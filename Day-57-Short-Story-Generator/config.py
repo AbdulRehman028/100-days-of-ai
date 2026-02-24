@@ -1,8 +1,3 @@
-"""
-Configuration constants for the Short Story Generator.
-Genres, tones, lengths, settings, protagonists, and model names.
-"""
-
 from pathlib import Path
 
 # ============================================

@@ -1,9 +1,3 @@
-"""
-StoryEngine — LangChain LCEL story generation engine.
-Handles model loading, chain construction, generation pipeline,
-and all post-processing (cleaning, trimming, analysis).
-"""
-
 import re
 import json
 import time

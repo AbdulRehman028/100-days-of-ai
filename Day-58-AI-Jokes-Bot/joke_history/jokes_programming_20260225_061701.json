@@ -1,0 +1,32 @@
+{
+  "jokes": [
+    "Title: Programming Jokesters One-Line Jokes Topics:",
+    "Flying cars Joke: Imagine flying! It's magical, like living on Mars all over again!",
+    "Virtual Reality Jokes: You want VR? We have ARs! The future is here, folks."
+  ],
+  "meta": {
+    "topic": "programming",
+    "style": "one-liner",
+    "style_label": "One-Liner",
+    "style_icon": "💬",
+    "count_requested": 3,
+    "count_generated": 3,
+    "temperature": 0.85,
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "time_seconds": 63.6,
+    "timestamp": "2026-02-25T06:17:01.454355"
+  },
+  "prompt_engineering": {
+    "system_prompt": "You are a world-class stand-up comedian known for razor-sharp one-liners. Write original, clever one-liner jokes that are concise (1-2 sentences max). Each joke must be self-contained, punchy, and end with a surprising twist or punchline. Never repeat the examples. Be creative and original.",
+    "user_prompt": "Here are examples of One-Liner jokes:\n\nTopic: coffee\nJoke: I like my coffee like I like my mornings — dark and impossible to get through without.\n\nTopic: cats\nJoke: Cats are basically tiny furry landlords — they live in your house, judge everything you do, and never pay rent.\n\nNow write exactly 3 original, funny One-Liner jokes about the topic: \"programming\"\n\nNumber each joke. Be creative, surprising, and hilarious. Do not repeat any of the examples above.",
+    "few_shot_count": 2,
+    "technique_used": [
+      "Role-based system prompt",
+      "Few-shot examples (2 per style)",
+      "Numbered output formatting",
+      "Temperature: 0.85",
+      "Repetition penalty: 1.2",
+      "No-repeat 3-gram"
+    ]
+  }
+}

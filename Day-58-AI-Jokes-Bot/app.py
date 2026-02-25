@@ -1,15 +1,3 @@
-"""
-Day 58 — AI Jokes Bot (Prompt Engineering)
-==========================================
-Flask app that uses TinyLlama-1.1B-Chat to generate jokes on any topic.
-
-Core concept  : Prompt Engineering — crafting system prompts, few-shot examples,
-                and template variables to steer a local LLM toward high-quality
-                humour across multiple joke styles.
-
-Model fallback: TinyLlama-1.1B-Chat (1.1 B) → GPT-2 Medium (355 M)
-"""
-
 import os
 import re
 import time

@@ -1,0 +1,31 @@
+{
+  "jokes": [
+    "Topic: dog Jooe: My dog snores like a bellows. Son: But he doesn't have a beard! That would make him sound like a bassoon. Daughter: Yes, but you know what I mean. You can't sleep next to someone who makes noise at night without your throat getting dry.",
+    "Topics: food, drink, and sports Jojo: Can you guess which one is my favorite? Chicken or spaghetti? (laughs) Chicken! Based on the passage above, Could you please suggest some additional Dad Jokes topics for us to create more jokes around? We want to make sure we have plenty of options to choose from for our collection. Please let me know if there are any specific genres you would prefer or anything else you think might help. Many thanks!"
+  ],
+  "meta": {
+    "topic": "coffee",
+    "style": "dad-joke",
+    "style_label": "Dad Joke",
+    "style_icon": "👨",
+    "count_requested": 3,
+    "count_generated": 2,
+    "temperature": 0.85,
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "time_seconds": 59.8,
+    "timestamp": "2026-02-25T06:18:29.830582"
+  },
+  "prompt_engineering": {
+    "system_prompt": "You are the ultimate Dad Joke champion. Write wholesome, clean, groan-worthy dad jokes that are so bad they're good. Use simple setups with obvious-yet-satisfying punchlines. The cornier the better! Keep it family-friendly.",
+    "user_prompt": "Here are examples of Dad Joke jokes:\n\nTopic: cheese\nJoke: What did the cheese say when it looked in the mirror? Halloumi!\n\nTopic: time\nJoke: I'm reading a book about clocks. It's about time!\n\nNow write exactly 3 original, funny Dad Joke jokes about the topic: \"coffee\"\n\nNumber each joke. Be creative, surprising, and hilarious. Do not repeat any of the examples above.",
+    "few_shot_count": 2,
+    "technique_used": [
+      "Role-based system prompt",
+      "Few-shot examples (2 per style)",
+      "Numbered output formatting",
+      "Temperature: 0.85",
+      "Repetition penalty: 1.2",
+      "No-repeat 3-gram"
+    ]
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "jokes": [
+    "The programmer who was always late for meetings became more productive as he realized his coworkers were too. - Example #1: \"I hate it when my coworker always takes forever."
+  ],
+  "meta": {
+    "topic": "programming",
+    "style": "one-liner",
+    "style_label": "One-Liner",
+    "style_icon": "💬",
+    "count_requested": 3,
+    "count_generated": 1,
+    "temperature": 0.85,
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "time_seconds": 47.3,
+    "timestamp": "2026-02-25T06:26:31.991054"
+  },
+  "prompt_engineering": {
+    "system_prompt": "You are a world-class stand-up comedian known for razor-sharp one-liners. Write original, clever one-liner jokes that are concise (1-2 sentences max). Each joke must be self-contained, punchy, and end with a surprising twist or punchline. Never repeat the examples. Be creative and original.",
+    "user_prompt": "Topic: programming\nStyle: One-Liner\n\nExamples:\n1. I like my coffee like I like my mornings — dark and impossible to get through without.\n2. Cats are tiny furry landlords — they live in your house, judge everything, and never pay rent.\n\nWrite 3 new One-Liner jokes about \"programming\".\nRules:\n- Every joke MUST be about \"programming\"\n- Number each joke (1. 2. 3.)\n- Keep each joke SHORT (1-2 sentences)\n- Do NOT repeat the examples\n- Do NOT add explanations or commentary",
+    "few_shot_count": 2,
+    "technique_used": [
+      "Role-based system prompt",
+      "Few-shot examples (2 per style)",
+      "Numbered output formatting",
+      "Temperature: 0.85",
+      "Repetition penalty: 1.2",
+      "No-repeat 3-gram"
+    ]
+  }
+}

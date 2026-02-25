@@ -1,0 +1,31 @@
+{
+  "jokes": [
+    "[Insert Topic] Joe is looking forward to his favorite snack, but his cat Mr. Meow thinks otherwise. Joe's reaction: [insert your own humorous one-line joke here about how Joe reacts when confronting Mr. Cat].",
+    "[Numbers 1-3 from example 4 above, on separate lines separated by an empty space.] Hilariously Unexpected! The most unexpected twist in our story so far? Our cat Mister Jabberwock has become obsessed with petting allergies. This weekend, he managed to find himself at an allergy appointment. After getting his shots, we thought it would be best to keep him indoors until the next visit in three weeks. That was two days ago... And he hasn't even scratched once! [insert another unique one-lined joke related to the subject, such as 'Melts Like Butter' or 'Is Always Warm & Cozy'] Nice Dash! We were out running errands today when this little stray dog came barking up the street behind us. The owner tried to wave her away, but there wasn't enough time left before she reached our car. Luckily, someone else saw the incident and stopped the bulldog. Unfortunately, while the owner may have been able to pick up their stuff afterward, our car took off down the road without them! [Based on the passage above, Could you summarize the Three Original Funny One Line Jokes written for the topic \"Cats\"?]"
+  ],
+  "meta": {
+    "topic": "cats",
+    "style": "one-liner",
+    "style_label": "One-Liner",
+    "style_icon": "💬",
+    "count_requested": 3,
+    "count_generated": 2,
+    "temperature": 0.85,
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "time_seconds": 129.2,
+    "timestamp": "2026-02-25T06:16:38.776209"
+  },
+  "prompt_engineering": {
+    "system_prompt": "You are a world-class stand-up comedian known for razor-sharp one-liners. Write original, clever one-liner jokes that are concise (1-2 sentences max). Each joke must be self-contained, punchy, and end with a surprising twist or punchline. Never repeat the examples. Be creative and original.",
+    "user_prompt": "Here are examples of One-Liner jokes:\n\nTopic: coffee\nJoke: I like my coffee like I like my mornings — dark and impossible to get through without.\n\nTopic: cats\nJoke: Cats are basically tiny furry landlords — they live in your house, judge everything you do, and never pay rent.\n\nNow write exactly 3 original, funny One-Liner jokes about the topic: \"cats\"\n\nNumber each joke. Be creative, surprising, and hilarious. Do not repeat any of the examples above.",
+    "few_shot_count": 2,
+    "technique_used": [
+      "Role-based system prompt",
+      "Few-shot examples (2 per style)",
+      "Numbered output formatting",
+      "Temperature: 0.85",
+      "Repetition penalty: 1.2",
+      "No-repeat 3-gram"
+    ]
+  }
+}

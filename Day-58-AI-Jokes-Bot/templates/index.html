@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Jokes Bot — Prompt Engineering</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<!-- Background -->
+<div class="bg-scene"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-emoji">🎤</div>
+    <div class="loading-step" id="loadingStep">Crafting prompts...</div>
+    <div class="loading-dots">
+        <div class="dot" style="animation-delay: 0s;"></div>
+        <div class="dot" style="animation-delay: 0.2s;"></div>
+        <div class="dot" style="animation-delay: 0.4s;"></div>
+    </div>
+    <div class="loading-timer" id="loadingTimer">0.0s</div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Header -->
+<header class="app-header">
+    <div class="app-title">🎤 AI Jokes Bot</div>
+    <div class="app-subtitle">Prompt Engineering — Craft the perfect prompt, get the perfect joke</div>
+</header>
+
+<!-- Main Layout -->
+<main class="main-layout">
+
+    <!-- ═══════════════════════════════ -->
+    <!-- LEFT PANEL: Controls            -->
+    <!-- ═══════════════════════════════ -->
+    <aside class="controls-panel">
+
+        <!-- Topic Input -->
+        <div class="glass-card" style="padding: 20px;">
+            <div class="section-label">Topic</div>
+            <div class="input-wrapper">
+                <input type="text" class="topic-input" id="topicInput"
+                    placeholder="Enter any topic... (e.g. coffee, cats, programming)"
+                    maxlength="100" autocomplete="off">
+                <span class="char-count" id="charCount">0 / 100</span>
+            </div>
+        </div>
+
+        <!-- Quick Topics -->
+        <div class="glass-card" style="padding: 16px;">
+            <div class="section-label">Quick Topics</div>
+            <div class="topic-chips" id="topicChips"></div>
+        </div>
+
+        <!-- Joke Style -->
+        <div class="glass-card" style="padding: 20px;">
+            <div class="section-label">Joke Style</div>
+            <div class="style-grid" id="styleGrid"></div>
+        </div>
+
+        <!-- Count & Temperature -->
+        <div class="glass-card" style="padding: 20px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div>
+                    <div class="section-label">Number of Jokes</div>
+                    <select class="custom-select" id="countSelect">
+                        <option value="1">1 joke</option>
+                        <option value="2">2 jokes</option>
+                        <option value="3" selected>3 jokes</option>
+                        <option value="5">5 jokes</option>
+                    </select>
+                </div>
+                <div>
+                    <div class="section-label">Creativity</div>
+                    <div class="slider-row">
+                        <input type="range" id="tempSlider" min="0.3" max="1.2" step="0.05" value="0.85">
+                        <span class="slider-value" id="tempValue">0.85</span>
+                    </div>
+                    <div class="slider-labels">
+                        <span>Safe</span><span>Wild</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Generate Button -->
+        <button class="generate-btn" id="generateBtn" onclick="generateJokes()">
+            <span class="btn-text">😂 Generate Jokes</span>
+        </button>
+
+        <!-- History -->
+        <div class="glass-card" style="padding: 20px;">
+            <div class="section-label">Recent Sessions</div>
+            <div id="historyList" class="history-list">
+                <div class="history-empty">No jokes yet — generate your first batch!</div>
+            </div>
+        </div>
+
+    </aside>
+
+    <!-- ═══════════════════════════════ -->
+    <!-- RIGHT PANEL: Output             -->
+    <!-- ═══════════════════════════════ -->
+    <div class="output-area">
+
+        <!-- Jokes Display -->
+        <div class="glass-card joke-card" id="jokeCard">
+            <div class="empty-state" id="emptyState">
+                <div class="empty-icon">🎭</div>
+                <div class="empty-text">Pick a topic, choose a style, and let the AI make you laugh.</div>
+                <div class="empty-sub">
+                    The bot uses <strong>prompt engineering</strong> — crafting system prompts, 
+                    few-shot examples, and structured templates to steer the LLM.
+                </div>
+            </div>
+
+            <div id="jokesDisplay" style="display: none;">
+                <div class="jokes-header">
+                    <div class="jokes-title" id="jokesTitle"></div>
+                    <div class="jokes-meta" id="jokesMeta"></div>
+                </div>
+                <div class="jokes-list" id="jokesList"></div>
+                <div class="joke-actions">
+                    <button class="action-btn" onclick="copyJokes()">📋 Copy All</button>
+                    <button class="action-btn" onclick="downloadJokes()">💾 Download</button>
+                    <button class="action-btn" onclick="regenerate()">🔄 Regenerate</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Prompt Engineering Panel -->
+        <div class="glass-card" id="promptCard" style="padding: 20px;" hidden>
+            <div class="section-label">🔧 Prompt Engineering Breakdown</div>
+            <div class="prompt-breakdown" id="promptBreakdown">
+                <div class="prompt-section">
+                    <div class="prompt-label">System Prompt (Role)</div>
+                    <div class="prompt-text" id="promptSystem"></div>
+                </div>
+                <div class="prompt-section">
+                    <div class="prompt-label">User Prompt (Few-shot + Task)</div>
+                    <div class="prompt-text" id="promptUser"></div>
+                </div>
+                <div class="prompt-section">
+                    <div class="prompt-label">Techniques Applied</div>
+                    <div class="techniques-list" id="techniquesList"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="glass-card" id="statsCard" style="padding: 20px;" hidden>
+            <div class="section-label">Generation Stats</div>
+            <div class="stats-grid" id="statsGrid"></div>
+        </div>
+
+        <!-- Engine Info -->
+        <div class="glass-card" style="padding: 16px;">
+            <div class="engine-info">
+                <div>
+                    <div class="info-label">Model</div>
+                    <div class="info-value" id="engineModel">Loading...</div>
+                </div>
+                <div>
+                    <div class="info-label">Device</div>
+                    <div class="info-value" id="engineDevice">—</div>
+                </div>
+                <div>
+                    <div class="info-label">Total Jokes</div>
+                    <div class="info-value" id="totalJokes">0</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

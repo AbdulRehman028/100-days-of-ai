@@ -9,7 +9,6 @@ from datetime import datetime
 from flask import Flask, render_template, request, jsonify
 from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
 
-# ══════════════════════════════════════════════
 # CONFIG
 # ══════════════════════════════════════════════
 BASE_DIR = Path(__file__).resolve().parent

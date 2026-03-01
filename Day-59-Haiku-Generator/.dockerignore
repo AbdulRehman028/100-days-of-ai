@@ -1,0 +1,14 @@
+# Ignore things that shouldn't go into the Docker image
+__pycache__/
+*.pyc
+*.pyo
+.git/
+.gitignore
+*.png
+*.jpg
+*.jpeg
+hf-deploy/
+haiku_collection/*.json
+.env
+venv/
+.venv/

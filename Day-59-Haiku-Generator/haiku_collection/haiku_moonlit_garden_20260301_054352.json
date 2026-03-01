@@ -1,0 +1,77 @@
+{
+  "haikus": [
+    {
+      "text": "In moonlit gardens wildflowers grow\nBirds sing sweet melodies above\nSilent rustling wind whispers tales",
+      "lines": [
+        "In moonlit gardens wildflowers grow",
+        "Birds sing sweet melodies above",
+        "Silent rustling wind whispers tales"
+      ],
+      "syllables": [
+        9,
+        8,
+        9
+      ],
+      "is_valid_575": false,
+      "score": 29.0
+    },
+    {
+      "text": "In moonlight twilight's glow\nThe winding pathway leads to you\nOrange sunset clouds drift by",
+      "lines": [
+        "In moonlight twilight's glow",
+        "The winding pathway leads to you",
+        "Orange sunset clouds drift by"
+      ],
+      "syllables": [
+        6,
+        8,
+        7
+      ],
+      "is_valid_575": false,
+      "score": 28.0
+    },
+    {
+      "text": "Silently still\nThe moon sits above us all\nA gentle whisper on windswept grasses",
+      "lines": [
+        "Silently still",
+        "The moon sits above us all",
+        "A gentle whisper on windswept grasses"
+      ],
+      "syllables": [
+        4,
+        7,
+        10
+      ],
+      "is_valid_575": false,
+      "score": 23.0
+    }
+  ],
+  "meta": {
+    "theme": "moonlit garden",
+    "mood": "serene",
+    "mood_label": "Serene",
+    "mood_icon": "🌸",
+    "season": "autumn",
+    "season_label": "Autumn",
+    "count_requested": 3,
+    "count_generated": 3,
+    "temperature": 0.8,
+    "attempts": 6,
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "time_seconds": 192.5,
+    "timestamp": "2026-03-01T05:43:52.323730"
+  },
+  "prompt_info": {
+    "system_prompt": "You are a master haiku poet. Write haikus in the traditional 5-7-5 syllable format. Each haiku has exactly 3 lines: first line 5 syllables, second line 7 syllables, third line 5 syllables. Write with vivid imagery and emotional depth. Output ONLY the haiku, nothing else.",
+    "user_prompt": "Write a serene haiku about \"moonlit garden\". Include imagery of autumn (falling leaves).\n\nExample haiku:\nAn old silent pond\nA frog jumps into the pond\nSplash! Silence again\n\nNow write one original haiku about \"moonlit garden\" (5-7-5 syllables, 3 lines only):",
+    "techniques": [
+      "Role-based system prompt (haiku master persona)",
+      "Few-shot example (mood-matched haiku)",
+      "Seasonal kigo imagery (autumn)",
+      "Temperature: 0.8",
+      "Repetition penalty: 1.3",
+      "Multi-attempt best-of-N selection",
+      "Syllable validation (5-7-5)"
+    ]
+  }
+}

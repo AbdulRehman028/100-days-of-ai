@@ -1,0 +1,77 @@
+{
+  "haikus": [
+    {
+      "text": "In candles' golden glow\nFlames dance as lightning strikes\nAs night falls on this scene",
+      "lines": [
+        "In candles' golden glow",
+        "Flames dance as lightning strikes",
+        "As night falls on this scene"
+      ],
+      "syllables": [
+        6,
+        8,
+        6
+      ],
+      "is_valid_575": false,
+      "score": 28.0
+    },
+    {
+      "text": "Infinite warmth spreads\nThrough branches of blooming trees\nTheir leaves tipped by moon's glow",
+      "lines": [
+        "Infinite warmth spreads",
+        "Through branches of blooming trees",
+        "Their leaves tipped by moon's glow"
+      ],
+      "syllables": [
+        5,
+        7,
+        7
+      ],
+      "is_valid_575": false,
+      "score": 28.0
+    },
+    {
+      "text": "The soft light of my candles\nShadows dance on their edges\nAs they sing to me from afar",
+      "lines": [
+        "The soft light of my candles",
+        "Shadows dance on their edges",
+        "As they sing to me from afar"
+      ],
+      "syllables": [
+        7,
+        7,
+        8
+      ],
+      "is_valid_575": false,
+      "score": 24.0
+    }
+  ],
+  "meta": {
+    "theme": "candle flame",
+    "mood": "serene",
+    "mood_label": "Serene",
+    "mood_icon": "🌸",
+    "season": "none",
+    "season_label": "Any",
+    "count_requested": 3,
+    "count_generated": 3,
+    "temperature": 0.8,
+    "attempts": 6,
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "time_seconds": 247.5,
+    "timestamp": "2026-03-01T05:45:10.071521"
+  },
+  "prompt_info": {
+    "system_prompt": "You are a master haiku poet. Write haikus in the traditional 5-7-5 syllable format. Each haiku has exactly 3 lines: first line 5 syllables, second line 7 syllables, third line 5 syllables. Write with vivid imagery and emotional depth. Output ONLY the haiku, nothing else.",
+    "user_prompt": "Write a serene haiku about \"candle flame\".\n\nExample haiku:\nAn old silent pond\nA frog jumps into the pond\nSplash! Silence again\n\nNow write one original haiku about \"candle flame\" (5-7-5 syllables, 3 lines only):",
+    "techniques": [
+      "Role-based system prompt (haiku master persona)",
+      "Few-shot example (mood-matched haiku)",
+      "No season constraint",
+      "Temperature: 0.8",
+      "Repetition penalty: 1.3",
+      "Multi-attempt best-of-N selection",
+      "Syllable validation (5-7-5)"
+    ]
+  }
+}

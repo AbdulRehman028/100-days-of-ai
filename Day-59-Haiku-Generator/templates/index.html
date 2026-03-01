@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Haiku Generator — AI Poetry</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Serif+JP:wght@400;600;700&family=Crimson+Pro:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ink: { 50: '#f7f6f4', 100: '#e8e5df', 200: '#d4cfc5', 300: '#b8b0a2', 400: '#9a8f7f', 500: '#7d7264', 600: '#635a4e', 700: '#4a4339', 800: '#322d26', 900: '#1a1714', 950: '#0d0b09' },
+                        sumi: { DEFAULT: '#1a1714', light: '#2a2520' },
+                        washi: { DEFAULT: '#f7f6f4', dark: '#ebe8e2' },
+                        accent: { DEFAULT: '#c4594a', light: '#d4796c', dark: '#a84030' },
+                        bamboo: '#6b8c5a',
+                        sakura: '#e8a0b4',
+                    },
+                    fontFamily: {
+                        serif: ['Crimson Pro', 'Noto Serif JP', 'serif'],
+                        sans: ['Inter', 'sans-serif'],
+                        jp: ['Noto Serif JP', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="bg-sumi text-ink-100 font-sans min-h-screen overflow-x-hidden">
+
+<!-- Ambient Particles -->
+<div class="particles" id="particles"></div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-brush"></div>
+    <div class="loading-text font-serif text-lg text-ink-200" id="loadingStep">Composing haiku...</div>
+    <div class="loading-dots">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    </div>
+    <div class="text-xs text-ink-400 mt-2" id="loadingTimer">0.0s</div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- HEADER                                      -->
+<!-- ═══════════════════════════════════════════ -->
+<header class="relative z-10 text-center pt-10 pb-4 px-4">
+    <div class="flex items-center justify-center gap-3 mb-2">
+        <div class="h-px w-12 bg-gradient-to-r from-transparent to-ink-600"></div>
+        <span class="text-2xl">🎋</span>
+        <div class="h-px w-12 bg-gradient-to-l from-transparent to-ink-600"></div>
+    </div>
+    <h1 class="font-jp text-4xl md:text-5xl font-bold tracking-tight text-washi">
+        俳句 <span class="text-accent">Haiku</span>
+    </h1>
+    <p class="text-sm text-ink-400 mt-2 font-light tracking-wide">
+        AI-Powered Poetry · 5-7-5 Syllables · Structured Prompt Engineering
+    </p>
+</header>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- MAIN LAYOUT                                 -->
+<!-- ═══════════════════════════════════════════ -->
+<main class="relative z-10 max-w-[1200px] mx-auto px-4 pb-16 grid grid-cols-1 lg:grid-cols-[360px_1fr] gap-6">
+
+    <!-- ─── LEFT: Controls ─────────────────── -->
+    <aside class="flex flex-col gap-4">
+
+        <!-- Theme Input -->
+        <div class="card p-5">
+            <label class="section-label">Theme</label>
+            <div class="relative">
+                <input type="text" id="themeInput" maxlength="80"
+                    class="w-full bg-white/[0.03] border border-ink-700/50 rounded-xl px-4 py-3
+                           text-ink-100 font-serif text-[0.95rem] placeholder-ink-500
+                           focus:outline-none focus:border-accent/50 focus:ring-2 focus:ring-accent/10
+                           transition-all duration-300"
+                    placeholder="Enter a theme... (e.g. moonlit garden)"
+                    autocomplete="off">
+                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[0.65rem] text-ink-500" id="charCount">0/80</span>
+            </div>
+        </div>
+
+        <!-- Inspiration Chips -->
+        <div class="card p-4">
+            <label class="section-label">Inspiration</label>
+            <div class="flex flex-wrap gap-1.5" id="themeChips"></div>
+        </div>
+
+        <!-- Mood Selector -->
+        <div class="card p-5">
+            <label class="section-label">Mood</label>
+            <div class="grid grid-cols-2 gap-2" id="moodGrid"></div>
+        </div>
+
+        <!-- Season Selector -->
+        <div class="card p-5">
+            <label class="section-label">Season (Kigo)</label>
+            <div class="flex gap-2 flex-wrap" id="seasonPills"></div>
+        </div>
+
+        <!-- Count & Temperature -->
+        <div class="card p-5">
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="section-label">Haiku Count</label>
+                    <select id="countSelect"
+                        class="w-full bg-white/[0.03] border border-ink-700/50 rounded-lg px-3 py-2.5
+                               text-ink-200 text-sm focus:outline-none focus:border-accent/50
+                               appearance-none cursor-pointer">
+                        <option value="1">1 haiku</option>
+                        <option value="3" selected>3 haikus</option>
+                        <option value="5">5 haikus</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="section-label">Creativity</label>
+                    <div class="flex items-center gap-2 mt-1">
+                        <input type="range" id="tempSlider" min="0.3" max="1.2" step="0.05" value="0.8"
+                            class="slider flex-1">
+                        <span class="text-xs font-semibold text-accent min-w-[2rem] text-center" id="tempValue">0.80</span>
+                    </div>
+                    <div class="flex justify-between text-[0.6rem] text-ink-500 mt-1">
+                        <span>Focused</span><span>Creative</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Generate Button -->
+        <button id="generateBtn" onclick="window.HaikuApp.generate()"
+            class="w-full py-4 rounded-xl font-serif text-lg font-semibold
+                   bg-gradient-to-r from-accent-dark to-accent text-white
+                   hover:shadow-lg hover:shadow-accent/20 hover:-translate-y-0.5
+                   active:translate-y-0 disabled:opacity-40 disabled:cursor-not-allowed
+                   transition-all duration-300">
+            🎋 Generate Haiku
+        </button>
+
+        <!-- Collection / History -->
+        <div class="card p-5">
+            <label class="section-label">Collection</label>
+            <div id="collectionList" class="max-h-[200px] overflow-y-auto">
+                <div class="text-center text-sm text-ink-500 py-6">Your haiku collection is empty.</div>
+            </div>
+        </div>
+
+    </aside>
+
+    <!-- ─── RIGHT: Output ──────────────────── -->
+    <div class="flex flex-col gap-4">
+
+        <!-- Haiku Display -->
+        <div class="card haiku-card p-8 min-h-[360px]" id="haikuCard">
+
+            <!-- Empty State -->
+            <div id="emptyState" class="flex flex-col items-center justify-center h-full py-12">
+                <div class="text-6xl mb-6 opacity-60">🌸</div>
+                <p class="font-serif text-xl text-ink-200 mb-3 text-center">
+                    Enter a theme and let the AI<br>compose haiku poetry for you.
+                </p>
+                <p class="text-xs text-ink-500 max-w-md text-center leading-relaxed">
+                    Traditional 5-7-5 syllable structure · Multiple mood styles ·
+                    Seasonal <em>kigo</em> imagery · AI-scored & validated
+                </p>
+            </div>
+
+            <!-- Haiku Results -->
+            <div id="haikuDisplay" class="hidden">
+                <div class="flex items-center justify-between mb-8">
+                    <div>
+                        <h2 class="font-serif text-2xl text-washi" id="resultTitle"></h2>
+                        <p class="text-xs text-ink-400 mt-1" id="resultMeta"></p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button class="icon-btn" onclick="window.HaikuApp.copyAll()" title="Copy all">📋</button>
+                        <button class="icon-btn" onclick="window.HaikuApp.download()" title="Download">💾</button>
+                    </div>
+                </div>
+                <div id="haikusContainer" class="space-y-6"></div>
+            </div>
+        </div>
+
+        <!-- Syllable Analysis -->
+        <div class="card p-5 hidden" id="analysisCard">
+            <label class="section-label">Syllable Analysis</label>
+            <div id="analysisContent"></div>
+        </div>
+
+        <!-- Prompt Engineering Panel -->
+        <div class="card p-5 hidden" id="promptCard">
+            <label class="section-label">🔧 Prompt Engineering</label>
+            <div class="space-y-3 mt-3">
+                <div class="prompt-block">
+                    <div class="prompt-label">System Prompt</div>
+                    <div class="prompt-text" id="promptSystem"></div>
+                </div>
+                <div class="prompt-block">
+                    <div class="prompt-label">User Prompt</div>
+                    <div class="prompt-text" id="promptUser"></div>
+                </div>
+                <div>
+                    <div class="prompt-label mb-2">Techniques</div>
+                    <div class="flex flex-wrap gap-1.5" id="techniquesTags"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="card p-5 hidden" id="statsCard">
+            <label class="section-label">Generation Stats</label>
+            <div class="grid grid-cols-4 gap-3 mt-3" id="statsGrid"></div>
+        </div>
+
+        <!-- Engine Footer -->
+        <div class="card p-4">
+            <div class="flex justify-between items-center text-xs">
+                <div>
+                    <span class="text-ink-500">Model:</span>
+                    <span class="text-ink-300 ml-1" id="engineModel">Loading...</span>
+                </div>
+                <div>
+                    <span class="text-ink-500">Device:</span>
+                    <span class="text-ink-300 ml-1" id="engineDevice">—</span>
+                </div>
+                <div>
+                    <span class="text-ink-500">Haikus:</span>
+                    <span class="text-accent font-semibold ml-1" id="totalHaikus">0</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

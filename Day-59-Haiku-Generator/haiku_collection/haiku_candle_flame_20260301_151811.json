@@ -1,0 +1,79 @@
+{
+  "haikus": [
+    {
+      "text": "gentle beckoning\nfade into darkness with ease\nembraces all things",
+      "lines": [
+        "gentle beckoning",
+        "fade into darkness with ease",
+        "embraces all things"
+      ],
+      "syllables": [
+        5,
+        7,
+        5
+      ],
+      "is_valid_575": true,
+      "score": 60.0
+    },
+    {
+      "text": "Candle's glow\nEchoes through this still night air\nalive within its",
+      "lines": [
+        "Candle's glow",
+        "Echoes through this still night air",
+        "alive within its"
+      ],
+      "syllables": [
+        3,
+        7,
+        5
+      ],
+      "is_valid_575": false,
+      "score": 50.5
+    },
+    {
+      "text": "Candle's warm glow\nSoftly dancing on my hearthside\nworld around me fade",
+      "lines": [
+        "Candle's warm glow",
+        "Softly dancing on my hearthside",
+        "world around me fade"
+      ],
+      "syllables": [
+        4,
+        8,
+        5
+      ],
+      "is_valid_575": false,
+      "score": 47.5
+    }
+  ],
+  "meta": {
+    "theme": "candle flame",
+    "mood": "serene",
+    "mood_label": "Serene",
+    "mood_icon": "🌸",
+    "season": "winter",
+    "season_label": "Winter",
+    "count_requested": 3,
+    "count_generated": 3,
+    "temperature": 0.75,
+    "attempts": 10,
+    "actual_attempts": 10,
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "time_seconds": 162.7,
+    "timestamp": "2026-03-01T15:18:11.596475"
+  },
+  "prompt_info": {
+    "system_prompt": "You write haiku poems. A haiku has exactly 3 lines: line 1 has 5 syllables, line 2 has 7 syllables, line 3 has 5 syllables. Write ONLY the 3 lines. No title, no explanation.",
+    "user_prompt": "Write a serene haiku about silence and about candle flame.\n\nExample 1 (5-7-5):\nStill morning dewdrops (5)\nRest upon the lotus leaf (7)\nSunlight slowly wakes (5)\n\nExample 2 (5-7-5):\nAn old silent pond (5)\nA frog jumps in the water (7)\nSplash silence again (5)\n\nNow write a NEW haiku about candle flame (3 short lines):",
+    "techniques": [
+      "Simplified system prompt (fewer rules = better compliance)",
+      "Syllable-annotated few-shot example",
+      "Seasonal kigo imagery (winter)",
+      "Temperature: 0.75",
+      "Repetition penalty: 1.4",
+      "Multi-attempt best-of-N selection (early exit on valid 5-7-5)",
+      "Post-processing: line trimming to target syllable counts",
+      "Syllable validation (5-7-5)"
+    ]
+  }
+}

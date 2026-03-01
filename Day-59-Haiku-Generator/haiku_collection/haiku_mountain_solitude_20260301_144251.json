@@ -1,0 +1,49 @@
+{
+  "haikus": [
+    {
+      "text": "Still water reflects\nThe mountains in perfect peace\nBreathing slowly now",
+      "lines": [
+        "Still water reflects",
+        "The mountains in perfect peace",
+        "Breathing slowly now"
+      ],
+      "syllables": [
+        5,
+        7,
+        5
+      ],
+      "is_valid_575": true,
+      "score": 30.0
+    }
+  ],
+  "meta": {
+    "theme": "mountain solitude",
+    "mood": "serene",
+    "mood_label": "Serene",
+    "mood_icon": "🌸",
+    "season": "none",
+    "season_label": "Any",
+    "count_requested": 3,
+    "count_generated": 1,
+    "temperature": 0.8,
+    "attempts": 8,
+    "actual_attempts": 8,
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "time_seconds": 172.1,
+    "timestamp": "2026-03-01T14:42:51.618600"
+  },
+  "prompt_info": {
+    "system_prompt": "You write haiku poems. A haiku has exactly 3 lines: line 1 has 5 syllables, line 2 has 7 syllables, line 3 has 5 syllables. Write ONLY the 3 lines. No title, no explanation.",
+    "user_prompt": "Write a serene haiku about mountain solitude.\n\nExample 1 (5-7-5):\nAn old silent pond (5)\nA frog jumps in the water (7)\nSplash silence again (5)\n\nExample 2 (5-7-5):\nStill morning dewdrops (5)\nRest upon the lotus leaf (7)\nSunlight slowly wakes (5)\n\nNow write a NEW haiku about mountain solitude (3 short lines):",
+    "techniques": [
+      "Simplified system prompt (fewer rules = better compliance)",
+      "Syllable-annotated few-shot example",
+      "No season constraint",
+      "Temperature: 0.8",
+      "Repetition penalty: 1.4",
+      "Multi-attempt best-of-N selection (early exit on valid 5-7-5)",
+      "Post-processing: line trimming to target syllable counts",
+      "Syllable validation (5-7-5)"
+    ]
+  }
+}

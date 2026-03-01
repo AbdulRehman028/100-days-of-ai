@@ -60,39 +60,41 @@ SAMPLE_THEMES = [
     "broken mirror", "ancient stone", "sleeping cat", "candle flame",
 ]
 
-# ── Few-shot haiku examples ───────────────────
+# ── Few-shot haiku examples (syllable-annotated for clarity) ──
+# Key insight: Annotating syllable counts in examples teaches the model
+# the 5-7-5 pattern far better than just stating the rule.
 HAIKU_EXAMPLES = {
     "serene": [
-        "An old silent pond\nA frog jumps into the pond\nSplash! Silence again",
-        "Gentle morning dew\nRests upon the lotus leaf\nSunlight slowly wakes",
+        "An old silent pond (5)\nA frog jumps in the water (7)\nSplash silence again (5)",
+        "Still morning dewdrops (5)\nRest upon the lotus leaf (7)\nSunlight slowly wakes (5)",
     ],
     "melancholy": [
-        "The light of a candle\nIs transferred to another\nSpring twilight fades",
-        "Empty rocking chair\nStill swaying on the front porch\nEchoes of laughter",
+        "Faded photograph (5)\nSmiles frozen in amber light (7)\nTime moves on without (5)",
+        "Empty rocking chair (5)\nStill swaying on the front porch (7)\nEchoes of laughter (5)",
     ],
     "joyful": [
-        "Spring rain gathers up\nDancing puddles in the lane\nChildren splash and sing",
-        "Sunflower faces\nTurning toward the golden light\nSummer joy abounds",
+        "Spring rain gathers up (5)\nDancing puddles in the lane (7)\nChildren splash and sing (5)",
+        "Bright sunflower face (5)\nTurning toward the golden light (7)\nSummer joy abounds (5)",
     ],
     "mysterious": [
-        "In the twilight rain\nThese brilliant-hued hibiscus\nA lovely sunset",
-        "Fog hides the mountain\nOnly whispers reach my ears\nWhat sleeps in the mist",
+        "Fog hides the mountain (5)\nOnly whispers reach my ears (7)\nWhat sleeps in the mist (5)",
+        "Behind the closed door (5)\nShadows whisper ancient tales (7)\nWho is listening (5)",
     ],
     "nature": [
-        "Over the wintry\nForest winds howl in rage\nWith no leaves to blow",
-        "The crow has flown off\nSwaying in the evening sun\nA leafless willow",
+        "Wind moves through the pines (5)\nA river carves its own path (7)\nNature finds a way (5)",
+        "The crow has flown off (5)\nSwaying in the evening sun (7)\nA leafless willow (5)",
     ],
     "cosmic": [
-        "Stars fall silently\nInto the endless dark sea\nGalaxies are born",
-        "Beyond Saturn's rings\nSilence stretches infinite\nWe are stardust still",
+        "Stars fall silently (5)\nInto the endless dark sea (7)\nGalaxies are born (5)",
+        "Beyond Saturn's rings (5)\nSilence stretches out so far (7)\nWe are stardust still (5)",
     ],
     "love": [
-        "Your hand touches mine\nA thousand words left unspoken\nHearts already know",
-        "Morning coffee shared\nYour laughter fills the kitchen\nThis is everything",
+        "Your hand touches mine (5)\nA thousand words left unsaid (7)\nHearts already know (5)",
+        "Morning coffee shared (5)\nYour laughter fills the kitchen (7)\nThis is everything (5)",
     ],
     "dark": [
-        "Shadows drink the light\nWalls remember every scream\nSilence is the ghost",
-        "Clock hands never stop\nYet the room feels frozen still\nDust collects on dreams",
+        "Shadows drink the light (5)\nWalls remember every scream (7)\nSilence is the ghost (5)",
+        "Clock hands never stop (5)\nYet the room feels frozen still (7)\nDust collects on dreams (5)",
     ],
 }
 
@@ -201,10 +203,10 @@ class HaikuEngine:
 
                 self.pipe = pipeline(
                     "text-generation", model=mdl, tokenizer=tok,
-                    max_new_tokens=120,
-                    temperature=0.8, top_k=40, top_p=0.9,
-                    repetition_penalty=1.3,
-                    no_repeat_ngram_size=2,
+                    max_new_tokens=45,      # Haiku = ~17 words ≈ 25-40 tokens
+                    temperature=0.8, top_k=50, top_p=0.92,
+                    repetition_penalty=1.4,
+                    no_repeat_ngram_size=3,
                     do_sample=True, return_full_text=False,
                     pad_token_id=tok.eos_token_id,
                 )
@@ -218,43 +220,62 @@ class HaikuEngine:
 
     # ── Prompt Building ────────────────────
     def _build_prompt(self, theme, mood, season):
-        """Build a structured prompt for haiku generation."""
+        """
+        Build a structured prompt for haiku generation.
+
+        Key insight from Day 58: Simpler prompts work better with small models.
+        Too many rules confuse them. Show, don't tell.
+        """
         mood_label = MOODS.get(mood, MOODS["serene"])["label"]
         examples = HAIKU_EXAMPLES.get(mood, HAIKU_EXAMPLES["serene"])
         example = random.choice(examples)
 
-        # Pick a seasonal word (kigo) if season specified
-        season_hint = ""
-        if season != "none" and season in SEASONS:
-            kigo = random.choice(SEASONS[season]["kigo"])
-            season_hint = f" Include imagery of {SEASONS[season]['label'].lower()} ({kigo})."
+        # Strip syllable annotations for the output but keep them in prompt
+        # so the model sees the pattern
+        example_annotated = example
+        example_clean = re.sub(r'\s*\(\d+\)', '', example)
 
+        # Pick a seasonal word (kigo) if season specified
+        kigo_word = ""
+        if season != "none" and season in SEASONS:
+            kigo_word = random.choice(SEASONS[season]["kigo"])
+
+        # Simpler system prompt — fewer rules, clearer constraint
         system_msg = (
-            "You are a master haiku poet. Write haikus in the traditional 5-7-5 syllable format. "
-            "Each haiku has exactly 3 lines: first line 5 syllables, second line 7 syllables, "
-            "third line 5 syllables. Write with vivid imagery and emotional depth. "
-            "Output ONLY the haiku, nothing else."
+            "You write haiku poems. A haiku has exactly 3 lines: "
+            "line 1 has 5 syllables, line 2 has 7 syllables, line 3 has 5 syllables. "
+            "Write ONLY the 3 lines. No title, no explanation."
         )
 
+        # Pick a 2nd example (different from first) for reinforcement
+        examples2 = [e for e in HAIKU_EXAMPLES.get(mood, HAIKU_EXAMPLES["serene"]) if e != example]
+        example2_annotated = examples2[0] if examples2 else example
+
         if self.model_type == "tinyllama":
+            # Show 2 annotated examples so model really learns 5-7-5
+            kigo_hint = f" about {kigo_word} and" if kigo_word else ""
             user_msg = (
-                f"Write a {mood_label.lower()} haiku about \"{theme}\".{season_hint}\n\n"
-                f"Example haiku:\n{example}\n\n"
-                f"Now write one original haiku about \"{theme}\" (5-7-5 syllables, 3 lines only):"
+                f"Write a {mood_label.lower()} haiku{kigo_hint} about {theme}.\n\n"
+                f"Example 1 (5-7-5):\n{example_annotated}\n\n"
+                f"Example 2 (5-7-5):\n{example2_annotated}\n\n"
+                f"Now write a NEW haiku about {theme} (3 short lines):"
             )
+            # Output priming: start with a theme-relevant word to keep on-topic
+            # Capitalize first word of theme for natural line start
+            prime_word = theme.split()[0].capitalize()
             prompt = (
                 f"<|system|>\n{system_msg}</s>\n"
                 f"<|user|>\n{user_msg}</s>\n"
-                f"<|assistant|>\n"
+                f"<|assistant|>\n{prime_word}"
             )
         else:
             user_msg = (
-                f"Write a {mood_label.lower()} haiku about \"{theme}\".{season_hint}"
+                f"Write a {mood_label.lower()} haiku about {theme}."
             )
             prompt = (
-                f"Haiku (5-7-5 syllables):\n\n"
-                f"Example:\n{example}\n\n"
-                f"Theme: {theme}\nMood: {mood_label}\n\n"
+                f"Haiku (5-7-5):\n\n"
+                f"Example:\n{example_clean}\n\n"
+                f"Theme: {theme}\n\n"
             )
 
         return prompt, system_msg, user_msg
@@ -272,18 +293,24 @@ class HaikuEngine:
         temperature = max(0.3, min(1.2, temperature))
         count = max(1, min(5, count))
 
-        gen_kwargs = {"temperature": temperature, "max_new_tokens": 80}
+        gen_kwargs = {"temperature": temperature, "max_new_tokens": 45}
 
         all_haikus = []
-        attempts = count + 3  # Generate extras to pick the best
+        attempts = count + 7  # Generate many extras for better selection
 
-        for _ in range(attempts):
+        for attempt_i in range(attempts):
             prompt, system_msg, user_msg = self._build_prompt(theme, mood, season)
             try:
                 raw = self.pipe(prompt, **gen_kwargs)[0]["generated_text"]
+                # Prepend the primed word (first word of theme) since return_full_text=False
+                prime_word = theme.split()[0].capitalize()
+                raw = prime_word + raw
                 haiku = self._extract_haiku(raw)
                 if haiku:
                     lines = haiku.split("\n")
+                    # Try to trim lines to fit 5-7-5
+                    lines = self._trim_lines(lines)
+                    haiku = "\n".join(lines)
                     is_valid, syllables = validate_haiku(lines)
                     all_haikus.append({
                         "text": haiku,
@@ -292,14 +319,26 @@ class HaikuEngine:
                         "is_valid_575": is_valid,
                         "score": self._score_haiku(haiku, theme, is_valid, syllables),
                     })
+                    # Early exit: if we already have enough valid 5-7-5 haikus
+                    valid_count = sum(1 for h in all_haikus if h["is_valid_575"])
+                    if valid_count >= count:
+                        break
             except Exception:
                 continue
 
-        # Sort by score (best first) and pick top `count`
-        all_haikus.sort(key=lambda h: h["score"], reverse=True)
-        selected = all_haikus[:count] if all_haikus else []
+        # Deduplicate by text (same haiku can appear twice)
+        seen_texts = set()
+        unique_haikus = []
+        for h in all_haikus:
+            if h["text"] not in seen_texts:
+                seen_texts.add(h["text"])
+                unique_haikus.append(h)
 
-        # If we got nothing, create a fallback
+        # Sort by score (best first) and pick top `count`
+        unique_haikus.sort(key=lambda h: h["score"], reverse=True)
+        selected = unique_haikus[:count] if unique_haikus else []
+
+        # If we got nothing at all, create a fallback
         if not selected:
             selected = [self._fallback_haiku(theme, mood)]
 
@@ -319,6 +358,7 @@ class HaikuEngine:
                 "count_generated": len(selected),
                 "temperature": temperature,
                 "attempts": attempts,
+                "actual_attempts": attempt_i + 1,
                 "model": self.model_name,
                 "time_seconds": elapsed,
                 "timestamp": datetime.now().isoformat(),
@@ -327,12 +367,13 @@ class HaikuEngine:
                 "system_prompt": system_msg,
                 "user_prompt": user_msg,
                 "techniques": [
-                    "Role-based system prompt (haiku master persona)",
-                    "Few-shot example (mood-matched haiku)",
+                    "Simplified system prompt (fewer rules = better compliance)",
+                    "Syllable-annotated few-shot example",
                     f"Seasonal kigo imagery ({season})" if season != "none" else "No season constraint",
                     f"Temperature: {temperature}",
-                    "Repetition penalty: 1.3",
-                    "Multi-attempt best-of-N selection",
+                    "Repetition penalty: 1.4",
+                    "Multi-attempt best-of-N selection (early exit on valid 5-7-5)",
+                    "Post-processing: line trimming to target syllable counts",
                     "Syllable validation (5-7-5)",
                 ],
             },
@@ -346,10 +387,12 @@ class HaikuEngine:
         """Extract a 3-line haiku from raw LLM output."""
         text = raw.strip()
 
-        # Remove common prefixes
-        text = re.sub(r'^(here\s*(is|are)|sure|okay|haiku|title)[:\s]*', '', text, flags=re.IGNORECASE)
+        # Remove common prefixes the model likes to add
+        text = re.sub(r'^(here\s*(is|are)|sure|okay|haiku|title|poem)[:\s]*', '', text, flags=re.IGNORECASE)
         text = re.sub(r'^\s*"', '', text)
         text = re.sub(r'"\s*$', '', text)
+        # Remove syllable annotations the model might copy from examples
+        text = re.sub(r'\s*\(\d+\)', '', text)
 
         # Try to find 3 lines that look like a haiku
         lines = [l.strip() for l in text.split('\n') if l.strip()]
@@ -358,15 +401,17 @@ class HaikuEngine:
         haiku_lines = []
         for line in lines:
             # Skip if it's a label/instruction
-            if re.match(r'^(line\s*\d|syllable|note|theme|mood|example)', line, re.IGNORECASE):
+            if re.match(r'^(line\s*\d|syllable|note|theme|mood|example|write|new)', line, re.IGNORECASE):
                 continue
-            if len(line) > 60:  # Haiku lines are short
+            if len(line) > 45:  # Haiku lines are short
                 continue
             if line.startswith('(') or line.startswith('['):
                 continue
             # Clean up
             line = re.sub(r'\s*\(.*?\)\s*$', '', line)  # Remove trailing (5 syllables) etc.
-            line = line.strip(' -—*•"\'')
+            line = re.sub(r'^\d+\.\s*', '', line)  # Remove leading numbers "1. "
+            line = re.sub(r'\s*/\s*', ' ', line)  # Remove "/" separators
+            line = line.strip(' -—*•"\',:;')
             if line and len(line) > 1:
                 haiku_lines.append(line)
             if len(haiku_lines) == 3:
@@ -376,26 +421,76 @@ class HaikuEngine:
             return '\n'.join(haiku_lines[:3])
         return None
 
+    # ── Line Trimming ──────────────────────
+    def _trim_lines(self, lines):
+        """
+        Post-process haiku lines to nudge them toward 5-7-5.
+        Tries all contiguous word subsequences to find one matching target.
+        """
+        if len(lines) != 3:
+            return lines
+
+        target = [5, 7, 5]
+        result = []
+
+        for line, tgt in zip(lines, target):
+            syls = count_line_syllables(line)
+
+            if syls == tgt:
+                result.append(line)
+                continue
+
+            words = line.split()
+
+            # If over target, try all contiguous subsets (keep word order)
+            if syls > tgt and len(words) >= 2:
+                best_match = None
+                # Try dropping words from end first (preserves beginning)
+                for end in range(len(words), 1, -1):
+                    for start in range(0, end - 1):
+                        candidate = ' '.join(words[start:end])
+                        if count_line_syllables(candidate) == tgt:
+                            # Prefer longer substrings (more of the original line)
+                            if best_match is None or len(candidate) > len(best_match):
+                                best_match = candidate
+                    if best_match:
+                        break  # Found a match at this length, use it
+
+                if best_match:
+                    result.append(best_match)
+                    continue
+
+            # Can't fix it — keep original
+            result.append(line)
+
+        return result
+
     # ── Scoring ────────────────────────────
     def _score_haiku(self, haiku_text, theme, is_valid, syllables):
-        """Score a haiku for quality ranking."""
+        """Score a haiku for quality ranking. Syllable accuracy dominates."""
         score = 0.0
 
-        # Syllable accuracy (most important)
+        # Syllable accuracy (MOST important — 60% of score)
         if is_valid:
-            score += 50
+            score += 60
         else:
             target = [5, 7, 5]
             for actual, expected in zip(syllables, target):
                 diff = abs(actual - expected)
-                score += max(0, 10 - diff * 3)
+                if diff == 0:
+                    score += 20       # Perfect line
+                elif diff == 1:
+                    score += 10       # Close
+                elif diff == 2:
+                    score += 3        # Okayish
+                # else: 0
 
-        # Theme relevance — check if theme words appear
-        theme_words = set(theme.lower().split())
+        # Theme relevance — check if theme words appear (important!)
+        theme_words = set(w for w in theme.lower().split() if len(w) > 2)
         haiku_lower = haiku_text.lower()
-        for word in theme_words:
-            if word in haiku_lower:
-                score += 5
+        theme_hits = sum(1 for w in theme_words if w in haiku_lower)
+        if theme_words:
+            score += (theme_hits / len(theme_words)) * 15  # Up to 15 points
 
         # Poetic quality heuristics
         # Has imagery (nature words, sensory language)

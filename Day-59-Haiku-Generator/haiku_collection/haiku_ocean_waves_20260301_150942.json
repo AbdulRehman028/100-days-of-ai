@@ -1,0 +1,49 @@
+{
+  "haikus": [
+    {
+      "text": "their thundering tune\nafter wave rolls out of sight\nonto shore below",
+      "lines": [
+        "their thundering tune",
+        "after wave rolls out of sight",
+        "onto shore below"
+      ],
+      "syllables": [
+        5,
+        7,
+        5
+      ],
+      "is_valid_575": true,
+      "score": 62.0
+    }
+  ],
+  "meta": {
+    "theme": "ocean waves",
+    "mood": "nature",
+    "mood_label": "Nature",
+    "mood_icon": "🍃",
+    "season": "summer",
+    "season_label": "Summer",
+    "count_requested": 3,
+    "count_generated": 1,
+    "temperature": 0.8,
+    "attempts": 8,
+    "actual_attempts": 8,
+    "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "time_seconds": 151.5,
+    "timestamp": "2026-03-01T15:09:42.188062"
+  },
+  "prompt_info": {
+    "system_prompt": "You write haiku poems. A haiku has exactly 3 lines: line 1 has 5 syllables, line 2 has 7 syllables, line 3 has 5 syllables. Write ONLY the 3 lines. No title, no explanation.",
+    "user_prompt": "Write a nature haiku about cicadas and about ocean waves.\n\nExample 1 (5-7-5):\nWind moves through the pines (5)\nA river carves its own path (7)\nNature finds a way (5)\n\nExample 2 (5-7-5):\nThe crow has flown off (5)\nSwaying in the evening sun (7)\nA leafless willow (5)\n\nNow write a NEW haiku about ocean waves (3 short lines):",
+    "techniques": [
+      "Simplified system prompt (fewer rules = better compliance)",
+      "Syllable-annotated few-shot example",
+      "Seasonal kigo imagery (summer)",
+      "Temperature: 0.8",
+      "Repetition penalty: 1.4",
+      "Multi-attempt best-of-N selection (early exit on valid 5-7-5)",
+      "Post-processing: line trimming to target syllable counts",
+      "Syllable validation (5-7-5)"
+    ]
+  }
+}

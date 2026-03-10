@@ -1,8 +1,3 @@
-/* ══════════════════════════════════════════════
-   Haiku Generator — App Controller
-   Day 59 · Proper state management pattern
-   ══════════════════════════════════════════════ */
-
 (() => {
     "use strict";
 

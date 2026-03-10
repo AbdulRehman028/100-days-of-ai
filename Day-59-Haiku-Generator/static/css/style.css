@@ -1,8 +1,3 @@
-/* ══════════════════════════════════════════════
-   Haiku Generator — Styles
-   Day 59 · Japanese ink / washi paper aesthetic
-   ══════════════════════════════════════════════ */
-
 /* ── Ambient Particles ─────────────────────── */
 .particles {
     position: fixed; inset: 0; z-index: 0;

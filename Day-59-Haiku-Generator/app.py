@@ -1,12 +1,3 @@
-"""
-Day 59 — Haiku Generator
-=========================
-Flask app that generates haikus on any theme using prompt-engineered
-TinyLlama-1.1B-Chat with syllable validation and post-processing.
-
-Haiku rules: 3 lines — 5 syllables / 7 syllables / 5 syllables
-"""
-
 import re
 import time
 import json
@@ -17,7 +8,6 @@ from datetime import datetime
 from flask import Flask, render_template, request, jsonify
 from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
 
-# ══════════════════════════════════════════════
 # CONFIG
 # ══════════════════════════════════════════════
 BASE_DIR = Path(__file__).resolve().parent
@@ -99,7 +89,6 @@ HAIKU_EXAMPLES = {
 }
 
 
-# ══════════════════════════════════════════════
 # SYLLABLE COUNTER
 # ══════════════════════════════════════════════
 def count_syllables(word):
@@ -160,7 +149,6 @@ def validate_haiku(lines):
     return is_valid, counts
 
 
-# ══════════════════════════════════════════════
 # HAIKU ENGINE
 # ══════════════════════════════════════════════
 class HaikuEngine:
@@ -583,7 +571,6 @@ class HaikuEngine:
         }
 
 
-# ══════════════════════════════════════════════
 # FLASK APP
 # ══════════════════════════════════════════════
 app = Flask(

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Day 60 - Startup Name/Idea Generator</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&family=Outfit:wght@400;500;700;800&display=swap" rel="stylesheet" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        midnight: '#0b1020',
+                        wave: '#111a35',
+                        panel: '#121a2f',
+                        neon: '#00d4ff',
+                        mint: '#2ee6a6',
+                        coral: '#ff6b6b',
+                        fog: '#dbe6ff'
+                    },
+                    fontFamily: {
+                        display: ['Outfit', 'sans-serif'],
+                        body: ['Sora', 'sans-serif'],
+                        mono: ['Space Grotesk', 'monospace']
+                    }
+                }
+            }
+        };
+    </script>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body class="bg-midnight text-fog font-body min-h-screen overflow-x-hidden">
+    <div class="aurora" aria-hidden="true"></div>
+    <div class="grain" aria-hidden="true"></div>
+
+    <div id="toast" class="toast"></div>
+
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loader-ring"></div>
+        <p id="loadingStep" class="text-fog text-sm tracking-wide">Generating startup ideas...</p>
+        <p id="loadingTimer" class="text-fog/50 text-xs mt-2">0.0s</p>
+    </div>
+
+    <header class="relative z-10 max-w-[1280px] mx-auto px-4 md:px-6 pt-8 pb-4">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+            <div>
+                <p class="text-neon text-xs tracking-[0.28em] uppercase font-mono">Day 60 Project</p>
+                <h1 class="text-3xl md:text-5xl font-display font-extrabold mt-1">Startup Name/Idea Generator</h1>
+                <p class="text-fog/70 mt-2 text-sm md:text-base">Creative LLM prompts + auto-generated SVG logos</p>
+            </div>
+            <div class="badge-panel">
+                <div><span class="label">Model</span><span id="modelName" class="value">Loading...</span></div>
+                <div><span class="label">Device</span><span id="deviceName" class="value">-</span></div>
+                <div><span class="label">Generated</span><span id="generatedCount" class="value text-neon">0</span></div>
+            </div>
+        </div>
+    </header>
+
+    <main class="relative z-10 max-w-[1280px] mx-auto px-4 md:px-6 pb-10 grid grid-cols-1 xl:grid-cols-[380px_1fr] gap-6">
+        <aside class="space-y-4">
+            <section class="panel p-5">
+                <p class="section-tag">Core Inputs</p>
+                <div class="space-y-3 mt-3">
+                    <div>
+                        <label class="field-label" for="industrySelect">Industry</label>
+                        <select id="industrySelect" class="field-input"></select>
+                    </div>
+                    <div>
+                        <label class="field-label" for="audienceInput">Target Audience</label>
+                        <input id="audienceInput" class="field-input" type="text" placeholder="e.g. independent restaurants" maxlength="80" />
+                        <div class="text-right text-[11px] text-fog/45 mt-1" id="audienceCount">0/80</div>
+                    </div>
+                    <div>
+                        <label class="field-label" for="constraintsInput">Constraints (optional)</label>
+                        <textarea id="constraintsInput" class="field-input min-h-[86px]" placeholder="e.g. avoid crypto buzzwords, focus on sustainability"></textarea>
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel p-5">
+                <p class="section-tag">Brand Controls</p>
+                <div class="space-y-3 mt-3">
+                    <div>
+                        <label class="field-label" for="toneSelect">Tone</label>
+                        <select id="toneSelect" class="field-input"></select>
+                    </div>
+                    <div>
+                        <label class="field-label" for="logoStyleSelect">Logo Style</label>
+                        <select id="logoStyleSelect" class="field-input"></select>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="field-label" for="countSelect">Idea Count</label>
+                            <select id="countSelect" class="field-input">
+                                <option value="3">3</option>
+                                <option value="5">5</option>
+                                <option value="6" selected>6</option>
+                                <option value="8">8</option>
+                                <option value="10">10</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="field-label" for="tempSlider">Creativity</label>
+                            <div class="flex items-center gap-2 pt-2">
+                                <input type="range" min="0.3" max="1.2" step="0.05" value="0.75" id="tempSlider" class="w-full accent-neon" />
+                                <span id="tempValue" class="text-xs text-neon font-mono w-9 text-right">0.75</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <button id="generateBtn" class="generate-btn" onclick="window.StartupApp.generateIdeas()">Generate Ideas + Logos</button>
+
+            <section class="panel p-5">
+                <p class="section-tag">Prompt Engineering</p>
+                <div class="mt-3 space-y-2">
+                    <div class="prompt-box">
+                        <p class="prompt-title">System Prompt</p>
+                        <p id="systemPrompt" class="prompt-text"></p>
+                    </div>
+                    <div class="prompt-box">
+                        <p class="prompt-title">User Prompt</p>
+                        <p id="userPrompt" class="prompt-text"></p>
+                    </div>
+                    <div id="techniques" class="flex flex-wrap gap-2"></div>
+                </div>
+            </section>
+        </aside>
+
+        <section class="space-y-4">
+            <div class="panel p-5">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                        <p class="section-tag">Results</p>
+                        <h2 id="resultsTitle" class="text-xl font-display font-bold mt-1">No ideas yet</h2>
+                        <p id="resultsMeta" class="text-sm text-fog/60 mt-1">Fill inputs and generate your startup batch.</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button class="ghost-btn" onclick="window.StartupApp.copyBatch()">Copy Batch</button>
+                        <button class="ghost-btn" onclick="window.StartupApp.downloadBatch()">Download JSON</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="resultsGrid" class="grid grid-cols-1 lg:grid-cols-2 gap-4"></div>
+
+            <div id="emptyState" class="panel p-10 text-center">
+                <p class="text-5xl mb-4">🚀</p>
+                <p class="text-lg font-display">Create launch-ready startup concepts in one click.</p>
+                <p class="text-fog/60 mt-2 text-sm">Each idea includes name, tagline, problem/solution, and a generated SVG logo.</p>
+            </div>
+        </section>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

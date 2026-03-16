@@ -1,10 +1,3 @@
-"""
-Day 60 - Startup Name/Idea Generator
-------------------------------------
-End-to-end Flask app using Hugging Face Transformers to generate startup ideas,
-plus deterministic SVG logo generation for each result.
-"""
-
 import json
 import random
 import re

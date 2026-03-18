@@ -1,4 +1,4 @@
-# Day 60 - Startup Name/Idea Generator
+## Day 60 - Startup Name/Idea Generator
 
 Generate startup names and product ideas with creative LLM prompts, then auto-create SVG logos for each concept.
 

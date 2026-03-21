@@ -20,7 +20,7 @@ Generate startup names and product ideas with creative LLM prompts, then auto-cr
 - Torch
 - Tailwind CSS + Vanilla JS
 
-## Run
+### Run
 
 cd Day-60-Startup-Name-Idea-Generator
 pip install -r requirements.txt

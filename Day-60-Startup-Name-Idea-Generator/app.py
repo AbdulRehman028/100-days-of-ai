@@ -383,7 +383,6 @@ def history_route():
 
 
 if __name__ == "__main__":
-    print("=" * 52)
     print(" Day 60 - Startup Name/Idea Generator")
     print("=" * 52)
     print(f"Model: {engine.model_name}")

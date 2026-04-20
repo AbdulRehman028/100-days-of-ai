@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Day 62 - Document QA System</title>
+    <style>
+      :root {
+        --bg: #f2efe7;
+        --panel: #fffaf0;
+        --ink: #1f2937;
+        --muted: #6b7280;
+        --accent: #0f766e;
+        --accent-2: #a16207;
+        --border: #d6d3d1;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at 20% 10%, #fde68a55 0, #00000000 35%),
+          radial-gradient(circle at 80% 85%, #99f6e455 0, #00000000 30%),
+          var(--bg);
+      }
+      .container {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 28px 16px 44px;
+      }
+      .card {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 18px;
+        margin-bottom: 16px;
+      }
+      h1 {
+        margin: 0;
+        font-size: 2rem;
+      }
+      p {
+        color: var(--muted);
+      }
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+      }
+      input[type="file"],
+      input[type="text"],
+      input[type="number"] {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+      }
+      button {
+        margin-top: 10px;
+        border: 0;
+        border-radius: 10px;
+        padding: 10px 14px;
+        color: white;
+        font-weight: 600;
+        background: linear-gradient(120deg, var(--accent), var(--accent-2));
+        cursor: pointer;
+      }
+      .row {
+        display: grid;
+        gap: 12px;
+        grid-template-columns: 1fr;
+      }
+      pre {
+        white-space: pre-wrap;
+        word-break: break-word;
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 12px;
+      }
+      @media (min-width: 760px) {
+        .row {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="card">
+        <h1>Document QA System</h1>
+        <p>Upload PDFs/DOCX and ask grounded questions with references only from your documents.</p>
+      </div>
+
+      <div class="row">
+        <div class="card">
+          <label for="docs">Upload documents</label>
+          <input id="docs" type="file" multiple accept=".pdf,.docx" />
+          <button id="uploadBtn">Upload + Index</button>
+        </div>
+
+        <div class="card">
+          <label for="question">Ask a question</label>
+          <input id="question" type="text" placeholder="What is the refund policy?" />
+          <label for="topk">Top K</label>
+          <input id="topk" type="number" value="5" min="1" max="12" />
+          <button id="askBtn">Ask</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <label>Result</label>
+        <pre id="result">No output yet.</pre>
+      </div>
+    </div>
+
+    <script>
+      const resultEl = document.getElementById("result");
+
+      document.getElementById("uploadBtn").addEventListener("click", async () => {
+        const input = document.getElementById("docs");
+        if (!input.files.length) {
+          resultEl.textContent = "Select at least one file.";
+          return;
+        }
+
+        const formData = new FormData();
+        for (const f of input.files) {
+          formData.append("files", f);
+        }
+
+        resultEl.textContent = "Uploading and indexing...";
+        const res = await fetch("/api/upload", { method: "POST", body: formData });
+        const data = await res.json();
+        resultEl.textContent = JSON.stringify(data, null, 2);
+      });
+
+      document.getElementById("askBtn").addEventListener("click", async () => {
+        const question = document.getElementById("question").value.trim();
+        const topK = Number(document.getElementById("topk").value || 5);
+        if (!question) {
+          resultEl.textContent = "Enter a question.";
+          return;
+        }
+
+        resultEl.textContent = "Searching and answering...";
+        const res = await fetch("/api/ask", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ question, top_k: topK })
+        });
+
+        const data = await res.json();
+        resultEl.textContent = JSON.stringify(data, null, 2);
+      });
+    </script>
+  </body>
+</html>
